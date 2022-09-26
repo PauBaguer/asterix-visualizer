@@ -14,6 +14,16 @@ export function initializeMap() {
         basemap: "hybrid",
         ground: "world-elevation",
       }),
+      camera: {
+        heading: 0,
+        position: {
+          // observation point
+          latitude: 41.25,
+          longitude: 2.08,
+          z: 3750, // zoom level
+        },
+        tilt: 50, // perspective in degrees
+      },
       spatialReference: SpatialReference.WGS84,
 
       // The id of a DOM element (may also be an actual DOM element)
