@@ -20,10 +20,16 @@ export function loadGroundLayer(map: Map) {
     }),
     symbol: symbol,
   });
+
+  const target = new Graphic({
+    geometry: new Point({ latitude: 41.30478992335686, longitude: 2.0985281688751427 }),
+    symbol: symbol,
+  });
+
   groundLayer = new GraphicsLayer();
   groundLayer.elevationInfo = { mode: "on-the-ground" };
 
-  groundLayer.add(graphic);
+  groundLayer.addMany([graphic, target]);
   map.add(groundLayer);
 
   const point: Point = graphic.geometry as Point;

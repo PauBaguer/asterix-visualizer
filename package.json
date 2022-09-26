@@ -63,7 +63,8 @@
     "@arcgis/core": "^4.24.7",
     "electron-log": "^4.3.5",
     "electron-store": "^8.0.0",
-    "electron-updater": "^5.2.1"
+    "electron-updater": "^5.2.1",
+    "geolib": "^3.3.3"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.2",
