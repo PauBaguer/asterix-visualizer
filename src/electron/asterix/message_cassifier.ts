@@ -1,4 +1,6 @@
 import { Cat10 } from './cat10_decoder';
+import { parseCartesianCoordinate, parsePolarCoordinate } from "./cat10_msg_parser";
+
 export function sliceMainBuffer(buffer: Buffer) {
   let start = 0;
   let end = 0;
@@ -29,24 +31,24 @@ export function sliceMainBuffer(buffer: Buffer) {
   // console.log({ cat_21: cat21msg.length });
   let a = 0;
   cat10msg.forEach(async msg => {
-    if (true) {
+    if (a <= 4) {
       console.log("MESSAGE " + a);
       const fspec = BigInt('0x' + msg.slice(3, 7).toString('hex')).toString(2).padStart(4 * 8, '0').split('');
 
       let count = 7;
       let found = false;
-      let offset = fspec.filter((value, index) => {
-        if ((index == count) && !found) {
-          if (value != '1') {
-            found = true;
-          } else {
-            count += 8;
+      let offset =
+        fspec.filter((value, index) => {
+          if (index == count && !found) {
+            if (value != "1") {
+              found = true;
+            } else {
+              count += 8;
+            }
+            return true;
           }
-          return true;
-        }
-        return
-
-      }).length + 3;
+          return;
+        }).length + 3;
       console.log("length fspec " + offset);
 
       var decod_msg: Cat10 = new Cat10(a);
@@ -91,33 +93,41 @@ export function sliceMainBuffer(buffer: Buffer) {
       /// "I010/140 Time of Day"
       tasks.push(decod_msg.set_time_of_day(msg.slice(offset, offset + 3)));
       offset += 3; //length =3
+      // **********************
       if (fspec[4] === '1') {
         console.log("I010/041 Position in WGS-84 Co-ordinates")
         console.log("	" + msg.slice(offset, offset + 8).toString('hex'));
         offset += 8;
         //length =8
-      } if (fspec[5] === '1') {
-        console.log("I010/040 Measured Position in Polar Co-ordinates")
-        console.log("	" + msg.slice(offset, offset + 4).toString('hex'));
+      }
+      if (fspec[5] === "1") {
+        console.log("I010/040 Measured Position in Polar Co-ordinates");
+        const buff = msg.slice(offset, offset + 4);
+        console.log("	" + buff.toString("hex"));
+        parsePolarCoordinate(buff);
         offset += 4;
         //length =4
-      } if (fspec[6] === '1') {
-        console.log("I010/042 Position in Cartesian Co-ordinates")
-        console.log("	" + msg.slice(offset, offset + 4).toString('hex'));
+      }
+      if (fspec[6] === "1") {
+        console.log("I010/042 Position in Cartesian Co-ordinates");
+        const buff = msg.slice(offset, offset + 4);
+        console.log("	" + buff.toString("hex"));
+        parseCartesianCoordinate(buff);
         offset += 4;
         //length =4
-      } if (fspec[7] === '1') {
-        console.log("Field Extension Indicator")
+      }
+      if (fspec[7] === "1") {
+        console.log("Field Extension Indicator");
 
-        if (fspec[8] === '1') {
-          console.log("I010/200 Calculated Track Velocity in Polar Co-ordinates")
-          console.log("	" + msg.slice(offset, offset + 4).toString('hex'));
+        if (fspec[8] === "1") {
+          console.log("I010/200 Calculated Track Velocity in Polar Co-ordinates");
+          console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
           offset += 4;
           //length =4
         }
-        if (fspec[9] === '1') {
-          console.log("I010/202 Calculated Track Velocity in Cartesian Coord.")
-          console.log("	" + msg.slice(offset, offset + 4).toString('hex'));
+        if (fspec[9] === "1") {
+          console.log("I010/202 Calculated Track Velocity in Cartesian Coord.");
+          console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
           offset += 4;
           //length =4
         } if (fspec[10] === '1') {
@@ -138,23 +148,25 @@ export function sliceMainBuffer(buffer: Buffer) {
           console.log("	" + msg.slice(offset, offset + 3).toString('hex'));
           offset += 3;
           //length =3
-        } if (fspec[14] === '1') {
-          console.log("I010/245 Target Identification")
-          console.log("	" + msg.slice(offset, offset + 7).toString('hex'));
+        }
+        if (fspec[14] === "1") {
+          console.log("I010/245 Target Identification");
+          console.log("	" + msg.slice(offset, offset + 7).toString("hex"));
           offset += 7;
           //length =7
-        } if (fspec[15] === '1') {
-          console.log("Field Extension Indicator")
-          if (fspec[16] === '1') {
-            console.log("I010/250 Mode S MB Data")
+        }
+        if (fspec[15] === "1") {
+          console.log("Field Extension Indicator");
+          if (fspec[16] === "1") {
+            console.log("I010/250 Mode S MB Data");
             const len = buffer.slice(offset, offset + 1).readInt16BE();
-            console.log("	" + msg.slice(offset + 1, offset + 1 + 8 * len).toString('hex'));
+            console.log("	" + msg.slice(offset + 1, offset + 1 + 8 * len).toString("hex"));
             offset += 1 + 8 * len;
             //length =1+8n
           }
-          if (fspec[17] === '1') {
-            console.log("I010/300 Vehicle Fleet Identification")
-            console.log("	" + msg.slice(offset, offset + 1).toString('hex'));
+          if (fspec[17] === "1") {
+            console.log("I010/300 Vehicle Fleet Identification");
+            console.log("	" + msg.slice(offset, offset + 1).toString("hex"));
             offset += 1;
             //length =1
           } if (fspec[18] === '1') {
@@ -166,11 +178,12 @@ export function sliceMainBuffer(buffer: Buffer) {
             console.log("	" + msg.slice(offset, offset + 2).toString('hex'));
             offset += 2;
             //length =2
-          } if (fspec[20] === '1') {
-            console.log("I010/270 Target Size & Orientation")
+          }
+          if (fspec[20] === "1") {
+            console.log("I010/270 Target Size & Orientation");
             /// First Part + First Extent + Second Extent => max 3
-            let len = variableItemOffset(msg.slice(offset, offset + 3), 3)
-            console.log("	" + msg.slice(offset, offset + len).toString('hex'));
+            let len = variableItemOffset(msg.slice(offset, offset + 3), 3);
+            console.log("	" + msg.slice(offset, offset + len).toString("hex"));
             offset += len;
             //length =1+
           }
@@ -180,42 +193,49 @@ export function sliceMainBuffer(buffer: Buffer) {
             console.log("	" + msg.slice(offset, offset + 1).toString('hex'));
             offset += 1;
             //length =1
-          } if (fspec[23] === '1') {
-            console.log("Field Extension Indicator")
+          }
+          if (fspec[23] === "1") {
+            console.log("Field Extension Indicator");
 
-            if (fspec[24] === '1') {
-              console.log("I010/500 Standard Deviation of Position")
-              console.log("	" + msg.slice(offset, offset + 4).toString('hex'));
+            if (fspec[24] === "1") {
+              console.log("I010/500 Standard Deviation of Position");
+              console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
               offset += 4;
               //length =4
             }
-            if (fspec[25] === '1') {
-              console.log("I010/280 Presence")
+            if (fspec[25] === "1") {
+              console.log("I010/280 Presence");
               const len = buffer.slice(offset, offset + 1).readInt16BE();
-              console.log("	" + msg.slice(offset + 1, offset + 1 + 2 * len).toString('hex'));
+              console.log("	" + msg.slice(offset + 1, offset + 1 + 2 * len).toString("hex"));
               offset += 1 + 2 * len;
               //length =1+2n
-            } if (fspec[26] === '1') {
-              console.log("I010/131 Amplitude of Primary Plot")
-              console.log("	" + msg.slice(offset, offset + 1).toString('hex'));
+            }
+            if (fspec[26] === "1") {
+              console.log("I010/131 Amplitude of Primary Plot");
+              console.log("	" + msg.slice(offset, offset + 1).toString("hex"));
               offset += 1;
               //length =1
-            } if (fspec[27] === '1') {
-              console.log("I010/210 Calculated Acceleration")
-              console.log("	" + msg.slice(offset, offset + 2).toString('hex'));
+            }
+            if (fspec[27] === "1") {
+              console.log("I010/210 Calculated Acceleration");
+              console.log("	" + msg.slice(offset, offset + 2).toString("hex"));
               offset += 2;
               //length =2
-            } if (fspec[28] === '1') {
-              console.log("Spare")
+            }
+            if (fspec[28] === "1") {
+              console.log("Spare");
               //length = Nan
-            } if (fspec[29] === '1') {
-              console.log("SP Special Purpose Field")
+            }
+            if (fspec[29] === "1") {
+              console.log("SP Special Purpose Field");
               //length =1+
-            } if (fspec[30] === '1') {
-              console.log("RE Reserved Expansion Field")
+            }
+            if (fspec[30] === "1") {
+              console.log("RE Reserved Expansion Field");
               //length =1+
-            } if (fspec[31] === '1') {
-              console.log("Field Extension Indicator, but no more in the spec")
+            }
+            if (fspec[31] === "1") {
+              console.log("Field Extension Indicator, but no more in the spec");
             }
           }
         }
@@ -513,21 +533,23 @@ export function sliceMainBuffer(buffer: Buffer) {
 }
 
 function variableItemOffset(buffer: Buffer, max_len: number) {
-  const bits = BigInt('0x' + buffer.toString('hex')).toString(2).padStart(max_len * 8, '0').split('');
+  const bits = BigInt("0x" + buffer.toString("hex"))
+    .toString(2)
+    .padStart(max_len * 8, "0")
+    .split("");
 
   let count = 7;
   let found = false;
   let offset = bits.filter((value, index) => {
-    if ((index == count) && !found) {
-      if (value != '1') {
+    if (index == count && !found) {
+      if (value != "1") {
         found = true;
       } else {
         count += 8;
       }
       return true;
     }
-    return
-
+    return;
   }).length;
   console.log("item offset " + offset);
   return offset;
