@@ -1,4 +1,4 @@
-import { parseCartesianCoordinate } from "./cat10_msg_parser";
+import { parseCartesianCoordinate, parsePolarCoordinate } from "./cat10_msg_parser";
 
 export function sliceMainBuffer(buffer: Buffer) {
   let start = 0;
@@ -87,14 +87,17 @@ export function sliceMainBuffer(buffer: Buffer) {
       }
       if (fspec[5] === "1") {
         console.log("I010/040 Measured Position in Polar Co-ordinates");
-        console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
+        const buff = msg.slice(offset, offset + 4);
+        console.log("	" + buff.toString("hex"));
+        parsePolarCoordinate(buff);
         offset += 4;
         //length =4
       }
       if (fspec[6] === "1") {
         console.log("I010/042 Position in Cartesian Co-ordinates");
-        console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
-        parseCartesianCoordinate(msg.slice(offset, offset + 4));
+        const buff = msg.slice(offset, offset + 4);
+        console.log("	" + buff.toString("hex"));
+        parseCartesianCoordinate(buff);
         offset += 4;
         //length =4
       }
