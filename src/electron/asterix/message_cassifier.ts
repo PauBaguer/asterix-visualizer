@@ -117,7 +117,7 @@ export function sliceMainBuffer(buffer: Buffer) {
         //length =4
       }
       if (fspec[7] === "1") {
-        console.log("Field Extension Indicator");
+        /**** Field Extension Indicator ****/
 
         if (fspec[8] === "1") {
           console.log("I010/200 Calculated Track Velocity in Polar Co-ordinates");
@@ -144,19 +144,18 @@ export function sliceMainBuffer(buffer: Buffer) {
           tasks.push(decod_msg.set_mod_3A_code(msg.slice(offset, offset + 2)));
           offset += 2; //length =2
         } if (fspec[13] === '1') {
-          console.log("I010/220 Target Address")
-          console.log("	" + msg.slice(offset, offset + 3).toString('hex'));
-          offset += 3;
-          //length =3
+          /// I010/220 Target Address
+          tasks.push(decod_msg.set_target_address(msg.slice(offset, offset + 3)));
+          offset += 3; //length =3
         }
         if (fspec[14] === "1") {
-          console.log("I010/245 Target Identification");
-          console.log("	" + msg.slice(offset, offset + 7).toString("hex"));
-          offset += 7;
-          //length =7
+          /// I010/245 Target Identification
+          tasks.push(decod_msg.set_target_identification(msg.slice(offset, offset + 7)));
+          offset += 7; //length =7
         }
         if (fspec[15] === "1") {
-          console.log("Field Extension Indicator");
+          /**** Field Extension Indicator ****/
+
           if (fspec[16] === "1") {
             console.log("I010/250 Mode S MB Data");
             const len = buffer.slice(offset, offset + 1).readInt16BE();
@@ -165,10 +164,9 @@ export function sliceMainBuffer(buffer: Buffer) {
             //length =1+8n
           }
           if (fspec[17] === "1") {
-            console.log("I010/300 Vehicle Fleet Identification");
-            console.log("	" + msg.slice(offset, offset + 1).toString("hex"));
-            offset += 1;
-            //length =1
+            /// I010/300 Vehicle Fleet Identification
+            tasks.push(decod_msg.set_vehicle_fleet_identification(msg.slice(offset, offset + 1)));
+            offset += 1; //length =1
           } if (fspec[18] === '1') {
             /// I010/090 Flight Level in Binary Representation
             tasks.push(decod_msg.set_flight_level(msg.slice(offset, offset + 2)));
@@ -189,13 +187,12 @@ export function sliceMainBuffer(buffer: Buffer) {
           }
           // Sytem Status -> Delete, never in a target report
           if (fspec[22] === '1') {
-            console.log("I010/310 Pre-programmed Message")
-            console.log("	" + msg.slice(offset, offset + 1).toString('hex'));
-            offset += 1;
-            //length =1
+            /// I010/310 Pre-programmed Message
+            tasks.push(decod_msg.set_preprogrammed_message(msg.slice(offset, offset + 1)));
+            offset += 1; //length =1
           }
           if (fspec[23] === "1") {
-            console.log("Field Extension Indicator");
+            /**** Field Extension Indicator ****/
 
             if (fspec[24] === "1") {
               console.log("I010/500 Standard Deviation of Position");

@@ -8,6 +8,12 @@ export class Cat10 {
     time_of_day: string;
     track_number: number;
     track_status: TrackStatus;
+    target_address: string;
+    target_identification: TargetIdentification;
+    target_size_and_orientation: TargetSizeAndOrientation;
+    vehicle_fleet_identification: string;
+    preprogrammed_message: PreprogrammedMessage;
+    standard_deviation_of_position: StandardDeviationOfPosition;
     system_status: SystemStatus;
 
     constructor(id: number) {
@@ -77,7 +83,7 @@ export class Cat10 {
 
         }
         var tot = "";
-        switch (bits.slice(13, 15).join()) {
+        switch (bits.slice(13, 15).join('')) {
             case '00': tot = "Undetermined"
                 break;
             case '01': tot = "Aircraft"
@@ -111,7 +117,7 @@ export class Cat10 {
         var v = (bits[0] === "0") ? "Code validated" : "Code not validated";
         var g = (bits[1] === "0") ? "Default" : "Garbled code";
         var l = (bits[2] === "0") ? "Mode-3/A code derived from the reply of the transponder" : "Mode-3/A code not extracted during the last scan";
-        var mode = parseInt('0x' + buffer.toString('hex')).toString(8);
+        var mode = parseInt('0x' + buffer.toString('hex')).toString(8).padStart(4, '0');
 
         this.mod_3A_code = { V: v, G: g, L: l, Mode: mode }
     }
@@ -223,9 +229,165 @@ export class Cat10 {
             TOM: tom, DOU: dou, MRS: mrs,
             GHO: gho
         }
+    }
 
+    set_target_address = async (buffer: Buffer) => {
+        this.target_address = "0x" + buffer.toString('hex');
+    }
+
+    set_target_identification = async (buffer: Buffer) => {
+        const bits = BigInt('0x' + buffer.toString('hex')).toString(2).padStart(7 * 8, '0').split('');
+        var sti = ""; // Operational Release Status of the System
+        switch (bits.slice(0, 2).join('')) {
+            case '00': sti = "Callsign or registration downlinked from transponder"
+                break;
+            case '01': sti = "Callsign not downlinked from transponder"
+                break;
+            case '10': sti = "Registration not downlinked from transponder"
+                break;
+
+        }
+        console.log(sti)
+        var target_identification = [];
+        var start = 8;
+        for (var i = 0; i < 8; i++) {
+            target_identification.push(this.ti_parse(bits.slice(start, start + 6)))
+            start += 6;
+        }
+
+        this.target_identification = { STI: sti, TargetIdentification: target_identification.join('') }
 
     }
+
+    ti_parse = (bits: string[]) => {
+        var res = "";
+        var slice = bits.slice(0, 2).join('');
+        if (slice === '11') { return parseInt(bits.slice(2, 6).join(''), 2).toString(10); }
+        switch (bits.slice(2, 6).join('')) {
+            case '0000': (slice === '01') ? res = "P" : res = " ";
+                break;
+            case '0001': (slice === '00') ? res = "A" : res = "Q";
+                break;
+            case '0010': (slice === '00') ? res = "B" : res = "R";
+                break;
+            case '0011': (slice === '00') ? res = "C" : res = "S";
+                break;
+            case '0100': (slice === '00') ? res = "D" : res = "T";
+                break;
+            case '0101': (slice === '00') ? res = "E" : res = "U";
+                break;
+            case '0110': (slice === '00') ? res = "F" : res = "V";
+                break;
+            case '0111': (slice === '00') ? res = "G" : res = "W";
+                break;
+            case '1000': (slice === '00') ? res = "H" : res = "X";
+                break;
+            case '1001': (slice === '00') ? res = "I" : res = "Y";
+                break;
+            case '1010': (slice === '00') ? res = "J" : res = "Z";
+                break;
+            case '1011': res = "K";
+                break;
+            case '1100': res = "L";
+                break;
+            case '1101': res = "M";
+                break;
+            case '1110': res = "N";
+                break;
+            case '1111': res = "O";
+                break;
+        }
+        return res;
+    }
+
+    set_target_size_and_orientation = async (buffer: Buffer) => {
+        var length = parseInt('0x' + buffer.slice(0, 1).toString('hex')).toString(10) + " m";
+        if (buffer.length === 1) {
+            this.target_size_and_orientation = {
+                Lenght: length
+            };
+            return;
+        }
+        var orientation = (parseInt('0x' + buffer.slice(1, 2).toString('hex')) * 360 / 128).toString(10) + "ª";
+        if (buffer.length === 2) {
+            this.target_size_and_orientation = {
+                Lenght: length, Orinetation: orientation
+            };
+            return;
+        }
+        var width = parseInt('0x' + buffer.slice(2, 3).toString('hex')).toString(10) + " m";
+        this.target_size_and_orientation = {
+            Lenght: length, Orinetation: orientation, Width: width
+        };
+    }
+
+    set_vehicle_fleet_identification = async (buffer: Buffer) => {
+        var vfi = parseInt('0x' + buffer.slice(1, 2).toString('hex'));
+        switch (vfi) {
+            case 0: this.vehicle_fleet_identification = "Unknown";
+                break;
+            case 1: this.vehicle_fleet_identification = "ATC equipment maintenance";
+                break;
+            case 2: this.vehicle_fleet_identification = "Airport maintenance";
+                break;
+            case 3: this.vehicle_fleet_identification = "Fire";
+                break;
+            case 4: this.vehicle_fleet_identification = "Bird scarer";
+                break;
+            case 5: this.vehicle_fleet_identification = "Snow plough";
+                break;
+            case 6: this.vehicle_fleet_identification = "Runway sweeper";
+                break;
+            case 7: this.vehicle_fleet_identification = "Emergency";
+                break;
+            case 8: this.vehicle_fleet_identification = "Police";
+                break;
+            case 9: this.vehicle_fleet_identification = "Bus";
+                break;
+            case 10: this.vehicle_fleet_identification = "Tug (push/tow)";
+                break;
+            case 11: this.vehicle_fleet_identification = "Grass cutter";
+                break;
+            case 12: this.vehicle_fleet_identification = "Fuel";
+                break;
+            case 13: this.vehicle_fleet_identification = "Baggage";
+                break;
+            case 14: this.vehicle_fleet_identification = "Catering";
+                break;
+            case 15: this.vehicle_fleet_identification = "Aircraft maintenance";
+                break;
+            case 16: this.vehicle_fleet_identification = "Flyco (follow me)";
+                break;
+        }
+    }
+
+    set_preprogrammed_message = async (buffer: Buffer) => {
+        let bits = BigInt('0x' + buffer.toString('hex')).toString(2).padStart(8, '0').split('');
+        var trb = (bits[0] === '0') ? "Default" : "In Trouble";
+        var msg_id = parseInt(bits.slice(1, 8).join(''), 2);
+        var msg = "";
+        switch (msg_id) {
+            case 1: msg = "Towing aircraft";
+                break;
+            case 2: msg = "“Follow me” operation";
+                break;
+            case 3: msg = "Runway check";
+                break;
+            case 4: msg = "Emergency operation (fire, medical…)";
+                break;
+            case 5: msg = "Work in progress (maintenance, birds scarer, sweepers…)";
+                break;
+        }
+        this.preprogrammed_message = {
+            TRB: trb, MSG: msg
+        }
+    }
+
+    // set_standard_deviation_of_position = async (buffer: Buffer) => {
+    //     // var x_component = (parseInt('0x' + buffer.slice(0, 1).toString('hex')) * 0.25).toString(10) + " m";
+    //     // var y_component = (parseInt('0x' + buffer.slice(1, 2).toString('hex')) * 0.25).toString(10) + " m";
+
+    // }
 
     set_system_status = async (buffer: Buffer) => {
         const bits = BigInt('0x' + buffer.toString('hex')).toString(2).padStart(8, '0').split('');
@@ -289,6 +451,28 @@ interface TrackStatus {
     DOU?: string;
     MRS?: string;
     GHO?: string;
+}
+
+interface TargetIdentification {
+    STI: string;
+    TargetIdentification: string;
+}
+
+interface TargetSizeAndOrientation {
+    Lenght: string;
+    Orinetation?: string;
+    Width?: string;
+}
+
+interface PreprogrammedMessage {
+    TRB: string;
+    MSG: string;
+}
+
+interface StandardDeviationOfPosition {
+    X_component: string;
+    Y_component: string;
+    Covariance: string;
 }
 
 interface SystemStatus {
