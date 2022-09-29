@@ -3,11 +3,11 @@ import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
 import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 
-import type Map from "@arcgis/core/Map";
+import type ArcGISMap from "@arcgis/core/Map";
 
 export let groundLayer: GraphicsLayer;
 
-export function loadGroundLayer(map: Map) {
+export function loadGroundLayer(map: ArcGISMap) {
   const symbol = new SimpleMarkerSymbol({
     style: "circle",
     color: "#009900",

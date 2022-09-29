@@ -38,24 +38,16 @@
 
 <script lang="ts">
   import { initializeMap } from "./arcgis/map";
+  import { ipcMainBidirectional, ipcMainOneDirection } from "./ipcMain/ipcMainCallers";
   initializeMap();
-
-  function ipcMain(event: string) {
-    window.electron.send(event);
-  }
-
-  async function ipcMainReceive(event: string) {
-    const returnValue = await window.electron.sendAndReceive(event);
-    console.log(returnValue);
-  }
 </script>
 
 <main>
   <div class="ontop">
-    <button on:click="{() => ipcMain('test')}">IPC MAIN test</button>
-    <button on:click="{() => ipcMain('open-file-picker')}">Open file picker</button>
-    <button on:click="{() => ipcMain('open-test-file')}">Open test file</button>
-    <button on:click="{() => ipcMainReceive('test-receive')}">Test IPC value return</button>
+    <button on:click="{() => ipcMainOneDirection('test')}">IPC MAIN test</button>
+    <button on:click="{() => ipcMainOneDirection('open-file-picker')}">Open file picker</button>
+    <button on:click="{() => ipcMainOneDirection('open-test-file')}">Open test file</button>
+    <button on:click="{() => ipcMainBidirectional('test-receive')}">Test IPC value return</button>
   </div>
   <div id="viewDiv"></div>
 </main>

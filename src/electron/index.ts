@@ -71,13 +71,11 @@ const createWindow = () => {
   });
 
   ipcMain.handle("test-receive", async () => {
-    // const buffer = await openFilePicker();
-    // if (buffer) return sliceMainBuffer(buffer);
-    // else console.log("No file opened");
-    // return;
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return "I send some info after 1 second!";
+    const buffer = await openFilePicker();
+    if (buffer) return await sliceMainBuffer(buffer);
+    else console.log("No file opened");
+    return;
+    //await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 };
 
