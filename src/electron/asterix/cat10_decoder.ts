@@ -1,16 +1,21 @@
 export class Cat10 {
     id: number;
     message_type: string;
-    //data_source_identifier:
+    data_source_identifier: DataSourceIdentifier;
     target_report_description: TargetReportDescription;
     mod_3A_code: Mod3ACode;
     flight_level: FlightLevel;
+    measured_height: string;
+    alitude_of_primary_plot: number;
     time_of_day: string;
     track_number: number;
     track_status: TrackStatus;
+    calculated_acceleration: CalculatedAcceleration;
     target_address: string;
     target_identification: TargetIdentification;
+    mode_s_mb_data: string[];
     target_size_and_orientation: TargetSizeAndOrientation;
+    presence: Presence[];
     vehicle_fleet_identification: string;
     preprogrammed_message: PreprogrammedMessage;
     standard_deviation_of_position: StandardDeviationOfPosition;
@@ -33,6 +38,17 @@ export class Cat10 {
             case 0x04: this.message_type = "Event-triggered Status Message"
                 break;
         }
+    }
+
+    set_data_source_identifier(buffer: Buffer) {
+        var sac = '0x' + buffer.slice(0, 1).toString('hex');
+
+        if (sac === '0x00') {
+            sac = "0x00, Local airport Identifier";
+        }
+
+        const sic = '0x' + buffer.slice(1, 2).toString('hex');
+        this.data_source_identifier = { SAC: sac, SIC: sic }
     }
 
     set_target_report_description = async (buffer: Buffer) => {
@@ -126,16 +142,24 @@ export class Cat10 {
         const bits = BigInt('0x' + buffer.toString('hex')).toString(2).padStart(2 * 8, '0').split('');
         var v = (bits[0] === "0") ? "Code validated" : "Code not validated";
         var g = (bits[1] === "0") ? "Default" : "Garbled code";
-        var fl = (parseInt('0x' + buffer.toString('hex')) / 4).toString(10) + "FL";
+        var fl = (buffer.readInt16BE() / 4).toString(10) + "FL";
 
         this.flight_level = { V: v, G: g, FlightLevel: fl }
     }
 
+    set_measured_height = async (buffer: Buffer) => {
+        this.measured_height = (buffer.readInt16BE() * 6.25).toString() + "ft (Range= +/- 204 800 ft)"
+    }
+
+    set_alitude_of_primary_plot = async (buffer: Buffer) => {
+        this.alitude_of_primary_plot = parseInt('0x' + buffer.toString('hex'));
+    }
+
     set_time_of_day = async (buffer: Buffer) => {
-        var sec = parseInt('0x' + buffer.toString('hex')) / 128;
+        var sec = parseInt('0x' + buffer.toString('hex')) / 128.0;
         var date = new Date(0);
-        date.setSeconds(sec);
-        this.time_of_day = date.toISOString().substring(11, 19);
+        date.setMilliseconds((sec * 1000));
+        this.time_of_day = date.toISOString().substring(11, 23);
     }
 
     set_track_number = async (buffer: Buffer) => {
@@ -231,6 +255,12 @@ export class Cat10 {
         }
     }
 
+    set_calculated_acceleration = async (buffer: Buffer) => {
+        var ax = buffer.readIntBE(0, 1) * 0.25;
+        var ay = buffer.readIntBE(1, 1) * 0.25;
+        this.calculated_acceleration = { Ax: ax, Ay: ay }
+    }
+
     set_target_address = async (buffer: Buffer) => {
         this.target_address = "0x" + buffer.toString('hex');
     }
@@ -247,7 +277,6 @@ export class Cat10 {
                 break;
 
         }
-        console.log(sti)
         var target_identification = [];
         var start = 8;
         for (var i = 0; i < 8; i++) {
@@ -300,25 +329,52 @@ export class Cat10 {
         return res;
     }
 
+    set_mode_s_mb_data = async (buffer: Buffer, rep: number) => {
+        var start = 7;
+
+        for (var i = 0; i < rep; i++) {
+            try {
+                var bits = BigInt('0x' + buffer.slice(start, start + 1).toString('hex')).toString(2).padStart(8, '0').split('');
+                this.mode_s_mb_data.push("BDS1: " + parseInt(bits.slice(0, 4).join(''), 2).toString(10) + " BDS2: " + parseInt(bits.slice(4, 8).join(''), 2).toString(10));
+                start += 8
+            } catch { }
+        }
+
+    }
+
     set_target_size_and_orientation = async (buffer: Buffer) => {
-        var length = parseInt('0x' + buffer.slice(0, 1).toString('hex')).toString(10) + " m";
+        var length = parseInt(BigInt('0x' + buffer.slice(0, 1).toString('hex')).toString(2).padStart(8, '0').split('').slice(0, 7).join(''), 2).toString(10) + " m";
         if (buffer.length === 1) {
             this.target_size_and_orientation = {
                 Lenght: length
             };
             return;
         }
-        var orientation = (parseInt('0x' + buffer.slice(1, 2).toString('hex')) * 360 / 128).toString(10) + "ª";
+        var orientation = (parseInt(BigInt('0x' + buffer.slice(1, 2).toString('hex')).toString(2).padStart(8, '0').split('').slice(0, 7).join(''), 2) * 360 / 128).toString(10) + " deg";
         if (buffer.length === 2) {
             this.target_size_and_orientation = {
                 Lenght: length, Orinetation: orientation
             };
             return;
         }
-        var width = parseInt('0x' + buffer.slice(2, 3).toString('hex')).toString(10) + " m";
+        var width = parseInt(BigInt('0x' + buffer.slice(2, 3).toString('hex')).toString(2).padStart(8, '0').split('').slice(0, 7).join(''), 2).toString(10) + " m";
         this.target_size_and_orientation = {
             Lenght: length, Orinetation: orientation, Width: width
         };
+    }
+
+    set_presence = async (buffer: Buffer, rep: number) => {
+        var start = 0;
+
+        for (var i = 0; i < rep; i++) {
+            try {
+                var drho = parseInt('0x' + buffer.slice(start, start + 1).toString('hex')).toString(10) + " m";
+                var dtheta = (parseInt('0x' + buffer.slice(start + 1, start + 2).toString('hex')) * 0.15).toString(10) + "º";
+                start += 2
+                this.presence.push({ DRHO: drho, DTHETA: dtheta });
+            } catch { }
+        }
+
     }
 
     set_vehicle_fleet_identification = async (buffer: Buffer) => {
@@ -383,11 +439,12 @@ export class Cat10 {
         }
     }
 
-    // set_standard_deviation_of_position = async (buffer: Buffer) => {
-    //     // var x_component = (parseInt('0x' + buffer.slice(0, 1).toString('hex')) * 0.25).toString(10) + " m";
-    //     // var y_component = (parseInt('0x' + buffer.slice(1, 2).toString('hex')) * 0.25).toString(10) + " m";
-
-    // }
+    set_standard_deviation_of_position = async (buffer: Buffer) => {
+        var x_component = (parseInt('0x' + buffer.slice(0, 1).toString('hex')) * 0.25).toString(10) + " m";
+        var y_component = (parseInt('0x' + buffer.slice(1, 2).toString('hex')) * 0.25).toString(10) + " m";
+        var covariance = (buffer.readInt16BE() * 0.25).toString(10) + " m"
+        this.standard_deviation_of_position = { X_component: x_component, Y_component: y_component, Covariance: covariance }
+    }
 
     set_system_status = async (buffer: Buffer) => {
         const bits = BigInt('0x' + buffer.toString('hex')).toString(2).padStart(8, '0').split('');
@@ -411,6 +468,11 @@ export class Cat10 {
         this.system_status = { NOGO: nogo, OVL: ovl, TSV: tsv, DIV: div, TTF: ttf }
 
     }
+}
+
+interface DataSourceIdentifier {
+    SAC: string;
+    SIC: string;
 }
 
 interface TargetReportDescription {
@@ -453,6 +515,11 @@ interface TrackStatus {
     GHO?: string;
 }
 
+interface CalculatedAcceleration {
+    Ax: number;
+    Ay: number;
+}
+
 interface TargetIdentification {
     STI: string;
     TargetIdentification: string;
@@ -462,6 +529,11 @@ interface TargetSizeAndOrientation {
     Lenght: string;
     Orinetation?: string;
     Width?: string;
+}
+
+interface Presence {
+    DRHO: string;
+    DTHETA: string;
 }
 
 interface PreprogrammedMessage {
