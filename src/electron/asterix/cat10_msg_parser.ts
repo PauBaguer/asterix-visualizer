@@ -1,18 +1,18 @@
 import { computeDestinationPoint } from "geolib";
-export function parseDataSourceIdentifier(buffer: Buffer) {
-  const sac_buffer = buffer.slice(0, 2);
-  const sic_buffer = buffer.slice(2, 4);
+// export function parseDataSourceIdentifier(buffer: Buffer) {
+//   const sac_buffer = buffer.slice(0, 2);
+//   const sic_buffer = buffer.slice(2, 4);
 
-  const sac = sac_buffer.readInt16BE();
+//   const sac = sac_buffer.readInt16BE();
 
-  console.log("SAC: ", sac);
-  if (sac === 0) {
-    console.log("SAC = 0, Local airport Identifier");
-  }
+//   console.log("SAC: ", sac);
+//   if (sac === 0) {
+//     console.log("SAC = 0, Local airport Identifier");
+//   }
 
-  const sic = sic_buffer.readInt16BE();
-  console.log("SIC: ", sic);
-}
+//   const sic = sic_buffer.readInt16BE();
+//   console.log("SIC: ", sic);
+// }
 
 export function parseCartesianCoordinate(buffer: Buffer) {
   const x_buffer = buffer.slice(0, 2);
