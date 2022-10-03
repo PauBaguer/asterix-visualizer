@@ -106,27 +106,28 @@ export function sliceMainBuffer(buffer: Buffer) {
       offset += 3; //length =3
       // **********************
       if (fspec[4] === "1") {
-        //TODO
+        //TODO test that the result is correct when we have data for this field
         // console.log("I010/041 Position in WGS-84 Co-ordinates")
         // console.log("	" + msg.slice(offset, offset + 8).toString('hex'));
+        tasks.push(decod_msg.set_wgs_84_coordinates(msg.slice(offset, offset + 8)));
         offset += 8;
         //length =8
       }
       if (fspec[5] === "1") {
-        //TODO
         //   console.log("I010/040 Measured Position in Polar Co-ordinates");
         //   const buff = msg.slice(offset, offset + 4);
         //   console.log("	" + buff.toString("hex"));
         //   parsePolarCoordinate(buff);
+        tasks.push(decod_msg.set_polar_coordinates(msg.slice(offset, offset + 4)));
         offset += 4;
         //length =4
       }
       if (fspec[6] === "1") {
-        //TODO
         // console.log("I010/042 Position in Cartesian Co-ordinates");
         // const buff = msg.slice(offset, offset + 4);
         // console.log("	" + buff.toString("hex"));
         // parseCartesianCoordinate(buff);
+        tasks.push(decod_msg.set_cartesian_coordinates(msg.slice(offset, offset + 4)));
         offset += 4;
         //length =4
       }
@@ -134,16 +135,18 @@ export function sliceMainBuffer(buffer: Buffer) {
         /**** Field Extension Indicator ****/
 
         if (fspec[8] === "1") {
-          //TOODO
+          // TODO test that the result is correct when we have data for this field
           // console.log("I010/200 Calculated Track Velocity in Polar Co-ordinates");
           // console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
+          tasks.push(decod_msg.set_calculated_track_velocity_polar_coordinates(msg.slice(offset, offset + 4)));
           offset += 4;
           //length =4
         }
         if (fspec[9] === "1") {
-          //TODO
+          //TODO test that the result is correct when we have data for this field
           // console.log("I010/202 Calculated Track Velocity in Cartesian Coord.");
           // console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
+          tasks.push(decod_msg.set_calculated_track_velocity_cartesian_coordinates(msg.slice(offset, offset + 4)));
           offset += 4;
           //length =4
         }

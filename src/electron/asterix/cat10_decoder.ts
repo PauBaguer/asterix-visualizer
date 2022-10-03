@@ -3,6 +3,11 @@ export class Cat10 {
   message_type: string;
   data_source_identifier: DataSourceIdentifier;
   target_report_description: TargetReportDescription;
+  wgs_84_coordinates: WGS_84_coordinates;
+  polar_coordinates: PolarCoordinates;
+  cartesian_coordinates: CartesianCoordinates;
+  calculated_track_velocity_polar_coordinates: PolarCoordinates;
+  calculated_track_velocity_cartesian_coordinates: CartesianCoordinates;
   mod_3A_code: Mod3ACode;
   flight_level: FlightLevel;
   measured_height: string;
@@ -161,6 +166,65 @@ export class Cat10 {
       TOT: tot,
       SPI: sip,
     };
+  };
+
+  set_wgs_84_coordinates = async (buffer: Buffer) => {
+    const lat_buffer = buffer.slice(0, 4);
+    const long_buffer = buffer.slice(4, 8);
+    const lat = (lat_buffer.readInt32BE() * 180) / Math.pow(2, 31);
+    const lon = (lat_buffer.readInt32BE() * 180) / Math.pow(2, 31);
+    this.wgs_84_coordinates.latitude = lat;
+    this.wgs_84_coordinates.longitude = lon;
+  };
+
+  set_polar_coordinates = async (buffer: Buffer) => {
+    const r_buffer = buffer.slice(0, 2);
+    const theta_buffer = buffer.slice(2, 4);
+    const r_coord = r_buffer.readInt16BE();
+    // console.log("r-coordinate: " + r_coord);
+
+    const theta_coord = (theta_buffer.readInt16BE() * 360) / Math.pow(2, 16);
+    // console.log("Theta-coordinate: " + theta_coord + "º");
+
+    this.polar_coordinates.r = r_coord;
+    this.polar_coordinates.theta = theta_coord;
+  };
+
+  set_cartesian_coordinates = async (buffer: Buffer) => {
+    const x_buffer = buffer.slice(0, 2);
+    const y_buffer = buffer.slice(2, 4);
+    const x_coord = x_buffer.readInt16BE();
+    // console.log("X-coordinate: " + x_coord);
+
+    const y_coord = y_buffer.readInt16BE();
+    // console.log("Y-coordinate: " + y_coord);
+    this.cartesian_coordinates.x = x_coord;
+    this.cartesian_coordinates.y = y_coord;
+  };
+
+  set_calculated_track_velocity_polar_coordinates = async (buffer: Buffer) => {
+    const r_buffer = buffer.slice(0, 2);
+    const theta_buffer = buffer.slice(2, 4);
+    const r_coord = r_buffer.readInt16BE() * Math.pow(2, -14);
+    // console.log("r-coordinate: " + r_coord);
+
+    const theta_coord = (theta_buffer.readInt16BE() * 360) / Math.pow(2, 16);
+    // console.log("Theta-coordinate: " + theta_coord + "º");
+
+    this.calculated_track_velocity_polar_coordinates.r = r_coord;
+    this.calculated_track_velocity_polar_coordinates.theta = theta_coord;
+  };
+
+  set_calculated_track_velocity_cartesian_coordinates = async (buffer: Buffer) => {
+    const x_buffer = buffer.slice(0, 2);
+    const y_buffer = buffer.slice(2, 4);
+    const x_coord = x_buffer.readInt16BE() * 0.25;
+    // console.log("X-coordinate: " + x_coord);
+
+    const y_coord = y_buffer.readInt16BE() * 0.25;
+    // console.log("Y-coordinate: " + y_coord);
+    this.calculated_track_velocity_cartesian_coordinates.x = x_coord;
+    this.calculated_track_velocity_cartesian_coordinates.y = y_coord;
   };
 
   set_mod_3A_code = async (buffer: Buffer) => {
@@ -665,6 +729,21 @@ interface TargetReportDescription {
   LOP?: string;
   TOT?: string;
   SPI?: string;
+}
+
+interface WGS_84_coordinates {
+  latitude: number;
+  longitude: number;
+}
+
+interface PolarCoordinates {
+  r: number;
+  theta: number;
+}
+
+interface CartesianCoordinates {
+  x: number;
+  y: number;
 }
 
 interface Mod3ACode {
