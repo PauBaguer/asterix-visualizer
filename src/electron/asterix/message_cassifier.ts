@@ -284,328 +284,326 @@ export async function decodeClass10Messages(buffer: Buffer, cat10msg: Buffer[]) 
   // console.log(vec)
 }
 
-export function decodeClass21Messages(buffer: Buffer, cat21msg: Buffer[]) {
-  let test2 = cat21msg.length - 10;
+export async function decodeClass21Messages(buffer: Buffer, cat21msg: Buffer[]) {
   var vec21: Cat21[] = [];
   let b = 0;
   //var test2 = 139747;
-  cat21msg.forEach((msg) => {
-    if (b <= test2) {
-      const fspec = BigInt("0x" + msg.slice(3, 10).toString("hex"))
-        .toString(2)
-        .padStart(7 * 8, "0")
-        .split("");
+  await cat21msg.forEach(async (msg) => {
+    const fspec = BigInt("0x" + msg.slice(3, 10).toString("hex"))
+      .toString(2)
+      .padStart(7 * 8, "0")
+      .split("");
 
-      let count = 7;
-      let found = false;
-      let offset =
-        fspec.filter((value, index) => {
-          if (index == count && !found) {
-            if (value != "1") {
-              found = true;
-            } else {
-              count += 8;
-            }
-            return true;
+    let count = 7;
+    let found = false;
+    let offset =
+      fspec.filter((value, index) => {
+        if (index == count && !found) {
+          if (value != "1") {
+            found = true;
+          } else {
+            count += 8;
           }
-          return;
-        }).length + 3;
-      // console.log("length fspec " + offset);
+          return true;
+        }
+        return;
+      }).length + 3;
+    // console.log("length fspec " + offset);
 
-      var decod_msg: Cat21 = new Cat21(b);
-      var tasks: any[] = [];
+    var decod_msg: Cat21 = new Cat21(b);
+    var tasks: any[] = [];
 
-      /** MANDATORY FIELD**/
-      /// I021/010 Data Source Identifier
-      tasks.push(decod_msg.set_data_source_identifier(msg.slice(offset, offset + 2)));
+    /** MANDATORY FIELD**/
+    /// I021/010 Data Source Identifier
+    tasks.push(decod_msg.set_data_source_identifier(msg.slice(offset, offset + 2)));
+    offset += 2; //length =2
+
+    /// I021/040 Target Report Descriptor
+    let len = variableItemOffset(msg.slice(offset, offset + 3), 3); // Primary Subfield + First Extension + Second Extension => max3
+    tasks.push(decod_msg.set_target_report_descriptor(msg.slice(offset, offset + len)));
+    offset += len; //length =1+
+    /********************/
+
+    if (fspec[2] === "1") {
+      /// I021/161 Track Number
+      tasks.push(decod_msg.set_track_number(msg.slice(offset, offset + 2)));
       offset += 2; //length =2
+    }
+    if (fspec[3] === "1") {
+      /// I021/015 Service Identification
+      tasks.push(decod_msg.set_service_identification(msg.slice(offset, offset + 1)));
+      offset += 1; //length =1
+    }
+    if (fspec[4] === "1") {
+      /// I021/071 Time of Applicability for Position
+      tasks.push(decod_msg.set_time_applicability_position(msg.slice(offset, offset + 3)));
+      offset += 3; //length =3
+    }
+    if (fspec[5] === "1") {
+      ///TODO
+      // console.log("I021/130 Position in WGS-84 co-ordinates")
+      // console.log("	" + msg.slice(offset, offset + 6).toString('hex'));
+      offset += 6;
+      //length =6
+    }
+    if (fspec[6] === "1") {
+      ///TODO
+      // console.log("I021/131 Position in WGS-84 co-ordinates, high res.")
+      // console.log("	" + msg.slice(offset, offset + 8).toString('hex'));
+      offset += 8;
+      //length =8
+    }
+    if (fspec[7] === "1") {
+      // Field Extension Indicator
 
-      /// I021/040 Target Report Descriptor
-      let len = variableItemOffset(msg.slice(offset, offset + 3), 3); // Primary Subfield + First Extension + Second Extension => max3
-      tasks.push(decod_msg.set_target_report_descriptor(msg.slice(offset, offset + len)));
-      offset += len; //length =1+
-      /********************/
-
-      if (fspec[2] === "1") {
-        /// I021/161 Track Number
-        tasks.push(decod_msg.set_track_number(msg.slice(offset, offset + 2)));
+      if (fspec[8] === "1") {
+        /// I021/072 Time of Applicability for Velocity
+        tasks.push(decod_msg.set_time_applicability_velocity(msg.slice(offset, offset + 3)));
+        offset += 3; //length =3
+      }
+      if (fspec[9] === "1") {
+        /// I021/150 Air Speed
+        tasks.push(decod_msg.set_air_speed(msg.slice(offset, offset + 2)));
         offset += 2; //length =2
       }
-      if (fspec[3] === "1") {
-        /// I021/015 Service Identification
-        tasks.push(decod_msg.set_service_identification(msg.slice(offset, offset + 1)));
-        offset += 1; //length =1
+      if (fspec[10] === "1") {
+        /// I021/151 True Air Speed
+        tasks.push(decod_msg.set_true_airspeed(msg.slice(offset, offset + 2)));
+        offset += 2; //length =2
       }
-      if (fspec[4] === "1") {
-        /// I021/071 Time of Applicability for Position
-        tasks.push(decod_msg.set_time_applicability_position(msg.slice(offset, offset + 3)));
+      /** MANDATORY ITEM **/
+      /// I021/080 Target Address
+      tasks.push(decod_msg.set_target_address(msg.slice(offset, offset + 3)));
+      offset += 3; //length =3
+      /*******************/
+      if (fspec[12] === "1") {
+        /// I021/073 Time of Message Reception of Position
+        tasks.push(decod_msg.set_time_message_reception_position(msg.slice(offset, offset + 3)));
         offset += 3; //length =3
       }
-      if (fspec[5] === "1") {
-        ///TODO
-        // console.log("I021/130 Position in WGS-84 co-ordinates")
-        // console.log("	" + msg.slice(offset, offset + 6).toString('hex'));
-        offset += 6;
-        //length =6
+      if (fspec[13] === "1") {
+        /// I021/074 Time of Message Reception of Position-High
+        tasks.push(decod_msg.set_time_message_reception_position_high(msg.slice(offset, offset + 4)));
+        offset += 4; //length =4
       }
-      if (fspec[6] === "1") {
-        ///TODO
-        // console.log("I021/131 Position in WGS-84 co-ordinates, high res.")
-        // console.log("	" + msg.slice(offset, offset + 8).toString('hex'));
-        offset += 8;
-        //length =8
+      if (fspec[14] === "1") {
+        /// I021/075 Time of Message Reception of Velocity
+        tasks.push(decod_msg.set_time_message_reception_velocity(msg.slice(offset, offset + 3)));
+        offset += 3; //length =3
       }
-      if (fspec[7] === "1") {
-        // Field Extension Indicator
+      if (fspec[15] === "1") {
+        /// Field Extension Indicator
 
-        if (fspec[8] === "1") {
-          /// I021/072 Time of Applicability for Velocity
-          tasks.push(decod_msg.set_time_applicability_velocity(msg.slice(offset, offset + 3)));
-          offset += 3; //length =3
-        }
-        if (fspec[9] === "1") {
-          /// I021/150 Air Speed
-          tasks.push(decod_msg.set_air_speed(msg.slice(offset, offset + 2)));
-          offset += 2; //length =2
-        }
-        if (fspec[10] === "1") {
-          /// I021/151 True Air Speed
-          tasks.push(decod_msg.set_true_airspeed(msg.slice(offset, offset + 2)));
-          offset += 2; //length =2
-        }
-        /** MANDATORY ITEM **/
-        /// I021/080 Target Address
-        tasks.push(decod_msg.set_target_address(msg.slice(offset, offset + 3)));
-        offset += 3; //length =3
-        /*******************/
-        if (fspec[12] === "1") {
-          /// I021/073 Time of Message Reception of Position
-          tasks.push(decod_msg.set_time_message_reception_position(msg.slice(offset, offset + 3)));
-          offset += 3; //length =3
-        }
-        if (fspec[13] === "1") {
-          /// I021/074 Time of Message Reception of Position-High
-          tasks.push(decod_msg.set_time_message_reception_position_high(msg.slice(offset, offset + 4)));
+        if (fspec[16] === "1") {
+          /// I021/076 Time of Message Reception of Velocity-High Precision
+          tasks.push(decod_msg.set_time_message_reception_velocity_high(msg.slice(offset, offset + 4)));
           offset += 4; //length =4
         }
-        if (fspec[14] === "1") {
-          /// I021/075 Time of Message Reception of Velocity
-          tasks.push(decod_msg.set_time_message_reception_velocity(msg.slice(offset, offset + 3)));
-          offset += 3; //length =3
+        if (fspec[17] === "1") {
+          /// I021/140 Geometric Height
+          tasks.push(decod_msg.set_geometric_height(msg.slice(offset, offset + 2)));
+          offset += 2; //length =2
         }
-        if (fspec[15] === "1") {
+        /*** MANDATORY ITEM ***/
+        /// I021/090 Quality Indicators
+        let len = variableItemOffset(msg.slice(offset, offset + 4), 4); // Primary Subfield + First extension + Second extension + Third Extension => max 4
+        tasks.push(decod_msg.set_quality_indicator(msg.slice(offset, offset + len)));
+        offset += len; //length =1+
+        /*********************/
+        if (fspec[19] === "1") {
+          /// I021/210 MOPS Version
+          tasks.push(decod_msg.set_mops_version(msg.slice(offset, offset + 1)));
+          offset += 1; //length =1
+        }
+        if (fspec[20] === "1") {
+          /// I021/070 Mode 3/A Code
+          tasks.push(decod_msg.set_mod_3A_code(msg.slice(offset, offset + 2)));
+          offset += 2; //length =2
+        }
+        if (fspec[21] === "1") {
+          /// I021/230 Roll Angle
+          tasks.push(decod_msg.set_roll_angle(msg.slice(offset, offset + 2)));
+          offset += 2; //length =2
+        }
+        if (fspec[22] === "1") {
+          /// I021/145 Flight Level
+          tasks.push(decod_msg.set_flight_level(msg.slice(offset, offset + 2)));
+          offset += 2; //length =2
+        }
+        if (fspec[23] === "1") {
           /// Field Extension Indicator
 
-          if (fspec[16] === "1") {
-            /// I021/076 Time of Message Reception of Velocity-High Precision
-            tasks.push(decod_msg.set_time_message_reception_velocity_high(msg.slice(offset, offset + 4)));
-            offset += 4; //length =4
-          }
-          if (fspec[17] === "1") {
-            /// I021/140 Geometric Height
-            tasks.push(decod_msg.set_geometric_height(msg.slice(offset, offset + 2)));
+          if (fspec[24] === "1") {
+            /// I021/152 Magnetic Heading
+            tasks.push(decod_msg.set_magnetic_heading(msg.slice(offset, offset + 2)));
             offset += 2; //length =2
           }
-          /*** MANDATORY ITEM ***/
-          /// I021/090 Quality Indicators
-          let len = variableItemOffset(msg.slice(offset, offset + 4), 4); // Primary Subfield + First extension + Second extension + Third Extension => max 4
-          tasks.push(decod_msg.set_quality_indicator(msg.slice(offset, offset + len)));
-          offset += len; //length =1+
-          /*********************/
-          if (fspec[19] === "1") {
-            /// I021/210 MOPS Version
-            tasks.push(decod_msg.set_mops_version(msg.slice(offset, offset + 1)));
+          if (fspec[25] === "1") {
+            /// I021/200 Target Status
+            tasks.push(decod_msg.set_target_status(msg.slice(offset, offset + 1)));
             offset += 1; //length =1
           }
-          if (fspec[20] === "1") {
-            /// I021/070 Mode 3/A Code
-            tasks.push(decod_msg.set_mod_3A_code(msg.slice(offset, offset + 2)));
+          if (fspec[26] === "1") {
+            /// I021/155 Barometric Vertical Rate
+            tasks.push(decod_msg.set_barometric_vertical_rate(msg.slice(offset, offset + 2)));
             offset += 2; //length =2
           }
-          if (fspec[21] === "1") {
-            /// I021/230 Roll Angle
-            tasks.push(decod_msg.set_roll_angle(msg.slice(offset, offset + 2)));
+          if (fspec[27] === "1") {
+            /// I021/157 Geometric Vertical Rate
+            tasks.push(decod_msg.set_geometric_vertical_rate(msg.slice(offset, offset + 2)));
             offset += 2; //length =2
           }
-          if (fspec[22] === "1") {
-            /// I021/145 Flight Level
-            tasks.push(decod_msg.set_flight_level(msg.slice(offset, offset + 2)));
+          if (fspec[28] === "1") {
+            /// I021/160 Airborne Ground Vector
+            tasks.push(decod_msg.set_airborne_ground_vector(msg.slice(offset, offset + 4)));
+            offset += 4; //length =4
+          }
+          if (fspec[29] === "1") {
+            /// I021/165 Track Angle Rate
+            tasks.push(decod_msg.set_track_angle_rate(msg.slice(offset, offset + 2)));
             offset += 2; //length =2
           }
-          if (fspec[23] === "1") {
+          if (fspec[30] === "1") {
+            /// I021/077 Time of Report Transmission
+            tasks.push(decod_msg.set_time_ASTERIX_report_transmission(msg.slice(offset, offset + 3)));
+            offset += 3; //length =3
+          }
+          if (fspec[31] === "1") {
             /// Field Extension Indicator
 
-            if (fspec[24] === "1") {
-              /// I021/152 Magnetic Heading
-              tasks.push(decod_msg.set_magnetic_heading(msg.slice(offset, offset + 2)));
-              offset += 2; //length =2
+            if (fspec[32] === "1") {
+              /// I021/170 Target Identification
+              tasks.push(decod_msg.set_target_identification(msg.slice(offset, offset + 6)));
+              offset += 6; //length =6
             }
-            if (fspec[25] === "1") {
-              /// I021/200 Target Status
-              tasks.push(decod_msg.set_target_status(msg.slice(offset, offset + 1)));
+            if (fspec[33] === "1") {
+              /// I021/020 Emitter Category
+              tasks.push(decod_msg.set_emitter_category(msg.slice(offset, offset + 1)));
               offset += 1; //length =1
             }
-            if (fspec[26] === "1") {
-              /// I021/155 Barometric Vertical Rate
-              tasks.push(decod_msg.set_barometric_vertical_rate(msg.slice(offset, offset + 2)));
+            if (fspec[34] === "1") {
+              /// I021/220 Met Information
+              let fields: string[] = []; // Primary Subfield + 2* Subfield #1 + 2* Subfield #2 + 2* Subfield #3 + Subfield #4 => max 8
+              let len = 1;
+              BigInt("0x" + buffer.toString("hex"))
+                .toString(2)
+                .padStart(8, "0")
+                .split("")
+                .forEach((value, index) => {
+                  switch (index) {
+                    case 0:
+                      if (value === "1") {
+                        fields.push("WS");
+                      }
+                      break;
+                    case 1:
+                      if (value === "1") {
+                        fields.push("WD");
+                      }
+                      break;
+                    case 2:
+                      if (value === "1") {
+                        fields.push("TMP");
+                      }
+                      break;
+                    case 3:
+                      if (value === "1") {
+                        fields.push("TRB");
+                        len--;
+                      } //only one octet
+                      break;
+                  }
+                });
+              tasks.push(
+                decod_msg.set_met_information(msg.slice(offset + 1, offset + fields.length * 2 + len), fields)
+              );
+              offset += fields.length * 2 + len; //length =1+
+            }
+            if (fspec[35] === "1") {
+              /// I021/146 Selected Altitude
+              tasks.push(decod_msg.set_selected_altitude(msg.slice(offset, offset + 2)));
               offset += 2; //length =2
             }
-            if (fspec[27] === "1") {
-              /// I021/157 Geometric Vertical Rate
-              tasks.push(decod_msg.set_geometric_vertical_rate(msg.slice(offset, offset + 2)));
+            if (fspec[36] === "1") {
+              /// I021/148 Final State Selected Altitude
+              tasks.push(decod_msg.set_final_state_selected_altitude(msg.slice(offset, offset + 2)));
               offset += 2; //length =2
             }
-            if (fspec[28] === "1") {
-              /// I021/160 Airborne Ground Vector
-              tasks.push(decod_msg.set_airborne_ground_vector(msg.slice(offset, offset + 4)));
-              offset += 4; //length =4
+            if (fspec[37] === "1") {
+              /// I021/110 Trajectory Intent
+              /// Primary Subfield + Subfield #1 + 16 * Subfield #2 => max 18
+              const bits = BigInt("0x" + msg.slice(offset, offset + 1).toString("hex"))
+                .toString(2)
+                .padStart(8, "0")
+                .split("");
+              let len = 0;
+              let tis = false;
+              let tid = false;
+              var rep = 0;
+              if (bits[0] === "1") {
+                len++;
+                tis = true;
+              }
+              if (bits[1] === "1") {
+                rep = buffer.slice(offset + 1 + len, offset + 2 + len).readInt16BE();
+                len += 15 * rep;
+                tid = true;
+              }
+              tasks.push(decod_msg.set_tarjectory_intent(msg.slice(offset + 1, offset + len + 1), tis, tid, rep));
+              offset += len + 1; //length =1+
             }
-            if (fspec[29] === "1") {
-              /// I021/165 Track Angle Rate
-              tasks.push(decod_msg.set_track_angle_rate(msg.slice(offset, offset + 2)));
-              offset += 2; //length =2
+            if (fspec[38] === "1") {
+              /// I021/016 Service Management
+              tasks.push(decod_msg.set_service_management(msg.slice(offset, offset + 1)));
+              offset += 1; //length =1
             }
-            if (fspec[30] === "1") {
-              /// I021/077 Time of Report Transmission
-              tasks.push(decod_msg.set_time_ASTERIX_report_transmission(msg.slice(offset, offset + 3)));
-              offset += 3; //length =3
-            }
-            if (fspec[31] === "1") {
+            if (fspec[39] === "1") {
               /// Field Extension Indicator
 
-              if (fspec[32] === "1") {
-                /// I021/170 Target Identification
-                tasks.push(decod_msg.set_target_identification(msg.slice(offset, offset + 6)));
-                offset += 6; //length =6
-              }
-              if (fspec[33] === "1") {
-                /// I021/020 Emitter Category
-                tasks.push(decod_msg.set_emitter_category(msg.slice(offset, offset + 1)));
+              if (fspec[40] === "1") {
+                /// I021/008 Aircraft Operational Status
+                tasks.push(decod_msg.set_aircraft_operational_status(msg.slice(offset, offset + 1)));
                 offset += 1; //length =1
               }
-              if (fspec[34] === "1") {
-                /// I021/220 Met Information
-                let fields: string[] = []; // Primary Subfield + 2* Subfield #1 + 2* Subfield #2 + 2* Subfield #3 + Subfield #4 => max 8
-                let len = 1;
-                BigInt("0x" + buffer.toString("hex"))
-                  .toString(2)
-                  .padStart(8, "0")
-                  .split("")
-                  .forEach((value, index) => {
-                    switch (index) {
-                      case 0:
-                        if (value === "1") {
-                          fields.push("WS");
-                        }
-                        break;
-                      case 1:
-                        if (value === "1") {
-                          fields.push("WD");
-                        }
-                        break;
-                      case 2:
-                        if (value === "1") {
-                          fields.push("TMP");
-                        }
-                        break;
-                      case 3:
-                        if (value === "1") {
-                          fields.push("TRB");
-                          len--;
-                        } //only one octet
-                        break;
-                    }
-                  });
-                tasks.push(
-                  decod_msg.set_met_information(msg.slice(offset + 1, offset + fields.length * 2 + len), fields)
-                );
-                offset += fields.length * 2 + len; //length =1+
+              if (fspec[41] === "1") {
+                /// I021/271 Surface Capabilities and Characteristics
+                let len = variableItemOffset(msg.slice(offset, offset + 2), 2); // Primary Subfield + First extension => max 2
+                tasks.push(decod_msg.set_surface_capabilities_and_characteristics(msg.slice(offset, offset + len)));
+                offset += len; //length =1+
               }
-              if (fspec[35] === "1") {
-                /// I021/146 Selected Altitude
-                tasks.push(decod_msg.set_selected_altitude(msg.slice(offset, offset + 2)));
-                offset += 2; //length =2
-              }
-              if (fspec[36] === "1") {
-                /// I021/148 Final State Selected Altitude
-                tasks.push(decod_msg.set_final_state_selected_altitude(msg.slice(offset, offset + 2)));
-                offset += 2; //length =2
-              }
-              if (fspec[37] === "1") {
-                /// I021/110 Trajectory Intent
-                /// Primary Subfield + Subfield #1 + 16 * Subfield #2 => max 18
-                const bits = BigInt("0x" + msg.slice(offset, offset + 1).toString("hex"))
-                  .toString(2)
-                  .padStart(8, "0")
-                  .split("");
-                let len = 0;
-                let tis = false;
-                let tid = false;
-                var rep = 0;
-                if (bits[0] === "1") {
-                  len++;
-                  tis = true;
-                }
-                if (bits[1] === "1") {
-                  rep = buffer.slice(offset + 1 + len, offset + 2 + len).readInt16BE();
-                  len += 15 * rep;
-                  tid = true;
-                }
-                tasks.push(decod_msg.set_tarjectory_intent(msg.slice(offset + 1, offset + len + 1), tis, tid, rep));
-                offset += len + 1; //length =1+
-              }
-              if (fspec[38] === "1") {
-                /// I021/016 Service Management
-                tasks.push(decod_msg.set_service_management(msg.slice(offset, offset + 1)));
+              if (fspec[42] === "1") {
+                /// I021/132 Message Amplitude
+                tasks.push(decod_msg.set_message_amplitude(msg.slice(offset, offset + 1)));
                 offset += 1; //length =1
               }
-              if (fspec[39] === "1") {
-                /// Field Extension Indicator
-
-                if (fspec[40] === "1") {
-                  /// I021/008 Aircraft Operational Status
-                  tasks.push(decod_msg.set_aircraft_operational_status(msg.slice(offset, offset + 1)));
-                  offset += 1; //length =1
-                }
-                if (fspec[41] === "1") {
-                  /// I021/271 Surface Capabilities and Characteristics
-                  let len = variableItemOffset(msg.slice(offset, offset + 2), 2); // Primary Subfield + First extension => max 2
-                  tasks.push(decod_msg.set_surface_capabilities_and_characteristics(msg.slice(offset, offset + len)));
-                  offset += len; //length =1+
-                }
-                if (fspec[42] === "1") {
-                  /// I021/132 Message Amplitude
-                  tasks.push(decod_msg.set_message_amplitude(msg.slice(offset, offset + 1)));
-                  offset += 1; //length =1
-                }
-                if (fspec[43] === "1") {
-                  /// I021/250 Mode S MB Data
-                  const len = buffer.slice(offset, offset + 1).readInt16BE();
-                  tasks.push(decod_msg.set_mode_s_mb_data(msg.slice(offset + 1, offset + 1 + 8 * len), len));
-                  offset += 1 + 8 * len; //length =1+8n
-                }
-                if (fspec[44] === "1") {
-                  //TODO
-                  //console.log("I021/260 ACAS Resolution Advisory Report")
-                  //console.log("	" + msg.slice(offset, offset + 7).toString('hex'));
-                  offset += 7;
-                  //length =7
-                }
-                if (fspec[45] === "1") {
-                  /// I021/400 Receiver ID
-                  tasks.push(decod_msg.set_receiver_ID(msg.slice(offset, offset + 1)));
-                  offset += 1;
-                  //length =1
-                }
-                if (fspec[46] === "1") {
-                  //TODO
-                  //console.log("I021/295 Data Ages")
-                  /// 4 octets to indicate octates presence
-                  //let offsetDA = variableItemOffsetDataAges(msg.slice(offset, offset + 4));
-                  //console.log("	" + msg.slice(offset, offset + offsetDA.Offset + offsetDA.Items).toString('hex'));
-                  //offset += len; //length =1+
-                }
-                /*if (fspec[47] === '1') {
+              if (fspec[43] === "1") {
+                /// I021/250 Mode S MB Data
+                const len = buffer.slice(offset, offset + 1).readInt16BE();
+                tasks.push(decod_msg.set_mode_s_mb_data(msg.slice(offset + 1, offset + 1 + 8 * len), len));
+                offset += 1 + 8 * len; //length =1+8n
+              }
+              if (fspec[44] === "1") {
+                //TODO
+                //console.log("I021/260 ACAS Resolution Advisory Report")
+                //console.log("	" + msg.slice(offset, offset + 7).toString('hex'));
+                offset += 7;
+                //length =7
+              }
+              if (fspec[45] === "1") {
+                /// I021/400 Receiver ID
+                tasks.push(decod_msg.set_receiver_ID(msg.slice(offset, offset + 1)));
+                offset += 1;
+                //length =1
+              }
+              if (fspec[46] === "1") {
+                //TODO
+                //console.log("I021/295 Data Ages")
+                /// 4 octets to indicate octates presence
+                //let offsetDA = variableItemOffsetDataAges(msg.slice(offset, offset + 4));
+                //console.log("	" + msg.slice(offset, offset + offsetDA.Offset + offsetDA.Items).toString('hex'));
+                //offset += len; //length =1+
+              }
+              /*if (fspec[47] === '1') {
                   console.log("Field Extension Indicator")
 
                   /// FRN43 - FRN 47 Not Used
@@ -619,22 +617,17 @@ export function decodeClass21Messages(buffer: Buffer, cat21msg: Buffer[]) {
                   console.log("Field Extension Indicator, but no more in the spec")
 
                 }*/
-              }
             }
           }
         }
       }
-      Promise.all(tasks).then(() => {
-        vec21.push(decod_msg);
-
-        if (decod_msg.id === test2) {
-          console.log(decod_msg);
-          console.log(vec21.length);
-        }
-      });
     }
+    await Promise.all(tasks);
+    vec21.push(decod_msg);
+
     b++;
   });
+  return vec21;
 }
 
 function variableItemOffset(buffer: Buffer, max_len: number) {
