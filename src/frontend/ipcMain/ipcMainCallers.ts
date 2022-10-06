@@ -1,7 +1,7 @@
 import { parseIpcMainReceiveMessage } from "./ipcMainReceiveParser";
 
-export async function ipcMainBidirectional(event: string) {
-  const returnValue = await window.electron.sendAndReceive(event);
+export async function ipcMainBidirectional(event: string, data?: any) {
+  const returnValue = await window.electron.sendAndReceive(event, data);
   parseIpcMainReceiveMessage(returnValue);
 }
 

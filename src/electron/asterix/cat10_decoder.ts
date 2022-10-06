@@ -170,11 +170,13 @@ export class Cat10 {
 
   set_wgs_84_coordinates = async (buffer: Buffer) => {
     const lat_buffer = buffer.slice(0, 4);
-    const long_buffer = buffer.slice(4, 8);
+    const lon_buffer = buffer.slice(4, 8);
     const lat = (lat_buffer.readInt32BE() * 180) / Math.pow(2, 31);
-    const lon = (lat_buffer.readInt32BE() * 180) / Math.pow(2, 31);
-    this.wgs_84_coordinates.latitude = lat;
-    this.wgs_84_coordinates.longitude = lon;
+    const lon = (lon_buffer.readInt32BE() * 180) / Math.pow(2, 31);
+    this.wgs_84_coordinates = {
+      latitude: lat,
+      longitude: lon,
+    };
   };
 
   set_polar_coordinates = async (buffer: Buffer) => {
@@ -186,8 +188,10 @@ export class Cat10 {
     const theta_coord = (theta_buffer.readInt16BE() * 360) / Math.pow(2, 16);
     // console.log("Theta-coordinate: " + theta_coord + "º");
 
-    this.polar_coordinates.r = r_coord;
-    this.polar_coordinates.theta = theta_coord;
+    this.polar_coordinates = {
+      r: r_coord,
+      theta: theta_coord,
+    };
   };
 
   set_cartesian_coordinates = async (buffer: Buffer) => {
@@ -198,8 +202,10 @@ export class Cat10 {
 
     const y_coord = y_buffer.readInt16BE();
     // console.log("Y-coordinate: " + y_coord);
-    this.cartesian_coordinates.x = x_coord;
-    this.cartesian_coordinates.y = y_coord;
+    this.cartesian_coordinates = {
+      x: x_coord,
+      y: y_coord,
+    };
   };
 
   set_calculated_track_velocity_polar_coordinates = async (buffer: Buffer) => {
@@ -211,8 +217,10 @@ export class Cat10 {
     const theta_coord = (theta_buffer.readInt16BE() * 360) / Math.pow(2, 16);
     // console.log("Theta-coordinate: " + theta_coord + "º");
 
-    this.calculated_track_velocity_polar_coordinates.r = r_coord;
-    this.calculated_track_velocity_polar_coordinates.theta = theta_coord;
+    this.calculated_track_velocity_polar_coordinates = {
+      r: r_coord,
+      theta: theta_coord,
+    };
   };
 
   set_calculated_track_velocity_cartesian_coordinates = async (buffer: Buffer) => {
@@ -223,8 +231,7 @@ export class Cat10 {
 
     const y_coord = y_buffer.readInt16BE() * 0.25;
     // console.log("Y-coordinate: " + y_coord);
-    this.calculated_track_velocity_cartesian_coordinates.x = x_coord;
-    this.calculated_track_velocity_cartesian_coordinates.y = y_coord;
+    this.calculated_track_velocity_cartesian_coordinates = { x: x_coord, y: y_coord };
   };
 
   set_mod_3A_code = async (buffer: Buffer) => {

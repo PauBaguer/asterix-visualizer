@@ -13,6 +13,7 @@ import logger from "./utils/logger";
 import settings from "./utils/settings";
 import { openFilePicker, openTestFile } from "./utils/file_management";
 import { sliceMainBuffer } from "./asterix/message_cassifier";
+import { getMessagesIpc, loadFileIpc } from "./utils/ipcMain";
 
 const isProd = process.env.NODE_ENV === "production" || app.isPackaged;
 
@@ -70,13 +71,8 @@ const createWindow = () => {
     else console.log("No file opened");
   });
 
-  ipcMain.handle("test-receive", async () => {
-    const buffer = await openFilePicker();
-    if (buffer) return await sliceMainBuffer(buffer);
-    else console.log("No file opened");
-    return;
-    //await new Promise((resolve) => setTimeout(resolve, 1000));
-  });
+  ipcMain.handle("test-receive", loadFileIpc);
+  ipcMain.handle("get-message-quantity", getMessagesIpc);
 };
 
 app.on("ready", createWindow);
