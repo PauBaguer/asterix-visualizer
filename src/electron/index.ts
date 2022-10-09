@@ -27,8 +27,8 @@ let notification: Notification | null;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 900,
-    height: 680,
+    width: 1400,
+    height: 1000,
     webPreferences: {
       devTools: isProd ? false : true,
       contextIsolation: true,
