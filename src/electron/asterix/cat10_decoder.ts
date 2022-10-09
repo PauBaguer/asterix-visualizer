@@ -11,7 +11,7 @@ export class Cat10 {
   mod_3A_code: Mod3ACode;
   flight_level: FlightLevel;
   measured_height: string;
-  alitude_of_primary_plot: number;
+  altitude_of_primary_plot: number;
   time_of_day: string;
   track_number: number;
   track_status: TrackStatus;
@@ -269,7 +269,7 @@ export class Cat10 {
   };
 
   set_alitude_of_primary_plot = async (buffer: Buffer) => {
-    this.alitude_of_primary_plot = parseInt("0x" + buffer.toString("hex"));
+    this.altitude_of_primary_plot = parseInt("0x" + buffer.toString("hex"));
   };
 
   set_time_of_day = async (buffer: Buffer) => {

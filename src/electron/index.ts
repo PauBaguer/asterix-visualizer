@@ -14,6 +14,7 @@ import settings from "./utils/settings";
 import { openFilePicker, openTestFile } from "./utils/file_management";
 import { sliceMainBuffer } from "./asterix/message_cassifier";
 import { getMessagesIpc, loadFileIpc } from "./utils/ipcMain";
+import { Cat21 } from "./asterix/cat21_decoder";
 
 const isProd = process.env.NODE_ENV === "production" || app.isPackaged;
 

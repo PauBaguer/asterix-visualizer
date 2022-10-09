@@ -22,16 +22,25 @@ export function classifyMessages(messages: Buffer[]): Buffer[][] {
 
   let cat10msg: Buffer[] = [];
   let cat21msg: Buffer[] = [];
+  let cat23msg: Buffer[] = [];
 
   cat10msg = messages.filter((v) => {
     // console.log(v[0]);
     if (v[0] === 10) {
       return true;
+    } else if (v[0] === 21) {
+      cat21msg.push(v);
+      return false;
+    } else if (v[0] === 23) {
+      cat23msg.push(v);
+      return false;
     }
-    cat21msg.push(v);
+    console.log(`Received message from Category ${v[0]}`);
     return false;
   });
-
+  console.log(`Received ${cat10msg.length} messages from Category 10`);
+  console.log(`Received ${cat21msg.length} messages from Category 21`);
+  console.log(`Received ${cat23msg.length} messages from Category 23`);
   return [cat10msg, cat21msg];
 }
 
@@ -340,16 +349,22 @@ export async function decodeClass21Messages(buffer: Buffer, cat21msg: Buffer[]) 
       offset += 3; //length =3
     }
     if (fspec[5] === "1") {
-      ///TODO
       // console.log("I021/130 Position in WGS-84 co-ordinates")
       // console.log("	" + msg.slice(offset, offset + 6).toString('hex'));
+      tasks.push(decod_msg.set_wgs_84_coordinates(msg.slice(offset, offset + 6)));
       offset += 6;
       //length =6
     }
     if (fspec[6] === "1") {
-      ///TODO
       // console.log("I021/131 Position in WGS-84 co-ordinates, high res.")
       // console.log("	" + msg.slice(offset, offset + 8).toString('hex'));
+      if (msg.slice(offset, offset + 8).length == 0) {
+        console.log("Zero buffer");
+        console.log(fspec);
+        console.log(msg);
+        console.log(b);
+      }
+      tasks.push(decod_msg.set_wgs_84_coordinates_high(msg.slice(offset, offset + 8)));
       offset += 8;
       //length =8
     }
