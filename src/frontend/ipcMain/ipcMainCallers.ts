@@ -1,12 +1,11 @@
 import { parseInitIpcMain, parseIpcMainReceiveMessage } from "./ipcMainReceiveParser";
 
 export async function initIpcMainBidirectional(event: string) {
-  const returnValue = await window.electron.sendAndReceive(event);
-  parseInitIpcMain(returnValue);
+  return await window.electron.sendAndReceive(event);
 }
 
 export async function ipcMainBidirectional(event: string, data?: any) {
-  window.electron.sendAndReceive(event, data).then((res) => parseIpcMainReceiveMessage(res));
+  return await window.electron.sendAndReceive(event, data);
 }
 
 export function ipcMainOneDirection(event: string) {

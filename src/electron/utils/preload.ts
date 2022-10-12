@@ -11,4 +11,6 @@ contextBridge.exposeInMainWorld("electron", {
   //   receive: (channel: any, func: any) => {
   //     ipcRenderer.on(channel, (event, ...args) => func(...args));
   //   },
+
+  pushNotification: (callback: any) => ipcRenderer.on("push-notification", callback),
 });

@@ -80,7 +80,7 @@ export class Cat21 {
     this.aircraft_operational_status = { RA: ra, TC: tc, TS: ts, ARV: arv, CDTI: cdti, TCAS: tcas, SA: sa };
   };
 
-  set_data_source_identifier(buffer: Buffer) {
+  async set_data_source_identifier(buffer: Buffer) {
     var sac = "0x" + buffer.slice(0, 1).toString("hex");
 
     if (sac === "0x00") {

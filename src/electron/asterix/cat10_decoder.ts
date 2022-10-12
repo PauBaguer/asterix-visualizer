@@ -49,7 +49,7 @@ export class Cat10 {
     }
   };
 
-  set_data_source_identifier(buffer: Buffer) {
+  async set_data_source_identifier(buffer: Buffer) {
     var sac = "0x" + buffer.slice(0, 1).toString("hex");
 
     if (sac === "0x00") {
