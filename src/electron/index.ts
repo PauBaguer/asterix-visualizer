@@ -30,6 +30,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 1000,
+    icon: "assets/asterix_color.png",
     webPreferences: {
       devTools: isProd ? false : true,
       contextIsolation: true,

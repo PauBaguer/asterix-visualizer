@@ -123,8 +123,7 @@
     },
     "linux": {
       "target": [
-        "AppImage",
-        "snap"
+        "AppImage"
       ],
       "category": "productivity"
     },
@@ -134,7 +133,10 @@
       "package.json"
     ],
     "extraResources": [
-      "assets/**"
+      {
+        "from": "./assets",
+        "to": "assets"
+      }
     ],
     "publish": [
       {

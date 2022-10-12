@@ -480,7 +480,6 @@ export class Cat21 {
       latitude: lat,
       longitude: lon,
     };
-    console.log({ wgs_84_coordinates: this.wgs_84_coordinates });
   };
 
   set_wgs_84_coordinates_high = async (buffer: Buffer) => {
@@ -493,7 +492,6 @@ export class Cat21 {
         latitude: lat,
         longitude: lon,
       };
-      console.log({ wgs_84_coordinates_high: this.wgs_84_coordinates_high });
     } catch (e) {
       if (e instanceof RangeError) {
         // Output expected ERR_BUFFER_OUT_OF_BOUNDS RangeErrors.

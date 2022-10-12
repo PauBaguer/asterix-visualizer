@@ -1,7 +1,7 @@
 import { Cat10 } from "../asterix/cat10_decoder";
 import { Cat21 } from "../asterix/cat21_decoder";
 import {
-  classifyMessages,
+  classifyMessages as decodeMessages,
   decodeClass10Messages,
   decodeClass21Messages,
   sliceMainBuffer,
@@ -12,6 +12,7 @@ let buffer: Buffer | undefined;
 let messages: Buffer[];
 let cat10msg: Buffer[];
 let cat21msg: Buffer[];
+let decodedMsg: (Cat10 | Cat21)[];
 
 export async function loadFileIpc() {
   buffer = await openFilePicker();
@@ -21,15 +22,12 @@ export async function loadFileIpc() {
   }
 
   messages = await sliceMainBuffer(buffer);
-  [cat10msg, cat21msg] = await classifyMessages(messages);
   return messages.length;
 }
 
 //@ts-ignore
 export async function getMessagesIpc(event: any, messageQuantity: number) {
-  const decodedCat10msg: Cat10[] = await decodeClass10Messages(buffer!, cat10msg.slice(0, messageQuantity))!;
-  const decodedCat21msg: Cat21[] = await decodeClass21Messages(buffer!, cat21msg.slice(0, messageQuantity))!;
-
-  //const jsArray = decodedCat10msg.map((obj) => JSON.stringify(obj));
-  return JSON.stringify([decodedCat10msg, decodedCat21msg]);
+  decodedMsg = await decodeMessages(messages, messageQuantity);
+  console.log(decodedMsg.length);
+  return JSON.stringify(decodedMsg);
 }
