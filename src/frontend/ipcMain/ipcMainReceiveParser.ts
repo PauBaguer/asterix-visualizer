@@ -9,4 +9,5 @@ export async function parseIpcMainReceiveMessage(msg: string) {
 
   const messages = await JSON.parse(msg);
   console.log(messages);
+  return messages;
 }

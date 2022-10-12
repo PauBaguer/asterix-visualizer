@@ -15,7 +15,7 @@ function initMap() {
   const view = new SceneView({
     // An instance of Map or WebScene
     map: new Map({
-      basemap: "hybrid",
+      basemap: "satellite",
       ground: "world-elevation",
     }),
     camera: {
