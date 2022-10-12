@@ -516,12 +516,12 @@ export class Cat10 {
           .split("");
         this.mode_s_mb_data.push(
           "BDS1: " +
-            parseInt(bits.slice(0, 4).join(""), 2).toString(10) +
-            " BDS2: " +
-            parseInt(bits.slice(4, 8).join(""), 2).toString(10)
+          parseInt(bits.slice(0, 4).join(""), 2).toString(10) +
+          " BDS2: " +
+          parseInt(bits.slice(4, 8).join(""), 2).toString(10)
         );
         start += 8;
-      } catch {}
+      } catch { }
     }
   };
 
@@ -589,12 +589,12 @@ export class Cat10 {
         var dtheta = (parseInt("0x" + buffer.slice(start + 1, start + 2).toString("hex")) * 0.15).toString(10) + "º";
         start += 2;
         this.presence.push({ DRHO: drho, DTHETA: dtheta });
-      } catch {}
+      } catch { }
     }
   };
 
   set_vehicle_fleet_identification = async (buffer: Buffer) => {
-    var vfi = parseInt("0x" + buffer.slice(1, 2).toString("hex"));
+    var vfi = parseInt("0x" + buffer.toString("hex"));
     switch (vfi) {
       case 0:
         this.vehicle_fleet_identification = "Unknown";
@@ -684,7 +684,7 @@ export class Cat10 {
   set_standard_deviation_of_position = async (buffer: Buffer) => {
     var x_component = (parseInt("0x" + buffer.slice(0, 1).toString("hex")) * 0.25).toString(10) + " m";
     var y_component = (parseInt("0x" + buffer.slice(1, 2).toString("hex")) * 0.25).toString(10) + " m";
-    var covariance = (buffer.readInt16BE() * 0.25).toString(10) + " m";
+    var covariance = (buffer.slice(2, 4).readInt16BE() * 0.25).toString(10) + " m";
     this.standard_deviation_of_position = {
       X_component: x_component,
       Y_component: y_component,

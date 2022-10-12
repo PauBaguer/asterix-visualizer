@@ -25,16 +25,18 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   let decodedMessages: (Cat10 | Cat21)[] = [];
 
   if (messageQuantity != -1) {
-    messages = messages.slice(0, 10);
+    messages = messages.slice(0, messageQuantity);
   }
 
   messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
 
   decodedMessages = await Promise.all(
-    messages.map((v) => {
+    messages.map(async (v) => {
       if (v[0] === 10) {
         cat10msg += 1;
-        return decodeClass10Messages(v);
+        let msg = await decodeClass10Messages(v);
+        //console.log(msg)
+        return msg;
       }
       //case 21
       cat21msg += 1;
