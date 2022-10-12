@@ -6,8 +6,7 @@ export async function initIpcMainBidirectional(event: string) {
 }
 
 export async function ipcMainBidirectional(event: string, data?: any) {
-  const returnValue = await window.electron.sendAndReceive(event, data);
-  parseIpcMainReceiveMessage(returnValue);
+  window.electron.sendAndReceive(event, data).then((res) => parseIpcMainReceiveMessage(res));
 }
 
 export function ipcMainOneDirection(event: string) {

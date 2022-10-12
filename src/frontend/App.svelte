@@ -47,7 +47,7 @@
     <button on:click="{() => ipcMainOneDirection('test')}">IPC MAIN test</button>
     <button on:click="{() => ipcMainOneDirection('open-file-picker')}">Open file picker</button>
     <button on:click="{() => ipcMainOneDirection('open-test-file')}">Open test file</button>
-    <button on:click="{() => initIpcMainBidirectional('test-receive')}">Test IPC value return</button>
+    <button on:click="{async () => await initIpcMainBidirectional('test-receive')}">Test IPC value return</button>
   </div>
   <div id="viewDiv"></div>
 </main>

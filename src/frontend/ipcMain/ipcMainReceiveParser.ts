@@ -1,11 +1,11 @@
 import { ipcMainBidirectional } from "./ipcMainCallers";
 
-export function parseInitIpcMain(msg: string) {
+export async function parseInitIpcMain(msg: string) {
   console.log(`Loaded ${msg} messages!`);
-  ipcMainBidirectional("get-message-quantity", 50);
+  ipcMainBidirectional("get-message-quantity", 20000);
 }
 
-export function parseIpcMainReceiveMessage(msg: string) {
+export async function parseIpcMainReceiveMessage(msg: string) {
   console.log(msg);
 
   const messages = JSON.parse(msg);

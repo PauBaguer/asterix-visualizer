@@ -1,7 +1,7 @@
 type electron = {
   send: (channel: string, data?: any) => void;
   sendSync: (channel: string, data?: any) => void;
-  sendAndReceive: (channel: string, data?: any) => string;
+  sendAndReceive: (channel: string, data?: any) => Promise<any>;
 };
 declare global {
   interface Window {

@@ -18,39 +18,34 @@ export function sliceMainBuffer(buffer: Buffer) {
 }
 
 export async function classifyMessages(messages: Buffer[], messageQuantity: number): Promise<(Cat10 | Cat21)[]> {
-  // console.log({ All: messages.length });
-
   let cat10msg: number = 0;
   let cat21msg: number = 0;
   let cat23msg: Buffer[] = [];
   let decodedMessages: (Cat10 | Cat21)[] = [];
 
-  //let tasks: any[] = [];
-
   if (messageQuantity != -1) {
     messages = messages.slice(0, messageQuantity);
   }
-  await messages.forEach(async (v) => {
-    // console.log(v[0]);
-    switch (v[0]) {
-      case 10:
-        cat10msg += 1;
-        //    tasks.push(decodeClass10Messages(v));
-        decodedMessages.push(await decodeClass10Messages(v));
-        break;
-      case 21:
-        cat21msg += 1;
-        //   tasks.push(decodeClass21Messages(v));
-        decodedMessages.push(await decodeClass21Messages(v));
-        break;
-      case 23:
-        cat23msg.push(v);
-        break;
-      default:
-        console.log(`Received message from Category ${v[0]}`);
-        break;
-    }
-  });
+  await Promise.all(
+    messages.map(async (v) => {
+      switch (v[0]) {
+        case 10:
+          cat10msg += 1;
+          decodedMessages.push(await decodeClass10Messages(v));
+          break;
+        case 21:
+          cat21msg += 1;
+          decodedMessages.push(await decodeClass21Messages(v));
+          break;
+        case 23:
+          cat23msg.push(v);
+          break;
+        default:
+          console.log(`Received message from Category ${v[0]}`);
+          break;
+      }
+    })
+  );
   console.log(`Received ${cat10msg} messages from Category 10`);
   console.log(`Received ${cat21msg} messages from Category 21`);
   console.log(`Received ${cat23msg.length} messages from Category 23`);
@@ -284,6 +279,7 @@ export async function decodeClass10Messages(msg: Buffer): Promise<Cat10> {
   }
   //@ts-ignore
   await Promise.all(tasks);
+
   return decod_msg;
 
   // if (vec.length === cat10msg.length) {

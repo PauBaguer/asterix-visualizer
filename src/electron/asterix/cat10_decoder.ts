@@ -276,7 +276,7 @@ export class Cat10 {
     var sec = parseInt("0x" + buffer.toString("hex")) / 128.0;
     var date = new Date(0);
     date.setMilliseconds(sec * 1000);
-    this.time_of_day = date.toISOString().substring(11, 23);
+    this.time_of_day = date.toISOString().substring(11, 23); //TODO invalid time error
   };
 
   set_track_number = async (buffer: Buffer) => {
