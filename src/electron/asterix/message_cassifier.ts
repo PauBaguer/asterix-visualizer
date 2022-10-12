@@ -24,7 +24,7 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   let decodedMessages: (Cat10 | Cat21)[] = [];
 
   if (messageQuantity != -1) {
-    messages = messages.slice(0, messageQuantity);
+    messages = messages.slice(0, 10);
   }
   await Promise.all(
     messages.map(async (v) => {
@@ -84,196 +84,196 @@ export async function decodeClass10Messages(msg: Buffer): Promise<Cat10> {
   var decod_msg: Cat10 = new Cat10(a); //TODO FIX
   var tasks: any[] = [];
 
-  if (fspec[0] === "1") {
-    /// I010/010 Data Source Identifier
-    tasks.push(decod_msg.set_data_source_identifier(msg.slice(offset, offset + 2)));
-    offset += 2; //length =2
-  }
-  if (fspec[1] === "1") {
-    /// I010/000 Message Type
-    tasks.push(decod_msg.set_message_type(msg.slice(offset, offset + 1)));
-    offset += 1; //length =1
-
-    /// Page 13 -> for Types 002, 003, 004 only present Data Source Identifier, Data Type, Time of Day, System Status (optional in 002).
-    if (msg[offset - 1] != 0x01) {
-      /// I010/140 Time of Day
-      tasks.push(decod_msg.set_time_of_day(msg.slice(offset, offset + 3)));
-
-      if (offset === 9) {
-        // Check if it has System  Status
-        /// I010/550 System Status
-        tasks.push(decod_msg.set_system_status(msg.slice(offset + 3, offset + 4)));
-      }
-
-      // await Promise.all(tasks);
-      // // console.log(decod_msg);
-      // vec.push(decod_msg);
-      // // if (vec.length === cat10msg.length) {
-      // //   // console.log(decod_msg);
-      // //   // console.log(vec.length);
-      // //   return vec;
-      // // }
-
-      // a++;
-    }
-  }
   // *** Mandatory items ***
+  /// I010/010 Data Source Identifier
+  tasks.push(decod_msg.set_data_source_identifier(msg.slice(offset, offset + 2)));
+  offset += 2; //length =2
 
-  /// I010/020 Target Report Descriptor
-  let len = variableItemOffset(msg.slice(offset, offset + 3), 3); // First Part + First Extent + Second Extent => max 3
-  tasks.push(decod_msg.set_target_report_description(msg.slice(offset, offset + len)));
-  offset += len; //length =1+
+  /// I010/000 Message Type
+  tasks.push(decod_msg.set_message_type(msg.slice(offset, offset + 1)));
+  offset += 1; //length =1
 
-  /// "I010/140 Time of Day"
-  tasks.push(decod_msg.set_time_of_day(msg.slice(offset, offset + 3)));
-  offset += 3; //length =3
-  // **********************
-  if (fspec[4] === "1") {
-    //TODO test that the result is correct when we have data for this field
-    // console.log("I010/041 Position in WGS-84 Co-ordinates")
-    // console.log("	" + msg.slice(offset, offset + 8).toString('hex'));
-    tasks.push(decod_msg.set_wgs_84_coordinates(msg.slice(offset, offset + 8)));
-    offset += 8;
-    //length =8
-  }
-  if (fspec[5] === "1") {
-    //   console.log("I010/040 Measured Position in Polar Co-ordinates");
-    //   const buff = msg.slice(offset, offset + 4);
-    //   console.log("	" + buff.toString("hex"));
-    //   parsePolarCoordinate(buff);
-    tasks.push(decod_msg.set_polar_coordinates(msg.slice(offset, offset + 4)));
-    offset += 4;
-    //length =4
-  }
-  if (fspec[6] === "1") {
-    // console.log("I010/042 Position in Cartesian Co-ordinates");
-    // const buff = msg.slice(offset, offset + 4);
-    // console.log("	" + buff.toString("hex"));
-    // parseCartesianCoordinate(buff);
-    tasks.push(decod_msg.set_cartesian_coordinates(msg.slice(offset, offset + 4)));
-    offset += 4;
-    //length =4
-  }
-  if (fspec[7] === "1") {
-    /**** Field Extension Indicator ****/
+  /// Page 13 -> for Types 002, 003, 004 only present Data Source Identifier, Data Type, Time of Day, System Status (optional in 002).
+  if (msg[offset - 1] != 0x01) {
+    /// I010/140 Time of Day
+    tasks.push(decod_msg.set_time_of_day(msg.slice(offset, offset + 3)));
 
-    if (fspec[8] === "1") {
-      // TODO test that the result is correct when we have data for this field
-      // console.log("I010/200 Calculated Track Velocity in Polar Co-ordinates");
-      // console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
-      tasks.push(decod_msg.set_calculated_track_velocity_polar_coordinates(msg.slice(offset, offset + 4)));
-      offset += 4;
-      //length =4
+    if (offset === 9) {
+      // Check if it has System  Status
+      /// I010/550 System Status
+      tasks.push(decod_msg.set_system_status(msg.slice(offset + 3, offset + 4)));
     }
-    if (fspec[9] === "1") {
+
+    // await Promise.all(tasks);
+    // // console.log(decod_msg);
+    // vec.push(decod_msg);
+    // // if (vec.length === cat10msg.length) {
+    // //   // console.log(decod_msg);
+    // //   // console.log(vec.length);
+    // //   return vec;
+    // // }
+
+    // a++;
+  } else {
+
+    // *** Mandatory items ***
+
+    /// I010/020 Target Report Descriptor
+    let len = variableItemOffset(msg.slice(offset, offset + 3), 3); // First Part + First Extent + Second Extent => max 3
+    tasks.push(decod_msg.set_target_report_description(msg.slice(offset, offset + len)));
+    offset += len; //length =1+
+
+    /// "I010/140 Time of Day"
+    tasks.push(decod_msg.set_time_of_day(msg.slice(offset, offset + 3)));
+    offset += 3; //length =3
+    // **********************
+    if (fspec[4] === "1") {
       //TODO test that the result is correct when we have data for this field
-      // console.log("I010/202 Calculated Track Velocity in Cartesian Coord.");
-      // console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
-      tasks.push(decod_msg.set_calculated_track_velocity_cartesian_coordinates(msg.slice(offset, offset + 4)));
+      // console.log("I010/041 Position in WGS-84 Co-ordinates")
+      // console.log("	" + msg.slice(offset, offset + 8).toString('hex'));
+      tasks.push(decod_msg.set_wgs_84_coordinates(msg.slice(offset, offset + 8)));
+      offset += 8;
+      //length =8
+    }
+    if (fspec[5] === "1") {
+      //   console.log("I010/040 Measured Position in Polar Co-ordinates");
+      //   const buff = msg.slice(offset, offset + 4);
+      //   console.log("	" + buff.toString("hex"));
+      //   parsePolarCoordinate(buff);
+      tasks.push(decod_msg.set_polar_coordinates(msg.slice(offset, offset + 4)));
       offset += 4;
       //length =4
     }
-    if (fspec[10] === "1") {
-      /// I010/161 Track Number
-      tasks.push(decod_msg.set_track_number(msg.slice(offset, offset + 2)));
-      offset += 2; //length =2
+    if (fspec[6] === "1") {
+      // console.log("I010/042 Position in Cartesian Co-ordinates");
+      // const buff = msg.slice(offset, offset + 4);
+      // console.log("	" + buff.toString("hex"));
+      // parseCartesianCoordinate(buff);
+      tasks.push(decod_msg.set_cartesian_coordinates(msg.slice(offset, offset + 4)));
+      offset += 4;
+      //length =4
     }
-    if (fspec[11] === "1") {
-      /// I010/170 Track Status
-      let len = variableItemOffset(msg.slice(offset, offset + 3), 3); // First Part + First Extent + Second Extent => max 3
-      tasks.push(decod_msg.set_track_status(msg.slice(offset, offset + len)));
-      offset += len; //length =1+
-    }
-    if (fspec[12] === "1") {
-      /// I010/060 Mode-3/A Code in Octal Representation
-      tasks.push(decod_msg.set_mod_3A_code(msg.slice(offset, offset + 2)));
-      offset += 2; //length =2
-    }
-    if (fspec[13] === "1") {
-      /// I010/220 Target Address
-      tasks.push(decod_msg.set_target_address(msg.slice(offset, offset + 3)));
-      offset += 3; //length =3
-    }
-    if (fspec[14] === "1") {
-      /// I010/245 Target Identification
-      tasks.push(decod_msg.set_target_identification(msg.slice(offset, offset + 7)));
-      offset += 7; //length =7
-    }
-    if (fspec[15] === "1") {
+    if (fspec[7] === "1") {
       /**** Field Extension Indicator ****/
 
-      if (fspec[16] === "1") {
-        /// I010/250 Mode S MB Data
-        const len = msg.slice(offset, offset + 1).readInt16BE(); //TODO this was buffer, i think its wrong
-        tasks.push(decod_msg.set_mode_s_mb_data(msg.slice(offset + 1, offset + 1 + 8 * len), len));
-        offset += 1 + 8 * len; //length =1+8n
+      if (fspec[8] === "1") {
+        // TODO test that the result is correct when we have data for this field
+        // console.log("I010/200 Calculated Track Velocity in Polar Co-ordinates");
+        // console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
+        tasks.push(decod_msg.set_calculated_track_velocity_polar_coordinates(msg.slice(offset, offset + 4)));
+        offset += 4;
+        //length =4
       }
-      if (fspec[17] === "1") {
-        /// I010/300 Vehicle Fleet Identification
-        tasks.push(decod_msg.set_vehicle_fleet_identification(msg.slice(offset, offset + 1)));
-        offset += 1; //length =1
+      if (fspec[9] === "1") {
+        //TODO test that the result is correct when we have data for this field
+        // console.log("I010/202 Calculated Track Velocity in Cartesian Coord.");
+        // console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
+        tasks.push(decod_msg.set_calculated_track_velocity_cartesian_coordinates(msg.slice(offset, offset + 4)));
+        offset += 4;
+        //length =4
       }
-      if (fspec[18] === "1") {
-        /// I010/090 Flight Level in Binary Representation
-        tasks.push(decod_msg.set_flight_level(msg.slice(offset, offset + 2)));
+      if (fspec[10] === "1") {
+        /// I010/161 Track Number
+        tasks.push(decod_msg.set_track_number(msg.slice(offset, offset + 2)));
         offset += 2; //length =2
       }
-      if (fspec[19] === "1") {
-        /// I010/091 Measured Height
-        tasks.push(decod_msg.set_measured_height(msg.slice(offset, offset + 2)));
-        offset += 2; //length =2
-      }
-      if (fspec[20] === "1") {
-        /// I010/270 Target Size & Orientation
+      if (fspec[11] === "1") {
+        /// I010/170 Track Status
         let len = variableItemOffset(msg.slice(offset, offset + 3), 3); // First Part + First Extent + Second Extent => max 3
-        tasks.push(decod_msg.set_target_size_and_orientation(msg.slice(offset, offset + len)));
+        tasks.push(decod_msg.set_track_status(msg.slice(offset, offset + len)));
         offset += len; //length =1+
       }
-      // Sytem Status -> Delete, never in a target report
-      if (fspec[22] === "1") {
-        /// I010/310 Pre-programmed Message
-        tasks.push(decod_msg.set_preprogrammed_message(msg.slice(offset, offset + 1)));
-        offset += 1; //length =1
+      if (fspec[12] === "1") {
+        /// I010/060 Mode-3/A Code in Octal Representation
+        tasks.push(decod_msg.set_mod_3A_code(msg.slice(offset, offset + 2)));
+        offset += 2; //length =2
       }
-      if (fspec[23] === "1") {
+      if (fspec[13] === "1") {
+        /// I010/220 Target Address
+        tasks.push(decod_msg.set_target_address(msg.slice(offset, offset + 3)));
+        offset += 3; //length =3
+      }
+      if (fspec[14] === "1") {
+        /// I010/245 Target Identification
+        tasks.push(decod_msg.set_target_identification(msg.slice(offset, offset + 7)));
+        offset += 7; //length =7
+      }
+      if (fspec[15] === "1") {
         /**** Field Extension Indicator ****/
 
-        if (fspec[24] === "1") {
-          /// I010/500 Standard Deviation of Position
-          tasks.push(decod_msg.set_standard_deviation_of_position(msg.slice(offset, offset + 4)));
-          offset += 4; //length =4
-        }
-        if (fspec[25] === "1") {
-          /// I010/280 Presence
+        if (fspec[16] === "1") {
+          /// I010/250 Mode S MB Data
           const len = msg.slice(offset, offset + 1).readInt16BE(); //TODO this was buffer, i think its wrong
-          tasks.push(decod_msg.set_presence(msg.slice(offset + 1, offset + 1 + 2 * len), len));
-          offset += 1 + 2 * len; //length =1+2n
+          tasks.push(decod_msg.set_mode_s_mb_data(msg.slice(offset + 1, offset + 1 + 8 * len), len));
+          offset += 1 + 8 * len; //length =1+8n
         }
-        if (fspec[26] === "1") {
-          /// I010/131 Amplitude of Primary Plot
-          tasks.push(decod_msg.set_alitude_of_primary_plot(msg.slice(offset, offset + 1)));
+        if (fspec[17] === "1") {
+          /// I010/300 Vehicle Fleet Identification
+          tasks.push(decod_msg.set_vehicle_fleet_identification(msg.slice(offset, offset + 1)));
           offset += 1; //length =1
         }
-        if (fspec[27] === "1") {
-          /// I010/210 Calculated Acceleration
-          tasks.push(decod_msg.set_calculated_acceleration(msg.slice(offset, offset + 2)));
-          // offset += 2; //length =2
+        if (fspec[18] === "1") {
+          /// I010/090 Flight Level in Binary Representation
+          tasks.push(decod_msg.set_flight_level(msg.slice(offset, offset + 2)));
+          offset += 2; //length =2
         }
-        //     /*if (fspec[28] === "1") {
-        //       console.log("Spare");
-        //       //length = Nan
-        //     }
-        //     if (fspec[29] === "1") {
-        //       console.log("SP Special Purpose Field");
-        //       //length =1+
-        //     }
-        //     if (fspec[30] === "1") {
-        //       console.log("RE Reserved Expansion Field");
-        //       //length =1+
-        //     }
-        //     if (fspec[31] === "1") {
-        //       console.log("Field Extension Indicator, but no more in the spec");
-        //     }*/
+        if (fspec[19] === "1") {
+          /// I010/091 Measured Height
+          tasks.push(decod_msg.set_measured_height(msg.slice(offset, offset + 2)));
+          offset += 2; //length =2
+        }
+        if (fspec[20] === "1") {
+          /// I010/270 Target Size & Orientation
+          let len = variableItemOffset(msg.slice(offset, offset + 3), 3); // First Part + First Extent + Second Extent => max 3
+          tasks.push(decod_msg.set_target_size_and_orientation(msg.slice(offset, offset + len)));
+          offset += len; //length =1+
+        }
+        // Sytem Status -> Delete, never in a target report
+        if (fspec[22] === "1") {
+          /// I010/310 Pre-programmed Message
+          tasks.push(decod_msg.set_preprogrammed_message(msg.slice(offset, offset + 1)));
+          offset += 1; //length =1
+        }
+        if (fspec[23] === "1") {
+          /**** Field Extension Indicator ****/
+
+          if (fspec[24] === "1") {
+            /// I010/500 Standard Deviation of Position
+            tasks.push(decod_msg.set_standard_deviation_of_position(msg.slice(offset, offset + 4)));
+            offset += 4; //length =4
+          }
+          if (fspec[25] === "1") {
+            /// I010/280 Presence
+            const len = msg.slice(offset, offset + 1).readInt16BE(); //TODO this was buffer, i think its wrong
+            tasks.push(decod_msg.set_presence(msg.slice(offset + 1, offset + 1 + 2 * len), len));
+            offset += 1 + 2 * len; //length =1+2n
+          }
+          if (fspec[26] === "1") {
+            /// I010/131 Amplitude of Primary Plot
+            tasks.push(decod_msg.set_alitude_of_primary_plot(msg.slice(offset, offset + 1)));
+            offset += 1; //length =1
+          }
+          if (fspec[27] === "1") {
+            /// I010/210 Calculated Acceleration
+            tasks.push(decod_msg.set_calculated_acceleration(msg.slice(offset, offset + 2)));
+            // offset += 2; //length =2
+          }
+          //     /*if (fspec[28] === "1") {
+          //       console.log("Spare");
+          //       //length = Nan
+          //     }
+          //     if (fspec[29] === "1") {
+          //       console.log("SP Special Purpose Field");
+          //       //length =1+
+          //     }
+          //     if (fspec[30] === "1") {
+          //       console.log("RE Reserved Expansion Field");
+          //       //length =1+
+          //     }
+          //     if (fspec[31] === "1") {
+          //       console.log("Field Extension Indicator, but no more in the spec");
+          //     }*/
+        }
       }
     }
   }
