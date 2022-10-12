@@ -211,7 +211,7 @@ export class Cat10 {
   set_calculated_track_velocity_polar_coordinates = async (buffer: Buffer) => {
     const r_buffer = buffer.slice(0, 2);
     const theta_buffer = buffer.slice(2, 4);
-    const r_coord = r_buffer.readInt16BE() * Math.pow(2, -14);
+    const r_coord = r_buffer.readInt16BE() * Math.pow(2, -14) * 3600;
     // console.log("r-coordinate: " + r_coord);
 
     const theta_coord = (theta_buffer.readInt16BE() * 360) / Math.pow(2, 16);
@@ -516,12 +516,12 @@ export class Cat10 {
           .split("");
         this.mode_s_mb_data.push(
           "BDS1: " +
-          parseInt(bits.slice(0, 4).join(""), 2).toString(10) +
-          " BDS2: " +
-          parseInt(bits.slice(4, 8).join(""), 2).toString(10)
+            parseInt(bits.slice(0, 4).join(""), 2).toString(10) +
+            " BDS2: " +
+            parseInt(bits.slice(4, 8).join(""), 2).toString(10)
         );
         start += 8;
-      } catch { }
+      } catch {}
     }
   };
 
@@ -589,7 +589,7 @@ export class Cat10 {
         var dtheta = (parseInt("0x" + buffer.slice(start + 1, start + 2).toString("hex")) * 0.15).toString(10) + "º";
         start += 2;
         this.presence.push({ DRHO: drho, DTHETA: dtheta });
-      } catch { }
+      } catch {}
     }
   };
 
