@@ -12,9 +12,8 @@ import { autoUpdater } from "electron-updater";
 import logger from "./utils/logger";
 import settings from "./utils/settings";
 import { openFilePicker, openTestFile } from "./utils/file_management";
-import { sliceMainBuffer } from "./asterix/message_cassifier";
+import { sliceMainBuffer, classifyMessages } from "./asterix/message_cassifier";
 import { getMessagesIpc, loadFileIpc } from "./utils/ipcMain";
-import { Cat21 } from "./asterix/cat21_decoder";
 
 const isProd = process.env.NODE_ENV === "production" || app.isPackaged;
 
@@ -63,19 +62,34 @@ const createWindow = () => {
 
   ipcMain.on("open-file-picker", async () => {
     const buffer = await openFilePicker();
-    if (buffer) sliceMainBuffer(buffer);
-    else console.log("No file opened");
+    if (!buffer) return;
+    const messages = await sliceMainBuffer(buffer!);
+    const decodedMsg = await classifyMessages(messages, 20000);
+    console.log(decodedMsg.length);
+    mainWindow?.webContents.send("push-notification", await JSON.stringify(decodedMsg));
   });
 
   ipcMain.on("open-test-file", async () => {
     const buffer = await openTestFile();
-    if (buffer) sliceMainBuffer(buffer);
-    else console.log("No file opened");
+    const messages = await sliceMainBuffer(buffer);
+    const decodedMsg = await classifyMessages(messages, 2000);
+    console.log(decodedMsg.length);
+    mainWindow?.webContents.send("push-notification", await JSON.stringify(decodedMsg));
+  });
+
+  ipcMain.handle("test-handle", async () => {
+    console.log("start timeout");
+    await timeout(10000);
+    console.log("end timeout");
+    return "noice";
   });
 
   ipcMain.handle("test-receive", loadFileIpc);
   ipcMain.handle("get-message-quantity", getMessagesIpc);
 };
+function timeout(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 app.on("ready", createWindow);
 

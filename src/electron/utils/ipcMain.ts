@@ -1,11 +1,6 @@
 import { Cat10 } from "../asterix/cat10_decoder";
 import { Cat21 } from "../asterix/cat21_decoder";
-import {
-  classifyMessages as decodeMessages,
-  decodeClass10Messages,
-  decodeClass21Messages,
-  sliceMainBuffer,
-} from "../asterix/message_cassifier";
+import { classifyMessages as decodeMessages, sliceMainBuffer } from "../asterix/message_cassifier";
 import { openFilePicker } from "./file_management";
 
 let buffer: Buffer | undefined;
@@ -29,5 +24,5 @@ export async function loadFileIpc() {
 export async function getMessagesIpc(event: any, messageQuantity: number) {
   decodedMsg = await decodeMessages(messages, messageQuantity);
   console.log(decodedMsg.length);
-  return JSON.stringify(decodedMsg);
+  return await JSON.stringify(decodedMsg);
 }

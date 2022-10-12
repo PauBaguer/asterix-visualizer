@@ -1,3 +1,4 @@
+import { resolve } from "path";
 import { Cat10 } from "./cat10_decoder";
 import { Cat21 } from "./cat21_decoder";
 //import { parseCartesianCoordinate, parsePolarCoordinate } from "./cat10_msg_parser";
@@ -26,24 +27,18 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   if (messageQuantity != -1) {
     messages = messages.slice(0, 10);
   }
-  await Promise.all(
-    messages.map(async (v) => {
-      switch (v[0]) {
-        case 10:
-          cat10msg += 1;
-          decodedMessages.push(await decodeClass10Messages(v));
-          break;
-        case 21:
-          cat21msg += 1;
-          decodedMessages.push(await decodeClass21Messages(v));
-          break;
-        case 23:
-          cat23msg.push(v);
-          break;
-        default:
-          console.log(`Received message from Category ${v[0]}`);
-          break;
+
+  messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
+
+  decodedMessages = await Promise.all(
+    messages.map((v) => {
+      if (v[0] === 10) {
+        cat10msg += 1;
+        return decodeClass10Messages(v);
       }
+      //case 21
+      cat21msg += 1;
+      return decodeClass21Messages(v);
     })
   );
   console.log(`Received ${cat10msg} messages from Category 10`);
