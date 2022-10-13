@@ -42,6 +42,29 @@ export class Cat21 {
   surface_capabilities_and_characteristics: SurfaceCapabilitiesAndCharacteristics;
   //data_ages
   receiver_ID: string;
+  Aircraft_Operational_Status_age: number;
+  Target_Report_Descriptor_age: number;
+  Mode_3A_Code_age: number;
+  Quality_Indicators_age: number;
+  Trajectory_Intent_age: number;
+  Message_Amplitude_age: number;
+  Geometric_Height_age: number;
+  Flight_Level_age: number;
+  Intermediate_State_Selected_Altitude_age: number;
+  Final_State_Selected_Altitude_age: number;
+  Air_Speed_age: number;
+  True_Air_Speed_age: number;
+  Magnetic_Heading_age: number;
+  Barometric_Vertical_Rate_age: number;
+  Geometric_Vertical_Rate_age: number;
+  Ground_Vector_age: number;
+  Track_Angle_Rate_age: number;
+  Target_Identification_age: number;
+  Target_Status_age: number;
+  Met_Information_age: number;
+  Roll_Angle_age: number;
+  ACAS_Resolution_Advisory_age: number;
+  Surface_Capabilities_and_Characteristics_age: number;
 
   constructor(id: number) {
     this.id = id;
@@ -842,12 +865,12 @@ export class Cat21 {
           .split("");
         this.mode_s_mb_data.push(
           "BDS1: " +
-            parseInt(bits.slice(0, 4).join(""), 2).toString(10) +
-            " BDS2: " +
-            parseInt(bits.slice(4, 8).join(""), 2).toString(10)
+          parseInt(bits.slice(0, 4).join(""), 2).toString(10) +
+          " BDS2: " +
+          parseInt(bits.slice(4, 8).join(""), 2).toString(10)
         );
         start += 8;
-      } catch {}
+      } catch { }
     }
   };
 
@@ -872,12 +895,12 @@ export class Cat21 {
 
     var lw = "";
     switch (
-      BigInt("0x" + buffer.slice(1, 2).toString("hex"))
-        .toString(2)
-        .padStart(8, "0")
-        .split("")
-        .slice(4, 8)
-        .join("")
+    BigInt("0x" + buffer.slice(1, 2).toString("hex"))
+      .toString(2)
+      .padStart(8, "0")
+      .split("")
+      .slice(4, 8)
+      .join("")
     ) {
       case "0000":
         lw = "L < 15   W < 11.5";
@@ -930,6 +953,153 @@ export class Cat21 {
     }
     this.surface_capabilities_and_characteristics = { POA: poa, CDTI: cdti, B2low: b2, RAS: ras, IDENT: ident, LW: lw };
   };
+
+  set_data_ages = async (buffer: Buffer) => {
+    const items = BigInt("0x" + buffer.slice(0, 4).toString("hex"))
+      .toString(2)
+      .padStart(4 * 8, "0")
+      .split("");
+
+    let count = 7;
+    let found = false;
+    let offset =
+      items.filter((value, index) => {
+        if (index == count && !found) {
+          if (value != "1") {
+            found = true;
+          } else {
+            count += 8;
+          }
+          return true;
+        }
+        return;
+      }).length;
+
+    if (items[0] === '1') {
+      // Subfield #1: Aircraft Operational Status age
+      this.Aircraft_Operational_Status_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+      offset++;
+    }
+    if (items[1] === '1') {
+      // Subfield #2: Target Report Descriptor age
+      this.Target_Report_Descriptor_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+      offset++;
+    }
+    if (items[2] === '1') {
+      // Subfield #3: Mode 3/A Code age
+      this.Mode_3A_Code_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+      offset++;
+    }
+    if (items[3] === '1') {
+      // Subfield #4: Quality Indicators age
+      this.Quality_Indicators_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+      offset++;
+    }
+    if (items[4] === '1') {
+      // Subfield #5: Trajectory Intent age
+      this.Trajectory_Intent_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+      offset++;
+    }
+    if (items[5] === '1') {
+      // Subfield #6: Message Amplitude age
+      this.Message_Amplitude_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+      offset++;
+    }
+    if (items[6] === '1') {
+      // Subfield #7: Geometric Height age
+      this.Geometric_Height_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+      offset++;
+    }
+    if (items[7] === '1') {
+      // More subfields
+      if (items[8] === '1') {
+        // Subfield #8: Flight Level age
+        this.Flight_Level_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+        offset++;
+      }
+      if (items[9] === '1') {
+        // Subfield #9: Intermediate State Selected Altitude age
+        this.Intermediate_State_Selected_Altitude_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+        offset++;
+      }
+      if (items[10] === '1') {
+        // Subfield #10: Final State Selected Altitude age
+        this.Final_State_Selected_Altitude_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+        offset++;
+      }
+      if (items[11] === '1') {
+        // Subfield #11: Air Speed age
+        this.Air_Speed_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+        offset++;
+      }
+      if (items[12] === '1') {
+        // Subfield #12: True Air Speed age
+        this.True_Air_Speed_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+        offset++;
+      }
+      if (items[13] === '1') {
+        // Subfield #13: Magnetic Heading age
+        this.Magnetic_Heading_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+        offset++;
+      }
+      if (items[14] === '1') {
+        // Subfield #14: Barometric Vertical Rate age
+        this.Barometric_Vertical_Rate_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+        offset++;
+      }
+      if (items[15] === '1') {
+        // More subfields
+        if (items[16] === '1') {
+          // Subfield #15: Geometric Vertical Rate age
+          this.Geometric_Vertical_Rate_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+          offset++;
+        }
+        if (items[17] === '1') {
+          // Subfield #16: Ground Vector age
+          this.Ground_Vector_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+          offset++;
+        }
+        if (items[18] === '1') {
+          // Subfield #17: Track Angle Rate age
+          this.Track_Angle_Rate_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+          offset++;
+        }
+        if (items[19] === '1') {
+          // Subfield #18: Target Identification age
+          this.Target_Identification_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+          offset++;
+        }
+        if (items[20] === '1') {
+          // Subfield #19: Target Status age
+          this.Target_Status_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+          offset++;
+        }
+        if (items[21] === '1') {
+          // Subfield #20: Met Information age
+          this.Met_Information_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+          offset++;
+        }
+        if (items[22] === '1') {
+          // Subfield #21: Roll Angle age
+          this.Roll_Angle_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+          offset++;
+        }
+        if (items[23] === '1') {
+          // More subfields
+          if (items[24] === '1') {
+            // Subfield #22: ACAS Resolution Advisory age
+            this.ACAS_Resolution_Advisory_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+            offset++;
+          }
+          if (items[25] === '1') {
+            // Subfield #23: Surface Capabilities and Characteristics age
+            this.Surface_Capabilities_and_Characteristics_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+            offset++;
+          }
+        }
+      }
+    }
+  }
 
   set_receiver_ID = async (buffer: Buffer) => {
     this.receiver_ID = "0x" + buffer.toString("hex").padStart(2, "0");

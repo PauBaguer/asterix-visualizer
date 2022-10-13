@@ -25,7 +25,7 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   let decodedMessages: (Cat10 | Cat21)[] = [];
 
   if (messageQuantity != -1) {
-    messages = messages.slice(0, messageQuantity);
+    messages = messages.slice(0, 1);
   }
 
   messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
@@ -34,13 +34,13 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
     messages.map(async (v) => {
       if (v[0] === 10) {
         cat10msg += 1;
-        let msg = await decodeClass10Messages(v);
-        //console.log(msg)
-        return msg;
+        return decodeClass10Messages(v);
       }
       //case 21
       cat21msg += 1;
-      return decodeClass21Messages(v);
+      let msg = await decodeClass21Messages(v);
+      console.log(msg)
+      return msg;
     })
   );
   console.log(`Received ${cat10msg} messages from Category 10`);
@@ -611,12 +611,11 @@ export async function decodeClass21Messages(msg: Buffer): Promise<Cat21> {
               //length =1
             }
             if (fspec[46] === "1") {
-              //TODO
-              //console.log("I021/295 Data Ages")
+              /// I021/295 Data Ages
               /// 4 octets to indicate octates presence
-              //let offsetDA = variableItemOffsetDataAges(msg.slice(offset, offset + 4));
-              //console.log("	" + msg.slice(offset, offset + offsetDA.Offset + offsetDA.Items).toString('hex'));
-              //offset += len; //length =1+
+
+              tasks.push(decod_msg.set_data_ages(msg.slice(offset, msg.length)));
+              offset += len; //length =1+
             }
             /*if (fspec[47] === '1') {
                   console.log("Field Extension Indicator")
@@ -663,35 +662,3 @@ function variableItemOffset(buffer: Buffer, max_len: number) {
   //console.log("item offset " + offset);
   return offset;
 }
-
-// function variableItemOffsetDataAges(buffer: Buffer) {
-//   const bits = BigInt("0x" + buffer.toString("hex"))
-//     .toString(2)
-//     .padStart(4 * 8, "0")
-//     .split("");
-
-//   let count = 7;
-//   let items = 0;
-//   let found = false;
-//   let offset = bits.filter((value, index) => {
-//     if (index == count && !found) {
-//       if (value != "1") {
-//         found = true;
-//       } else {
-//         count += 8;
-//       }
-//       return true;
-//     }
-//     else {
-//       if (value == "1") {
-//         items++;
-//       }
-//     }
-//     return;
-//   }).length;
-//   return { Offset: offset, Items: items };
-// }
-// export interface OffsetDA {
-//   Offset: number;
-//   Items: number;
-// }
