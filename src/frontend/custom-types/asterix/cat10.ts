@@ -1,5 +1,6 @@
 export interface Cat10 {
   id: number;
+  class: 10;
   message_type: string;
   data_source_identifier: DataSourceIdentifier;
   target_report_description: TargetReportDescription;

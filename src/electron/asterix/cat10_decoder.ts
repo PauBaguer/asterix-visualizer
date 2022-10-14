@@ -1,5 +1,6 @@
 export class Cat10 {
   id: number;
+  class: 10;
   message_type: string;
   data_source_identifier: DataSourceIdentifier;
   target_report_description: TargetReportDescription;
@@ -30,6 +31,7 @@ export class Cat10 {
     this.id = id;
     this.message_type = "";
     this.time_of_day = "";
+    this.class = 10;
   }
 
   set_message_type = async (buffer: Buffer) => {

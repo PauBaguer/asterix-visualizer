@@ -28,9 +28,13 @@
     right: 0px;
     width: 100%;
     height: 100%;
+  }
+
+  .overflow {
     overflow-y: hidden;
     overflow-x: hidden;
   }
+
   #viewDiv {
     width: 100%;
     height: 100%;
@@ -45,7 +49,7 @@
   import { parseIpcMainReceiveMessage } from "./ipcMain/ipcMainReceiveParser";
   import ExpandableTable from "./svelte-components/ExpandableTable.svelte";
 
-  export let messages: (Cat10 | Cat21)[] = [];
+  let messages: (Cat10 | Cat21)[] = [];
 
   initializeMap();
 
@@ -57,8 +61,8 @@
   async function handleLoadFileClick() {
     const numberOfMsg = await initIpcMainBidirectional("test-receive");
     console.log(`Loaded ${numberOfMsg} messages!`);
-    const res = await ipcMainBidirectional("get-message-quantity", 20000);
-    await parseIpcMainReceiveMessage(res);
+    const res = await ipcMainBidirectional("get-message-quantity", 510);
+    messages = await parseIpcMainReceiveMessage(res);
   }
 
   async function handleDecodeMessages() {
@@ -83,7 +87,7 @@
 </script>
 
 <main>
-  <div class="main">
+  <div class="{visibleItem === 'MAP' ? 'main overflow' : 'main'}">
     <ul class="nav nav-tabs">
       <li role="presentation" class="{visibleItem === 'MAP' ? 'active' : ''}" on:click="{handleMapClick}">
         <a href="#a">MAP</a>

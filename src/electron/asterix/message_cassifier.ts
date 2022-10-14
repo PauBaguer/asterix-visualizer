@@ -25,7 +25,7 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   let decodedMessages: (Cat10 | Cat21)[] = [];
 
   if (messageQuantity != -1) {
-    messages = messages.slice(0, 1);
+    messages = messages.slice(0, messageQuantity);
   }
 
   messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
@@ -39,7 +39,7 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
       //case 21
       cat21msg += 1;
       let msg = await decodeClass21Messages(v);
-      console.log(msg)
+      console.log(msg);
       return msg;
     })
   );
@@ -112,7 +112,6 @@ export async function decodeClass10Messages(msg: Buffer): Promise<Cat10> {
 
     // a++;
   } else {
-
     // *** Mandatory items ***
 
     /// I010/020 Target Report Descriptor

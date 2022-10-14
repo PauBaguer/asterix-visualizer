@@ -1,5 +1,6 @@
 export class Cat21 {
   id: number;
+  class: 21;
   aircraft_operational_status: AircraftOperationalStatus;
   data_source_identifier: DataSourceIdentifier;
   service_identification: string;
@@ -68,6 +69,7 @@ export class Cat21 {
 
   constructor(id: number) {
     this.id = id;
+    this.class = 21;
   }
 
   set_aircraft_operational_status = async (buffer: Buffer) => {
