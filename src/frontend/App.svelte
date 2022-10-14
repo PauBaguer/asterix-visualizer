@@ -47,7 +47,7 @@
   import type { Cat21 } from "./custom-types/asterix/cat21";
   import { initIpcMainBidirectional, ipcMainBidirectional, ipcMainOneDirection } from "./ipcMain/ipcMainCallers";
   import { parseIpcMainReceiveMessage } from "./ipcMain/ipcMainReceiveParser";
-  import ExpandableTable from "./svelte-components/ExpandableTable.svelte";
+  import ExpandableTable from "./svelte-components/table/ExpandableTable.svelte";
 
   let messages: (Cat10 | Cat21)[] = [];
 

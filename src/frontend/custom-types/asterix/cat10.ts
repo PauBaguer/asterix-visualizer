@@ -28,12 +28,12 @@ export interface Cat10 {
   system_status: SystemStatus;
 }
 
-interface DataSourceIdentifier {
+export interface DataSourceIdentifier {
   SAC: string;
   SIC: string;
 }
 
-interface TargetReportDescription {
+export interface TargetReportDescription {
   TYP: string;
   DCR: string;
   CHN: string;
@@ -47,35 +47,35 @@ interface TargetReportDescription {
   SPI?: string;
 }
 
-interface WGS_84_coordinates {
+export interface WGS_84_coordinates {
   latitude: number;
   longitude: number;
 }
 
-interface PolarCoordinates {
+export interface PolarCoordinates {
   r: number;
   theta: number;
 }
 
-interface CartesianCoordinates {
+export interface CartesianCoordinates {
   x: number;
   y: number;
 }
 
-interface Mod3ACode {
+export interface Mod3ACode {
   V: string;
   G: string;
   L: string;
   Mode: string;
 }
 
-interface FlightLevel {
+export interface FlightLevel {
   V: string;
   G: string;
   FlightLevel: string;
 }
 
-interface TrackStatus {
+export interface TrackStatus {
   CNF: string;
   TRE: string;
   CST: string;
@@ -88,39 +88,39 @@ interface TrackStatus {
   GHO?: string;
 }
 
-interface CalculatedAcceleration {
+export interface CalculatedAcceleration {
   Ax: number;
   Ay: number;
 }
 
-interface TargetIdentification {
+export interface TargetIdentification {
   STI: string;
   TargetIdentification: string;
 }
 
-interface TargetSizeAndOrientation {
+export interface TargetSizeAndOrientation {
   Lenght: string;
   Orinetation?: string;
   Width?: string;
 }
 
-interface Presence {
+export interface Presence {
   DRHO: string;
   DTHETA: string;
 }
 
-interface PreprogrammedMessage {
+export interface PreprogrammedMessage {
   TRB: string;
   MSG: string;
 }
 
-interface StandardDeviationOfPosition {
+export interface StandardDeviationOfPosition {
   X_component: string;
   Y_component: string;
   Covariance: string;
 }
 
-interface SystemStatus {
+export interface SystemStatus {
   NOGO: string;
   OVL: string;
   TSV: string;
