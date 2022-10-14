@@ -493,11 +493,15 @@ export class Cat21 {
     const lat_buffer = buffer.slice(0, 3);
     const lon_buffer = buffer.slice(3, 6);
 
-    const padded_buffer_lat = Buffer.concat([Buffer.alloc(1), lat_buffer]);
-    const padded_buffer_lon = Buffer.concat([Buffer.alloc(1), lon_buffer]);
+    const str_lat = BigInt("0x" + lat_buffer.toString("hex"))
+      .toString(2)
+      .padStart(24, "0");
 
-    const lat = (padded_buffer_lat.readInt32BE() * 180) / Math.pow(2, 23);
-    const lon = (padded_buffer_lon.readInt32BE() * 180) / Math.pow(2, 23);
+    const str_lon = BigInt("0x" + lon_buffer.toString("hex"))
+      .toString(2)
+      .padStart(24, "0");
+    const lat = (fromTwosComplement(str_lat) * 180) / Math.pow(2, 23);
+    const lon = (fromTwosComplement(str_lon) * 180) / Math.pow(2, 23);
 
     this.wgs_84_coordinates = {
       latitude: lat,
@@ -606,7 +610,7 @@ export class Cat21 {
       .split("");
     this.barometric_vertical_rate =
       bits[0] === "0"
-        ? (~~parseInt(bits.slice(1, 16).join(""), 2) * 6.25).toString(10) + " feet/minute"
+        ? (fromTwosComplement(bits.slice(1, 16).join("")) * 6.25).toString(10) + " feet/minute"
         : "Value exceeds defined range";
   };
 
@@ -865,12 +869,12 @@ export class Cat21 {
           .split("");
         this.mode_s_mb_data.push(
           "BDS1: " +
-          parseInt(bits.slice(0, 4).join(""), 2).toString(10) +
-          " BDS2: " +
-          parseInt(bits.slice(4, 8).join(""), 2).toString(10)
+            parseInt(bits.slice(0, 4).join(""), 2).toString(10) +
+            " BDS2: " +
+            parseInt(bits.slice(4, 8).join(""), 2).toString(10)
         );
         start += 8;
-      } catch { }
+      } catch {}
     }
   };
 
@@ -895,12 +899,12 @@ export class Cat21 {
 
     var lw = "";
     switch (
-    BigInt("0x" + buffer.slice(1, 2).toString("hex"))
-      .toString(2)
-      .padStart(8, "0")
-      .split("")
-      .slice(4, 8)
-      .join("")
+      BigInt("0x" + buffer.slice(1, 2).toString("hex"))
+        .toString(2)
+        .padStart(8, "0")
+        .split("")
+        .slice(4, 8)
+        .join("")
     ) {
       case "0000":
         lw = "L < 15   W < 11.5";
@@ -962,144 +966,146 @@ export class Cat21 {
 
     let count = 7;
     let found = false;
-    let offset =
-      items.filter((value, index) => {
-        if (index == count && !found) {
-          if (value != "1") {
-            found = true;
-          } else {
-            count += 8;
-          }
-          return true;
+    let offset = items.filter((value, index) => {
+      if (index == count && !found) {
+        if (value != "1") {
+          found = true;
+        } else {
+          count += 8;
         }
-        return;
-      }).length;
+        return true;
+      }
+      return;
+    }).length;
 
-    if (items[0] === '1') {
+    if (items[0] === "1") {
       // Subfield #1: Aircraft Operational Status age
       this.Aircraft_Operational_Status_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
       offset++;
     }
-    if (items[1] === '1') {
+    if (items[1] === "1") {
       // Subfield #2: Target Report Descriptor age
       this.Target_Report_Descriptor_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
       offset++;
     }
-    if (items[2] === '1') {
+    if (items[2] === "1") {
       // Subfield #3: Mode 3/A Code age
       this.Mode_3A_Code_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
       offset++;
     }
-    if (items[3] === '1') {
+    if (items[3] === "1") {
       // Subfield #4: Quality Indicators age
       this.Quality_Indicators_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
       offset++;
     }
-    if (items[4] === '1') {
+    if (items[4] === "1") {
       // Subfield #5: Trajectory Intent age
       this.Trajectory_Intent_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
       offset++;
     }
-    if (items[5] === '1') {
+    if (items[5] === "1") {
       // Subfield #6: Message Amplitude age
       this.Message_Amplitude_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
       offset++;
     }
-    if (items[6] === '1') {
+    if (items[6] === "1") {
       // Subfield #7: Geometric Height age
       this.Geometric_Height_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
       offset++;
     }
-    if (items[7] === '1') {
+    if (items[7] === "1") {
       // More subfields
-      if (items[8] === '1') {
+      if (items[8] === "1") {
         // Subfield #8: Flight Level age
         this.Flight_Level_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
         offset++;
       }
-      if (items[9] === '1') {
+      if (items[9] === "1") {
         // Subfield #9: Intermediate State Selected Altitude age
-        this.Intermediate_State_Selected_Altitude_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+        this.Intermediate_State_Selected_Altitude_age =
+          parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
         offset++;
       }
-      if (items[10] === '1') {
+      if (items[10] === "1") {
         // Subfield #10: Final State Selected Altitude age
-        this.Final_State_Selected_Altitude_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+        this.Final_State_Selected_Altitude_age =
+          parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
         offset++;
       }
-      if (items[11] === '1') {
+      if (items[11] === "1") {
         // Subfield #11: Air Speed age
         this.Air_Speed_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
         offset++;
       }
-      if (items[12] === '1') {
+      if (items[12] === "1") {
         // Subfield #12: True Air Speed age
         this.True_Air_Speed_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
         offset++;
       }
-      if (items[13] === '1') {
+      if (items[13] === "1") {
         // Subfield #13: Magnetic Heading age
         this.Magnetic_Heading_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
         offset++;
       }
-      if (items[14] === '1') {
+      if (items[14] === "1") {
         // Subfield #14: Barometric Vertical Rate age
         this.Barometric_Vertical_Rate_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
         offset++;
       }
-      if (items[15] === '1') {
+      if (items[15] === "1") {
         // More subfields
-        if (items[16] === '1') {
+        if (items[16] === "1") {
           // Subfield #15: Geometric Vertical Rate age
           this.Geometric_Vertical_Rate_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
           offset++;
         }
-        if (items[17] === '1') {
+        if (items[17] === "1") {
           // Subfield #16: Ground Vector age
           this.Ground_Vector_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
           offset++;
         }
-        if (items[18] === '1') {
+        if (items[18] === "1") {
           // Subfield #17: Track Angle Rate age
           this.Track_Angle_Rate_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
           offset++;
         }
-        if (items[19] === '1') {
+        if (items[19] === "1") {
           // Subfield #18: Target Identification age
           this.Target_Identification_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
           offset++;
         }
-        if (items[20] === '1') {
+        if (items[20] === "1") {
           // Subfield #19: Target Status age
           this.Target_Status_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
           offset++;
         }
-        if (items[21] === '1') {
+        if (items[21] === "1") {
           // Subfield #20: Met Information age
           this.Met_Information_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
           offset++;
         }
-        if (items[22] === '1') {
+        if (items[22] === "1") {
           // Subfield #21: Roll Angle age
           this.Roll_Angle_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
           offset++;
         }
-        if (items[23] === '1') {
+        if (items[23] === "1") {
           // More subfields
-          if (items[24] === '1') {
+          if (items[24] === "1") {
             // Subfield #22: ACAS Resolution Advisory age
             this.ACAS_Resolution_Advisory_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
             offset++;
           }
-          if (items[25] === '1') {
+          if (items[25] === "1") {
             // Subfield #23: Surface Capabilities and Characteristics age
-            this.Surface_Capabilities_and_Characteristics_age = parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
+            this.Surface_Capabilities_and_Characteristics_age =
+              parseInt("0x" + buffer.slice(offset, offset + 1).toString("hex")) * 0.1;
             offset++;
           }
         }
       }
     }
-  }
+  };
 
   set_receiver_ID = async (buffer: Buffer) => {
     this.receiver_ID = "0x" + buffer.toString("hex").padStart(2, "0");
@@ -1224,4 +1230,9 @@ interface SurfaceCapabilitiesAndCharacteristics {
 interface WGS_84_coordinates {
   latitude: number;
   longitude: number;
+}
+
+export function fromTwosComplement(s: string) {
+  //@ts-ignore
+  return "0b" + s - s[0] * 2 ** s.length;
 }

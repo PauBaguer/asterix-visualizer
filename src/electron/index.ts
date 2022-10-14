@@ -14,6 +14,7 @@ import settings from "./utils/settings";
 import { openFilePicker, openTestFile } from "./utils/file_management";
 import { sliceMainBuffer, classifyMessages } from "./asterix/message_cassifier";
 import { getMessagesIpc, loadFileIpc } from "./utils/ipcMain";
+import { fromTwosComplement } from "./asterix/cat21_decoder";
 
 const isProd = process.env.NODE_ENV === "production" || app.isPackaged;
 
@@ -78,10 +79,10 @@ const createWindow = () => {
   });
 
   ipcMain.handle("test-handle", async () => {
-    console.log("start timeout");
-    await timeout(10000);
-    console.log("end timeout");
-    return "noice";
+    console.log("HIII");
+    console.log(fromTwosComplement("1010"));
+
+    console.log(fromTwosComplement("0101"));
   });
 
   ipcMain.handle("test-receive", loadFileIpc);
