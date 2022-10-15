@@ -8,19 +8,18 @@
   }
 </style>
 
-<script lang="ts">
-  import type { Cat10 } from "../../custom-types/asterix/cat10";
-  import type { Cat21 } from "../../custom-types/asterix/cat21";
+<script>
   import CartesianCoordinates from "./cat10_items/CartesianCoordinates.svelte";
+  import GenericComponent from "./cat10_items/GenericComponent.svelte";
   import TargetReportDescription from "./cat10_items/TargetReportDescription.svelte";
 
-  export let messages: (Cat10 | Cat21)[];
+  export let messages;
   let renderedMessges = messages.slice(0, 20);
   const pageNumber = Math.round(messages.length / 20);
   const pageArray = Array.from({ length: pageNumber }, (_, i) => i + 1);
   let activePage = 1;
 
-  function handlePageClick(page: number) {
+  function handlePageClick(page) {
     if (pageArray.includes(page)) {
       activePage = page;
       renderedMessges = messages.slice((page - 1) * 20, page * 20);
@@ -53,7 +52,7 @@
                   ><button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button
                   ></td
                 >
-                {#if msg.class === 10}
+                {#if msg.class === "Cat10"}
                   <td>{msg.id}</td>
                   <td>{msg.class}</td>
                   <td>{msg.message_type}</td>
@@ -87,14 +86,16 @@
 
                       <tbody>
                         {#each Object.keys(msg) as key, j}
-                          {#if key === "target_report_description" && msg.class === 10}
+                          {#if key === "target_report_description" && msg.class === "Cat10"}
                             <TargetReportDescription
                               i="{i}"
                               j="{j}"
                               targetReportDescription="{msg.target_report_description}"
                             />
-                          {:else if key === "cartesian_coordinates" && msg.class === 10}
+                          {:else if key === "cartesian_coordinates" && msg.class === "Cat10"}
                             <CartesianCoordinates i="{i}" j="{j}" cartesianCoordinates="{msg.cartesian_coordinates}" />
+                          {:else if msg.class === 10 && key != "id" && key != "time_of_day" && key != "message_type" && key !== "class"}
+                            <GenericComponent i="{i}" j="{j}" genericObject="{msg[key]}" dataItemName="{key}" />
                           {/if}
                         {/each}
                       </tbody>

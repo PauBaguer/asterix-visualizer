@@ -19,11 +19,13 @@
 </tr>
 <tr>
   <td colspan="12" class="hiddenRow">
-    <div class="accordian-body collapse" id="{`demo${i}${j}`}">
+    <div class="accordian-body collapse.show" id="{`demo${i}${j}`}">
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>TYP</th>
+            {#if targetReportDescription.TYP}
+              <th>TYP</th>
+            {/if}
             <th>DCR</th>
             <th>CHN</th>
             <th>GBS</th>

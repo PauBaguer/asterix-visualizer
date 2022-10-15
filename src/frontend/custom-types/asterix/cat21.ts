@@ -1,6 +1,6 @@
 export interface Cat21 {
   id: number;
-  class: 21;
+  class: "Cat21";
   aircraft_operational_status: AircraftOperationalStatus;
   data_source_identifier: DataSourceIdentifier;
   service_identification: string;

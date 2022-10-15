@@ -31,14 +31,14 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
 
   decodedMessages = await Promise.all(
-    messages.map(async (v) => {
+    messages.map(async (v, index) => {
       if (v[0] === 10) {
         cat10msg += 1;
-        return decodeClass10Messages(v);
+        return decodeClass10Messages(v, index + 1);
       }
       //case 21
       cat21msg += 1;
-      let msg = await decodeClass21Messages(v);
+      let msg = await decodeClass21Messages(v, index + 1);
       console.log(msg);
       return msg;
     })
@@ -50,11 +50,9 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   return decodedMessages;
 }
 
-export async function decodeClass10Messages(msg: Buffer): Promise<Cat10> {
+export async function decodeClass10Messages(msg: Buffer, id: number): Promise<Cat10> {
   // console.log({ cat_21: cat21msg.length });
   var vec: Cat10[] = [];
-
-  let a = 0;
 
   //n console.log("MESSAGE " + a);
   const fspec = BigInt("0x" + msg.slice(3, 7).toString("hex"))
@@ -78,7 +76,7 @@ export async function decodeClass10Messages(msg: Buffer): Promise<Cat10> {
     }).length + 3;
   //console.log("length fspec " + offset);
 
-  var decod_msg: Cat10 = new Cat10(a); //TODO FIX
+  var decod_msg: Cat10 = new Cat10(id); //TODO FIX
   var tasks: any[] = [];
 
   // *** Mandatory items ***
@@ -294,9 +292,8 @@ export async function decodeClass10Messages(msg: Buffer): Promise<Cat10> {
   // console.log(vec)
 }
 
-export async function decodeClass21Messages(msg: Buffer): Promise<Cat21> {
+export async function decodeClass21Messages(msg: Buffer, id: number): Promise<Cat21> {
   var vec21: Cat21[] = [];
-  let b = 0;
   //var test2 = 139747;
 
   const fspec = BigInt("0x" + msg.slice(3, 10).toString("hex"))
@@ -320,7 +317,7 @@ export async function decodeClass21Messages(msg: Buffer): Promise<Cat21> {
     }).length + 3;
   // console.log("length fspec " + offset);
 
-  var decod_msg: Cat21 = new Cat21(b);
+  var decod_msg: Cat21 = new Cat21(id);
   var tasks: any[] = [];
 
   /** MANDATORY FIELD**/
@@ -363,7 +360,6 @@ export async function decodeClass21Messages(msg: Buffer): Promise<Cat21> {
       console.log("Zero buffer");
       console.log(fspec);
       console.log(msg);
-      console.log(b);
     }
     tasks.push(decod_msg.set_wgs_84_coordinates_high(msg.slice(offset, offset + 8)));
     offset += 8;

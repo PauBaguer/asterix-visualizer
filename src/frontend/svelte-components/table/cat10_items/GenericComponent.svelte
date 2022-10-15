@@ -1,16 +1,17 @@
 <script lang="ts">
-  import type { CartesianCoordinates } from "../../../custom-types/asterix/cat10";
+  import type { TargetReportDescription } from "../../../custom-types/asterix/cat10";
 
   export let i: number;
   export let j: number;
-  export let cartesianCoordinates: CartesianCoordinates;
-  console.log(cartesianCoordinates);
+  export let genericObject: any;
+  export let dataItemName: string;
+  console.log(genericObject);
 </script>
 
 <tr data-toggle="collapse" class="accordion-toggle" data-target="{`#demo${i}${j}`}">
   <td></td>
   <td><button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button></td>
-  <td>Cartesian Coordinates</td>
+  <td>{dataItemName}</td>
   <td></td>
   <td></td>
   <td></td>
@@ -23,14 +24,20 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>X</th>
-            <th>Y</th>
+            {#each Object.keys(genericObject) as key}
+              {#if genericObject[key]}
+                <th>{key}</th>
+              {/if}
+            {/each}
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>{cartesianCoordinates.x || ""}</td>
-            <td>{cartesianCoordinates.y || ""}</td>
+            {#each Object.keys(genericObject) as key}
+              {#if genericObject[key]}
+                <td>{genericObject[key]}</td>
+              {/if}
+            {/each}
           </tr>
         </tbody>
       </table>
