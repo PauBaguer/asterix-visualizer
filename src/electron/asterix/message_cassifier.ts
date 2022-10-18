@@ -25,7 +25,7 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   let decodedMessages: (Cat10 | Cat21)[] = [];
 
   if (messageQuantity != -1) {
-    messages = messages.slice(0, messageQuantity);
+    messages = messages.slice(0, 1);
   }
 
   messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
@@ -559,7 +559,7 @@ export async function decodeClass21Messages(msg: Buffer, id: number): Promise<Ca
               len += 15 * rep;
               tid = true;
             }
-            tasks.push(decod_msg.set_tarjectory_intent(msg.slice(offset + 1, offset + len + 1), tis, tid, rep));
+            tasks.push(decod_msg.set_trajectory_intent(msg.slice(offset + 1, offset + len + 1), tis, tid, rep));
             offset += len + 1; //length =1+
           }
           if (fspec[38] === "1") {
@@ -593,11 +593,9 @@ export async function decodeClass21Messages(msg: Buffer, id: number): Promise<Ca
               offset += 1 + 8 * len; //length =1+8n
             }
             if (fspec[44] === "1") {
-              //TODO
-              //console.log("I021/260 ACAS Resolution Advisory Report")
-              //console.log("	" + msg.slice(offset, offset + 7).toString('hex'));
-              offset += 7;
-              //length =7
+              /// I021/260 ACAS Resolution Advisory Report
+              tasks.push(decod_msg.set_acas_resolution_advisory_report(msg.slice(offset, offset + 7)));
+              offset += 7; //length =7
             }
             if (fspec[45] === "1") {
               /// I021/400 Receiver ID

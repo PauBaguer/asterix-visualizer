@@ -16,7 +16,7 @@ export class Cat21 {
   time_message_reception_velocity_high: number;
   time_ASTERIX_report_transmission: number;
   target_address: string;
-  quality_indicator: QualityIndicator; // TODO
+  quality_indicator: QualityIndicator;
   tarjectory_intent: TrajectoryIntent;
   wgs_84_coordinates: WGS_84_coordinates;
   wgs_84_coordinates_high: WGS_84_coordinates;
@@ -39,7 +39,7 @@ export class Cat21 {
   met_information: MetInformation;
   roll_angle: string;
   mode_s_mb_data: string[];
-  //acas_resolution_advisory_report
+  acas_resolution_advisory_report: ACAS_ResolutioinAdvisorReport;
   surface_capabilities_and_characteristics: SurfaceCapabilitiesAndCharacteristics;
   //data_ages
   receiver_ID: string;
@@ -365,10 +365,87 @@ export class Cat21 {
   };
 
   set_quality_indicator = async (buffer: Buffer) => {
-    this.quality_indicator = { PIC: buffer.toString("hex") };
+    const bits = BigInt("0x" + buffer.toString("hex"))
+      .toString(2)
+      .padStart(buffer.length * 8, "0")
+      .split("");
+    const nucr_or_nacv = "0x" + parseInt(bits.slice(0, 3).join("").toString(), 2).toString(16).padStart(2, "0");
+    const nucp_or_nic = "0x" + parseInt(bits.slice(3, 7).join("").toString(), 2).toString(16).padStart(2, "0");
+    if (bits[7] == "0") { this.quality_indicator = { NUCr_or_NACv: nucr_or_nacv, NUCp_or_NIC: nucp_or_nic }; return; }
+
+    const nicbaro = "0x" + parseInt(bits.slice(8, 9).join("").toString(), 2).toString(16).padStart(2, "0");
+    const sil = "0x" + parseInt(bits.slice(9, 11).join("").toString(), 2).toString(16).padStart(2, "0");
+    const nacp = "0x" + parseInt(bits.slice(11, 15).join("").toString(), 2).toString(16).padStart(2, "0");
+    if (bits[15] == "0") { this.quality_indicator = { NUCr_or_NACv: nucr_or_nacv, NUCp_or_NIC: nucp_or_nic, NICBARO: nicbaro, SIL: sil, NACp: nacp }; return; }
+
+    const sil_s = (bits[18] == "0") ? "measured per flight-hour" : "measured per sample";
+    const sda = "0x" + parseInt(bits.slice(19, 21).join("").toString(), 2).toString(16).padStart(2, "0");
+    const gva = "0x" + parseInt(bits.slice(21, 23).join("").toString(), 2).toString(16).padStart(2, "0");
+    if (bits[23] == "0") {
+      this.quality_indicator = {
+        NUCr_or_NACv: nucr_or_nacv, NUCp_or_NIC: nucp_or_nic, NICBARO: nicbaro, SIL: sil, NACp: nacp,
+        SILsupplement: sil_s, SDA: sda, GVA: gva
+      }; return;
+    }
+
+    let pic = "";
+    switch (bits.slice(24, 28).join("")) {
+      case "0000":
+        pic = "No integrity (or > 20.0 NM)";
+        break;
+      case "0001":
+        pic = "< 20.0 NM";
+        break;
+      case "0010":
+        pic = "< 10.0 NM";
+        break;
+      case "0011":
+        pic = "< 8.0 NM";
+        break;
+      case "0100":
+        pic = "< 4.0 NM";
+        break;
+      case "0101":
+        pic = "< 2.0 NM";
+        break;
+      case "0110":
+        pic = "< 1.0 NM";
+        break;
+      case "0111":
+        pic = "< 0.6 NM";
+        break;
+      case "1000":
+        pic = "< 0.5 NM";
+        break;
+      case "1001":
+        pic = "< 0.3 NM";
+        break;
+      case "1010":
+        pic = "< 0.2 NM";
+        break;
+      case "1011":
+        pic = "< 0.1 NM";
+        break;
+      case "1100":
+        pic = "< 0.04 NM";
+        break;
+      case "1101":
+        pic = "< 0.013 NM";
+        break;
+      case "1110":
+        pic = "< 0.004 NM";
+        break;
+      case "1111":
+        pic = "Not defined";
+        break;
+    }
+    this.quality_indicator = {
+      NUCr_or_NACv: nucr_or_nacv, NUCp_or_NIC: nucp_or_nic, NICBARO: nicbaro, SIL: sil, NACp: nacp,
+      SILsupplement: sil_s, SDA: sda, GVA: gva, PIC: pic
+    };
   };
 
-  set_tarjectory_intent = async (buffer: Buffer, tis: boolean, tid: boolean, rep: number) => {
+  set_trajectory_intent = async (buffer: Buffer, tis: boolean, tid: boolean, rep: number) => {
     var nav = "";
     var nvb = "";
     var offset = 0;
@@ -623,7 +700,7 @@ export class Cat21 {
       .split("");
     this.geometric_vertical_rate =
       bits[0] === "0"
-        ? (parseInt(bits.slice(1, 16).join(""), 2) * 6.25).toString(10) + " feet/minute"
+        ? (fromTwosComplement(bits.slice(1, 16).join("")) * 6.25).toString(10) + " feet/minute"
         : "Value exceeds defined range";
   };
 
@@ -634,9 +711,9 @@ export class Cat21 {
       .split("");
     const gs =
       bits[0] === "0"
-        ? ((parseInt(bits.slice(1, 16).join(""), 2) * 2) ^ -14).toString(10) + " kt"
+        ? (parseInt(bits.slice(1, 16).join("").toString(), 2) * Math.pow(2, -14) + " nmi/s")
         : "Value exceeds defined range";
-    const ta = ((parseInt("0x" + buffer.slice(2, 4).toString("hex")) * 360) / (2 ^ 16)).toString(10) + " deg";
+    const ta = ((parseInt("0x" + buffer.slice(2, 4).toString("hex")) * 360) / Math.pow(2, 16) + " deg");
     this.airborne_ground_vector = { GroundSpeed: gs, TrackAngle: ta };
   };
 
@@ -647,11 +724,10 @@ export class Cat21 {
   set_track_angle_rate = async (buffer: Buffer) => {
     this.track_angle_rate =
       (
-        ~~parseInt(
+        fromTwosComplement(
           BigInt("0x" + buffer.slice(0, 2).toString("hex"))
             .toString(2)
-            .padStart(10, "0"),
-          2
+            .padStart(10, "0")
         ) / 32
       ).toString(10) + " deg/s";
   };
@@ -861,24 +937,43 @@ export class Cat21 {
   };
 
   set_mode_s_mb_data = async (buffer: Buffer, rep: number) => {
-    var start = 7;
+    var start = 0;
 
     for (var i = 0; i < rep; i++) {
       try {
-        var bits = BigInt("0x" + buffer.slice(start, start + 1).toString("hex"))
+        var bits = BigInt("0x" + buffer.slice(start, start + 8).toString("hex"))
           .toString(2)
-          .padStart(8, "0")
+          .padStart(9 * 8, "0")
           .split("");
+
         this.mode_s_mb_data.push(
-          "BDS1: " +
-            parseInt(bits.slice(0, 4).join(""), 2).toString(10) +
-            " BDS2: " +
-            parseInt(bits.slice(4, 8).join(""), 2).toString(10)
+          "BDS1: 0x" +
+          parseInt(bits.slice(8 * 7, 8 * 7 + 4).join(""), 2).toString(16).padStart(2, "0") +
+          " BDS2: 0x" +
+          parseInt(bits.slice(8 * 7 + 4, 8 * 7 + 8).join(""), 2).toString(16).padStart(2, "0") +
+          " MB Data: 0x" + parseInt(bits.slice(0, 8 * 7).join(""), 2).toString(16).padStart(2 * 7, "0")
         );
         start += 8;
-      } catch {}
+      } catch { }
     }
   };
+
+  set_acas_resolution_advisory_report = async (buffer: Buffer) => {
+    var bits = BigInt("0x" + buffer.slice(0, 1).toString("hex"))
+      .toString(2)
+      .padStart(7 * 8, "0")
+      .split("");
+    this.acas_resolution_advisory_report = {
+      TYP: bits.slice(0, 5).join(""),
+      STYP: bits.slice(5, 8).join(""),
+      ARA: bits.slice(8, 16).join(""),
+      RAC: bits.slice(16, 26).join(""),
+      RAT: bits[26],
+      MTE: bits[27],
+      TTI: bits.slice(28, 30).join(""),
+      TID: bits.slice(30).join("")
+    }
+  }
 
   set_surface_capabilities_and_characteristics = async (buffer: Buffer) => {
     var bits = BigInt("0x" + buffer.slice(0, 1).toString("hex"))
@@ -901,12 +996,12 @@ export class Cat21 {
 
     var lw = "";
     switch (
-      BigInt("0x" + buffer.slice(1, 2).toString("hex"))
-        .toString(2)
-        .padStart(8, "0")
-        .split("")
-        .slice(4, 8)
-        .join("")
+    BigInt("0x" + buffer.slice(1, 2).toString("hex"))
+      .toString(2)
+      .padStart(8, "0")
+      .split("")
+      .slice(4, 8)
+      .join("")
     ) {
       case "0000":
         lw = "L < 15   W < 11.5";
@@ -1218,6 +1313,17 @@ interface MetInformation {
   WD?: string;
   TMP?: string;
   TRB?: string;
+}
+
+interface ACAS_ResolutioinAdvisorReport {
+  TYP: string;
+  STYP: string;
+  ARA: string;
+  RAC: string;
+  RAT: string;
+  MTE: string;
+  TTI: string;
+  TID: string;
 }
 
 interface SurfaceCapabilitiesAndCharacteristics {

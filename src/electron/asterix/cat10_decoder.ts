@@ -508,22 +508,24 @@ export class Cat10 {
   };
 
   set_mode_s_mb_data = async (buffer: Buffer, rep: number) => {
-    var start = 7;
+    var start = 0;
 
     for (var i = 0; i < rep; i++) {
       try {
-        var bits = BigInt("0x" + buffer.slice(start, start + 1).toString("hex"))
+        var bits = BigInt("0x" + buffer.slice(start, start + 8).toString("hex"))
           .toString(2)
-          .padStart(8, "0")
+          .padStart(9 * 8, "0")
           .split("");
+
         this.mode_s_mb_data.push(
-          "BDS1: " +
-            parseInt(bits.slice(0, 4).join(""), 2).toString(10) +
-            " BDS2: " +
-            parseInt(bits.slice(4, 8).join(""), 2).toString(10)
+          "BDS1: 0x" +
+          parseInt(bits.slice(8 * 7, 8 * 7 + 4).join(""), 2).toString(16).padStart(2, "0") +
+          " BDS2: 0x" +
+          parseInt(bits.slice(8 * 7 + 4, 8 * 7 + 8).join(""), 2).toString(16).padStart(2, "0") +
+          " MB Data: 0x" + parseInt(bits.slice(0, 8 * 7).join(""), 2).toString(16).padStart(2 * 7, "0")
         );
         start += 8;
-      } catch {}
+      } catch { }
     }
   };
 
@@ -591,7 +593,7 @@ export class Cat10 {
         var dtheta = (parseInt("0x" + buffer.slice(start + 1, start + 2).toString("hex")) * 0.15).toString(10) + "º";
         start += 2;
         this.presence.push({ DRHO: drho, DTHETA: dtheta });
-      } catch {}
+      } catch { }
     }
   };
 
