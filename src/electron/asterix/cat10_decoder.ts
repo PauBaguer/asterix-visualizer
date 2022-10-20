@@ -12,7 +12,7 @@ export class Cat10 {
   mod_3A_code: Mod3ACode;
   flight_level: FlightLevel;
   measured_height: string;
-  altitude_of_primary_plot: number;
+  amplitude_of_primary_plot: number;
   time_of_day: string;
   track_number: number;
   track_status: TrackStatus;
@@ -26,12 +26,14 @@ export class Cat10 {
   preprogrammed_message: PreprogrammedMessage;
   standard_deviation_of_position: StandardDeviationOfPosition;
   system_status: SystemStatus;
+  test: boolean;
 
   constructor(id: number) {
     this.id = id;
     this.message_type = "";
     this.time_of_day = "";
     this.class = "Cat10";
+    this.test = false;
   }
 
   set_message_type = async (buffer: Buffer) => {
@@ -270,8 +272,8 @@ export class Cat10 {
     this.measured_height = (buffer.readInt16BE() * 6.25).toString() + "ft (Range= +/- 204 800 ft)";
   };
 
-  set_alitude_of_primary_plot = async (buffer: Buffer) => {
-    this.altitude_of_primary_plot = parseInt("0x" + buffer.toString("hex"));
+  set_amplitude_of_primary_plot = async (buffer: Buffer) => {
+    this.amplitude_of_primary_plot = parseInt("0x" + buffer.toString("hex"));
   };
 
   set_time_of_day = async (buffer: Buffer) => {
@@ -509,13 +511,21 @@ export class Cat10 {
 
   set_mode_s_mb_data = async (buffer: Buffer, rep: number) => {
     var start = 0;
+    this.test = true;
+    console.log(buffer);
 
     for (var i = 0; i < rep; i++) {
       try {
+        console.log(buffer.slice(start, start + 8))
         var bits = BigInt("0x" + buffer.slice(start, start + 8).toString("hex"))
           .toString(2)
           .padStart(9 * 8, "0")
           .split("");
+        console.log("BDS1: 0x" +
+          parseInt(bits.slice(8 * 7, 8 * 7 + 4).join(""), 2).toString(16).padStart(2, "0") +
+          " BDS2: 0x" +
+          parseInt(bits.slice(8 * 7 + 4, 8 * 7 + 8).join(""), 2).toString(16).padStart(2, "0") +
+          " MB Data: 0x" + parseInt(bits.slice(0, 8 * 7).join(""), 2).toString(16).padStart(2 * 7, "0"))
 
         this.mode_s_mb_data.push(
           "BDS1: 0x" +

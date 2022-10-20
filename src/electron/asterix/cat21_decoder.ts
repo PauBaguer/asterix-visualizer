@@ -369,18 +369,163 @@ export class Cat21 {
       .toString(2)
       .padStart(buffer.length * 8, "0")
       .split("");
-    const nucr_or_nacv = "0x" + parseInt(bits.slice(0, 3).join("").toString(), 2).toString(16).padStart(2, "0");
-    const nucp_or_nic = "0x" + parseInt(bits.slice(3, 7).join("").toString(), 2).toString(16).padStart(2, "0");
+    var nucr_or_nacv = "";
+    switch (bits.slice(0, 3).join("")) {
+      case "000":
+        nucr_or_nacv = "Horizontal Velocity Error >= 10 m/s";
+        break;
+      case "001":
+        nucr_or_nacv = "Horizontal Velocity Error < 10 m/s";
+        break;
+      case "010":
+        nucr_or_nacv = "Horizontal Velocity Error < 3 m/s";
+        break;
+      case "011":
+        nucr_or_nacv = "Horizontal Velocity Error < 1 m/s";
+        break;
+      case "100":
+        nucr_or_nacv = "Horizontal Velocity Error < 0.3 m/s";
+        break;
+    }
+
+    var nucp_or_nic = "";
+    switch (bits.slice(3, 7).join("")) {
+      case "0000":
+        nucp_or_nic = "Radius of Containment unknown";
+        break;
+      case "0001":
+        nucp_or_nic = "Radius of Containment < 20 NM (37.04 km)";
+        break;
+      case "0010":
+        nucp_or_nic = "Radius of Containment < 8 NM (14.816 km)";
+        break;
+      case "0011":
+        nucp_or_nic = "Radius of Containment < 4 NM (7.408 km)";
+        break;
+      case "0100":
+        nucp_or_nic = "Radius of Containment < 2 NM (3.704 km)";
+        break;
+      case "0101":
+        nucp_or_nic = "Radius of Containment < 1 NM (1852 m)";
+        break;
+      case "0110":
+        nucp_or_nic = "Radius of Containment < 0.6 NM (1111.2 m)";
+        break;
+      case "0111":
+        nucp_or_nic = "Radius of Containment < 0.2 NM (370.4 m)";
+        break;
+      case "1000":
+        nucp_or_nic = "Radius of Containment < 0.1 NM (185.2 m)";
+        break;
+      case "1001":
+        nucp_or_nic = "Radius of Containment < 75 m";
+        break;
+      case "1010":
+        nucp_or_nic = "Radius of Containment < 25 m";
+        break;
+      case "1011":
+        nucp_or_nic = "Radius of Containment < 7.5 m";
+        break;
+      default:
+        nucp_or_nic = "Reserved";
+        break;
+    }
+
     if (bits[7] == "0") { this.quality_indicator = { NUCr_or_NACv: nucr_or_nacv, NUCp_or_NIC: nucp_or_nic }; return; }
 
     const nicbaro = "0x" + parseInt(bits.slice(8, 9).join("").toString(), 2).toString(16).padStart(2, "0");
-    const sil = "0x" + parseInt(bits.slice(9, 11).join("").toString(), 2).toString(16).padStart(2, "0");
-    const nacp = "0x" + parseInt(bits.slice(11, 15).join("").toString(), 2).toString(16).padStart(2, "0");
+    var sil = "";
+    switch (bits.slice(9, 11).join("")) {
+      case "00":
+        sil = "Unknown or > 1 x 10^-3 per flight hour or per sample";
+        break;
+      case "01":
+        sil = "<= 1 x 10^-3 per flight hour or per sample";
+        break;
+      case "10":
+        sil = "<= 1 x 10^-5 per flight hour or per sample";
+        break;
+      case "11":
+        sil = "<= 1 x 10^-7 per flight hour or per sample";
+        break;
+    }
+
+    let nacp = "";
+    switch (bits.slice(11, 15).join("")) {
+      case "0000":
+        nacp = "EPU >= 18.52 km (>= 10 NM) 'Unknown accuracy'";
+        break;
+      case "0001":
+        nacp = "EPU < 18.52 km (10 NM) 'RNP-10 accuracy'";
+        break;
+      case "0010":
+        nacp = "EPU < 7.408 km (4 NM) 'RNP-4 accuracy'";
+        break;
+      case "0011":
+        nacp = "EPU < 3.704 km (2 NM) 'RNP-2 accuracy'";
+        break;
+      case "0100":
+        nacp = "EPU < 1852 m (1 NM) 'RNP-1 accuracy'";
+        break;
+      case "0101":
+        nacp = "EPU < 926 m (0.5 NM) 'RNP-0.5 accuracy'";
+        break;
+      case "0110":
+        nacp = "EPU < 555.6 m (0.3 NM) 'RNP-0.3 accuracy'";
+        break;
+      case "0111":
+        nacp = "EPU < 185.2 m (0.1 NM) 'RNP-0.1 accuracy'";
+        break;
+      case "1000":
+        nacp = "EPU < 92.6 m (0.05 NM) 'e.g., GPS (with SA on)'";
+        break;
+      case "1001":
+        nacp = "EPU < 30 m 'e.g., GPS (SA off)'";
+        break;
+      case "1010":
+        nacp = "EPU < 10 m 'e.g., WAAS'";
+        break;
+      case "1011":
+        nacp = "EPU < 3 m 'e.g., LAAS'";
+        break;
+      default:
+        nacp = "Reserved";
+        break;
+    }
     if (bits[15] == "0") { this.quality_indicator = { NUCr_or_NACv: nucr_or_nacv, NUCp_or_NIC: nucp_or_nic, NICBARO: nicbaro, SIL: sil, NACp: nacp }; return; }
 
     const sil_s = (bits[18] == "0") ? "measured per flight-hour" : "measured per sample";
-    const sda = "0x" + parseInt(bits.slice(19, 21).join("").toString(), 2).toString(16).padStart(2, "0");
-    const gva = "0x" + parseInt(bits.slice(21, 23).join("").toString(), 2).toString(16).padStart(2, "0");
+
+    var sda = "";
+    switch (bits.slice(19, 21).join("")) {
+      case "00":
+        sda = "Supported Failure Conditions: Unknown/No safety effect \nProbability of Undetected Fault: > 1 x 10^-3 per flight hour or Unknown \nSoftware & Hardware Design Assurance Level: N/A";
+        break;
+      case "01":
+        sda = "Supported Failure Conditions: Minor \nProbability of Undetected Fault: <= 1 x 10^-3 per flight hour \nSoftware & Hardware Design Assurance Level: D";
+        break;
+      case "10":
+        sda = "Supported Failure Conditions: Major \nProbability of Undetected Fault: > 1 x 10^-5 per flight hour \nSoftware & Hardware Design Assurance Level: C";
+        break;
+      case "11":
+        sda = "Supported Failure Conditions: Hazardous \nProbability of Undetected Fault: > 1 x 10^-7 per flight hour \nSoftware & Hardware Design Assurance Level: B";
+        break;
+    }
+    var gva = "";
+    switch (bits.slice(21, 23).join("")) {
+      case "00":
+        gva = "Unknown or > 150 meters";
+        break;
+      case "01":
+        gva = "<= 150 meters";
+        break;
+      case "10":
+        gva = "<= 45 meters";
+        break;
+      case "11":
+        gva = "Reserved";
+        break;
+    }
     if (bits[23] == "0") {
       this.quality_indicator = {
         NUCr_or_NACv: nucr_or_nacv, NUCp_or_NIC: nucp_or_nic, NICBARO: nicbaro, SIL: sil, NACp: nacp,
@@ -985,7 +1130,7 @@ export class Cat21 {
         ? "Position transmitted is not ADS-B position reference point"
         : "Position transmitted is the ADS-B position reference point";
     var cdti = bits[3] === "0" ? "CDTI not operational" : "CDTI operational";
-    var b2 = bits[4] === "0" ? "≥ 70 Watts" : "< 70 Watts";
+    var b2 = bits[4] === "0" ? "0 >= 70 Watts" : "< 70 Watts";
     var ras = bits[5] === "0" ? "Aircraft not receiving ATC-services" : "Aircraft receiving ATC services";
     var ident = bits[6] === "0" ? "IDENT switch not active" : "IDENT switch active";
 

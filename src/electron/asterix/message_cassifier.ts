@@ -11,7 +11,6 @@ export function sliceMainBuffer(buffer: Buffer) {
   while (end < buffer.length) {
     const len = buffer.slice(start + 1, start + 3).readInt16BE();
     end = start + len;
-    // console.log(len);
     messages.push(buffer.slice(start, end));
     start = end;
   }
@@ -34,13 +33,17 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
     messages.map(async (v, index) => {
       if (v[0] === 10) {
         cat10msg += 1;
+        // let msg = await decodeClass10Messages(v, index + 1)
+        // if (msg.test == true) {
+        //   console.log(index + cat23msg.length)
+        //   console.log(msg);
+        // }
+        // return msg;
         return decodeClass10Messages(v, index + 1);
       }
       //case 21
       cat21msg += 1;
-      let msg = await decodeClass21Messages(v, index + 1);
-      console.log(msg);
-      return msg;
+      return decodeClass21Messages(v, index + 1);
     })
   );
   console.log(`Received ${cat10msg} messages from Category 10`);
@@ -51,10 +54,8 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
 }
 
 export async function decodeClass10Messages(msg: Buffer, id: number): Promise<Cat10> {
-  // console.log({ cat_21: cat21msg.length });
   var vec: Cat10[] = [];
 
-  //n console.log("MESSAGE " + a);
   const fspec = BigInt("0x" + msg.slice(3, 7).toString("hex"))
     .toString(2)
     .padStart(4 * 8, "0")
@@ -123,48 +124,34 @@ export async function decodeClass10Messages(msg: Buffer, id: number): Promise<Ca
     // **********************
     if (fspec[4] === "1") {
       //TODO test that the result is correct when we have data for this field
-      // console.log("I010/041 Position in WGS-84 Co-ordinates")
-      // console.log("	" + msg.slice(offset, offset + 8).toString('hex'));
+      /// I010/041 Position in WGS-84 Co-ordinates
       tasks.push(decod_msg.set_wgs_84_coordinates(msg.slice(offset, offset + 8)));
-      offset += 8;
-      //length =8
+      offset += 8; //length =8
     }
     if (fspec[5] === "1") {
-      //   console.log("I010/040 Measured Position in Polar Co-ordinates");
-      //   const buff = msg.slice(offset, offset + 4);
-      //   console.log("	" + buff.toString("hex"));
-      //   parsePolarCoordinate(buff);
+      /// I010/040 Measured Position in Polar Co-ordinates
       tasks.push(decod_msg.set_polar_coordinates(msg.slice(offset, offset + 4)));
-      offset += 4;
-      //length =4
+      offset += 4; //length =4
     }
     if (fspec[6] === "1") {
-      // console.log("I010/042 Position in Cartesian Co-ordinates");
-      // const buff = msg.slice(offset, offset + 4);
-      // console.log("	" + buff.toString("hex"));
-      // parseCartesianCoordinate(buff);
+      /// I010/042 Position in Cartesian Co-ordinates
       tasks.push(decod_msg.set_cartesian_coordinates(msg.slice(offset, offset + 4)));
-      offset += 4;
-      //length =4
+      offset += 4; //length =4
     }
     if (fspec[7] === "1") {
       /**** Field Extension Indicator ****/
 
       if (fspec[8] === "1") {
         // TODO test that the result is correct when we have data for this field
-        // console.log("I010/200 Calculated Track Velocity in Polar Co-ordinates");
-        // console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
+        /// I010/200 Calculated Track Velocity in Polar Co-ordinates
         tasks.push(decod_msg.set_calculated_track_velocity_polar_coordinates(msg.slice(offset, offset + 4)));
-        offset += 4;
-        //length =4
+        offset += 4; //length =4
       }
       if (fspec[9] === "1") {
         //TODO test that the result is correct when we have data for this field
-        // console.log("I010/202 Calculated Track Velocity in Cartesian Coord.");
-        // console.log("	" + msg.slice(offset, offset + 4).toString("hex"));
+        /// I010/202 Calculated Track Velocity in Cartesian Coord.
         tasks.push(decod_msg.set_calculated_track_velocity_cartesian_coordinates(msg.slice(offset, offset + 4)));
-        offset += 4;
-        //length =4
+        offset += 4; //length =4
       }
       if (fspec[10] === "1") {
         /// I010/161 Track Number
@@ -197,7 +184,7 @@ export async function decodeClass10Messages(msg: Buffer, id: number): Promise<Ca
 
         if (fspec[16] === "1") {
           /// I010/250 Mode S MB Data
-          const len = msg.slice(offset, offset + 1).readInt16BE(); //TODO this was buffer, i think its wrong
+          const len = parseInt("0x" + msg.slice(offset, offset + 1).toString("hex"));
           tasks.push(decod_msg.set_mode_s_mb_data(msg.slice(offset + 1, offset + 1 + 8 * len), len));
           offset += 1 + 8 * len; //length =1+8n
         }
@@ -238,13 +225,13 @@ export async function decodeClass10Messages(msg: Buffer, id: number): Promise<Ca
           }
           if (fspec[25] === "1") {
             /// I010/280 Presence
-            const len = msg.slice(offset, offset + 1).readInt16BE(); //TODO this was buffer, i think its wrong
+            const len = parseInt("0x" + msg.slice(offset, offset + 1).toString("hex"));
             tasks.push(decod_msg.set_presence(msg.slice(offset + 1, offset + 1 + 2 * len), len));
             offset += 1 + 2 * len; //length =1+2n
           }
           if (fspec[26] === "1") {
             /// I010/131 Amplitude of Primary Plot
-            tasks.push(decod_msg.set_alitude_of_primary_plot(msg.slice(offset, offset + 1)));
+            tasks.push(decod_msg.set_amplitude_of_primary_plot(msg.slice(offset, offset + 1)));
             offset += 1; //length =1
           }
           if (fspec[27] === "1") {
@@ -275,21 +262,6 @@ export async function decodeClass10Messages(msg: Buffer, id: number): Promise<Ca
   await Promise.all(tasks);
 
   return decod_msg;
-
-  // if (vec.length === cat10msg.length) {
-  //   // console.log(decod_msg);
-  //   // console.log(vec.length);
-  //   return vec;
-  // }
-
-  // vec.filter((value) => {
-  //   if (value.time_of_day == "08:13:55.648") {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // });
-  // console.log(vec)
 }
 
 export async function decodeClass21Messages(msg: Buffer, id: number): Promise<Cat21> {
@@ -347,23 +319,20 @@ export async function decodeClass21Messages(msg: Buffer, id: number): Promise<Ca
     offset += 3; //length =3
   }
   if (fspec[5] === "1") {
-    // console.log("I021/130 Position in WGS-84 co-ordinates")
-    // console.log("	" + msg.slice(offset, offset + 6).toString('hex'));
+    /// I021/130 Position in WGS-84 co-ordinates
     tasks.push(decod_msg.set_wgs_84_coordinates(msg.slice(offset, offset + 6)));
     offset += 6;
     //length =6
   }
   if (fspec[6] === "1") {
-    // console.log("I021/131 Position in WGS-84 co-ordinates, high res.")
-    // console.log("	" + msg.slice(offset, offset + 8).toString('hex'));
+    /// I021/131 Position in WGS-84 co-ordinates, high res.
     if (msg.slice(offset, offset + 8).length == 0) {
       console.log("Zero buffer");
       console.log(fspec);
       console.log(msg);
     }
     tasks.push(decod_msg.set_wgs_84_coordinates_high(msg.slice(offset, offset + 8)));
-    offset += 8;
-    //length =8
+    offset += 8; //length =8
   }
   if (fspec[7] === "1") {
     // Field Extension Indicator
@@ -555,7 +524,7 @@ export async function decodeClass21Messages(msg: Buffer, id: number): Promise<Ca
               tis = true;
             }
             if (bits[1] === "1") {
-              rep = msg.slice(offset + 1 + len, offset + 2 + len).readInt16BE(); //TODO this was buffer, i think its wrong
+              rep = parseInt("0x" + msg.slice(offset + 1 + len, offset + 2 + len).toString("hex"));
               len += 15 * rep;
               tid = true;
             }
@@ -588,7 +557,7 @@ export async function decodeClass21Messages(msg: Buffer, id: number): Promise<Ca
             }
             if (fspec[43] === "1") {
               /// I021/250 Mode S MB Data
-              const len = msg.slice(offset, offset + 1).readInt16BE(); //TODO this was buffer, i think its wrong
+              const len = parseInt("0x" + msg.slice(offset, offset + 1).toString("hex"));
               tasks.push(decod_msg.set_mode_s_mb_data(msg.slice(offset + 1, offset + 1 + 8 * len), len));
               offset += 1 + 8 * len; //length =1+8n
             }
@@ -606,7 +575,6 @@ export async function decodeClass21Messages(msg: Buffer, id: number): Promise<Ca
             if (fspec[46] === "1") {
               /// I021/295 Data Ages
               /// 4 octets to indicate octates presence
-
               tasks.push(decod_msg.set_data_ages(msg.slice(offset, msg.length)));
               offset += len; //length =1+
             }
@@ -652,6 +620,5 @@ function variableItemOffset(buffer: Buffer, max_len: number) {
     }
     return;
   }).length;
-  //console.log("item offset " + offset);
   return offset;
 }
