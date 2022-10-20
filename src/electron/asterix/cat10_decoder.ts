@@ -263,7 +263,7 @@ export class Cat10 {
       .split("");
     var v = bits[0] === "0" ? "Code validated" : "Code not validated";
     var g = bits[1] === "0" ? "Default" : "Garbled code";
-    var fl = (buffer.readInt16BE() / 4).toString(10) + "FL";
+    var fl = (fromTwosComplement(buffer.join("")) / 4) + "FL";
 
     this.flight_level = { V: v, G: g, FlightLevel: fl };
   };
@@ -831,4 +831,9 @@ interface SystemStatus {
   TSV: string;
   DIV: string;
   TTF: string;
+}
+
+export function fromTwosComplement(s: string) {
+  //@ts-ignore
+  return "0b" + s - s[0] * 2 ** s.length;
 }

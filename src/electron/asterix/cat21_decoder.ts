@@ -333,7 +333,7 @@ export class Cat21 {
       fsi = -1;
     }
 
-    this.time_message_reception_position_high = ((parseInt("0x" + buffer.toString("hex")) + fsi) * 2) ^ (-30 * 10) ^ 9; //[ns]
+    this.time_message_reception_position_high = ((parseInt("0x" + buffer.toString("hex")) + fsi) * Math.pow(2, -30)) * Math.pow(2, 9); //[ns]
   };
 
   set_time_message_reception_velocity = async (buffer: Buffer) => {
@@ -353,7 +353,7 @@ export class Cat21 {
       fsi = -1;
     }
 
-    this.time_message_reception_velocity_high = ((parseInt("0x" + buffer.toString("hex")) + fsi) * 2) ^ (-30 * 10) ^ 9; //[ns]
+    this.time_message_reception_velocity_high = ((parseInt("0x" + buffer.toString("hex")) + fsi) * Math.pow(2, -30)) * Math.pow(2, 9); //[ns]
   };
 
   set_time_ASTERIX_report_transmission = async (buffer: Buffer) => {
@@ -623,8 +623,9 @@ export class Cat21 {
         const tcp = parseInt(octet1.slice(2, 7).join(""), 2).toString(10);
 
         const altitude = (buffer.slice(offset + 1, offset + 3).readInt16BE() * 10).toString(10) + " ft";
-        const latitude = ((buffer.slice(offset + 3, offset + 6).readInt16BE() * 180) / (2 ^ 23)).toString(10) + " deg";
-        const longitude = ((buffer.slice(offset + 6, offset + 9).readInt16BE() * 180) / (2 ^ 23)).toString(10) + " deg";
+
+        const latitude = (buffer.readIntBE(offset + 3, offset + 6) * 180) / Math.pow(2, 23) + "deg";
+        const longitude = (buffer.readIntBE(offset + 6, offset + 9) * 180) / Math.pow(2, 23) + "deg";
 
         const octet11 = BigInt("0x" + buffer.slice(offset + 9, offset + 10).toString("hex"))
           .toString(2)
@@ -787,7 +788,7 @@ export class Cat21 {
         source = "FMS Selected Altitude";
         break;
     }
-    const altitude = (parseInt(bits.slice(3, 16).join(""), 2) * 25).toString(10) + " fl";
+    const altitude = (fromTwosComplement(bits.slice(3, 16).join("")) * 25).toString(10) + " fl";
     this.selected_altitude = { SAS: sas, Source: source, Altitude: altitude };
   };
 
@@ -800,7 +801,7 @@ export class Cat21 {
     const ah = bits[1] === "0" ? "Not active or unknown" : "Active";
     const am = bits[2] === "0" ? "Not active or unknown" : "Active";
 
-    const altitude = (parseInt(bits.slice(3, 16).join(""), 2) * 25).toString(10) + " fl";
+    const altitude = (fromTwosComplement(bits.slice(3, 16).join("")) * 25).toString(10) + " fl";
     this.final_state_selected_altitude = { MV: mv, AH: ah, AM: am, Altitude: altitude };
   };
 
@@ -811,7 +812,7 @@ export class Cat21 {
       .split("");
     const speed = parseInt(bits.slice(1, 16).join(""), 2);
     this.air_speed =
-      bits[0] === "0" ? "IAS: " + ((speed * 2) ^ -14).toString(10) + " NM/s" : "Mach: " + (speed * 0.001).toString(10);
+      bits[0] === "0" ? "IAS: " + (speed * Math.pow(2, -14)).toString(10) + " NM/s" : "Mach: " + (speed * 0.001).toString(10);
   };
 
   set_true_airspeed = async (buffer: Buffer) => {
@@ -824,7 +825,7 @@ export class Cat21 {
   };
 
   set_magnetic_heading = async (buffer: Buffer) => {
-    this.magnetic_heading = ((parseInt("0x" + buffer.toString("hex")) * 360) / (2 ^ 16)).toString(10) + " deg";
+    this.magnetic_heading = ((parseInt("0x" + buffer.toString("hex")) * 360) / Math.pow(2, 16)).toString(10) + " deg";
   };
 
   set_barometric_vertical_rate = async (buffer: Buffer) => {
