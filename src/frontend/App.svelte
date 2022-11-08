@@ -62,7 +62,7 @@
   async function handleLoadFileClick() {
     const numberOfMsg = await initIpcMainBidirectional("test-receive");
     console.log(`Loaded ${numberOfMsg} messages!`);
-    const res = await ipcMainBidirectional("get-message-quantity", 510);
+    const res = await ipcMainBidirectional("get-message-quantity", -1);
     messages = await parseIpcMainReceiveMessage(res);
     initializeSimulation(messages);
   }
