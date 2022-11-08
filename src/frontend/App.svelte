@@ -43,6 +43,7 @@
 
 <script lang="ts">
   import { initializeMap } from "./arcgis/map";
+  import { initializeSimulation, tickSimulation } from "./arcgis/simulation";
   import type { Cat10 } from "./custom-types/asterix/cat10";
   import type { Cat21 } from "./custom-types/asterix/cat21";
   import { initIpcMainBidirectional, ipcMainBidirectional, ipcMainOneDirection } from "./ipcMain/ipcMainCallers";
@@ -63,6 +64,7 @@
     console.log(`Loaded ${numberOfMsg} messages!`);
     const res = await ipcMainBidirectional("get-message-quantity", 510);
     messages = await parseIpcMainReceiveMessage(res);
+    initializeSimulation(messages);
   }
 
   async function handleDecodeMessages() {
@@ -110,6 +112,7 @@
         <button on:click="{() => ipcMainOneDirection('open-test-file')}">Open test file</button>
         <button on:click="{handleLoadFileClick}">Test IPC value return</button>
         <button on:click="{handleDecodeMessages}">Test decode msg</button>
+        <button on:click="{tickSimulation}">Advance simulation</button>
       </div>
       <div id="viewDiv"></div>
     {/if}

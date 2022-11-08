@@ -263,7 +263,7 @@ export class Cat10 {
       .split("");
     var v = bits[0] === "0" ? "Code validated" : "Code not validated";
     var g = bits[1] === "0" ? "Default" : "Garbled code";
-    var fl = (fromTwosComplement(buffer.join("")) / 4) + "FL";
+    var fl = fromTwosComplement(buffer.join("")) / 4 + "FL";
 
     this.flight_level = { V: v, G: g, FlightLevel: fl };
   };
@@ -280,7 +280,7 @@ export class Cat10 {
     var sec = parseInt("0x" + buffer.toString("hex")) / 128.0;
     var date = new Date(0);
     date.setMilliseconds(sec * 1000);
-    this.time_of_day = date.toISOString().substring(11, 23); //TODO invalid time error
+    this.time_of_day = date.toISOString(); //.substring(11, 23); //TODO invalid time error
   };
 
   set_track_number = async (buffer: Buffer) => {
@@ -516,26 +516,42 @@ export class Cat10 {
 
     for (var i = 0; i < rep; i++) {
       try {
-        console.log(buffer.slice(start, start + 8))
+        console.log(buffer.slice(start, start + 8));
         var bits = BigInt("0x" + buffer.slice(start, start + 8).toString("hex"))
           .toString(2)
           .padStart(9 * 8, "0")
           .split("");
-        console.log("BDS1: 0x" +
-          parseInt(bits.slice(8 * 7, 8 * 7 + 4).join(""), 2).toString(16).padStart(2, "0") +
-          " BDS2: 0x" +
-          parseInt(bits.slice(8 * 7 + 4, 8 * 7 + 8).join(""), 2).toString(16).padStart(2, "0") +
-          " MB Data: 0x" + parseInt(bits.slice(0, 8 * 7).join(""), 2).toString(16).padStart(2 * 7, "0"))
+        console.log(
+          "BDS1: 0x" +
+            parseInt(bits.slice(8 * 7, 8 * 7 + 4).join(""), 2)
+              .toString(16)
+              .padStart(2, "0") +
+            " BDS2: 0x" +
+            parseInt(bits.slice(8 * 7 + 4, 8 * 7 + 8).join(""), 2)
+              .toString(16)
+              .padStart(2, "0") +
+            " MB Data: 0x" +
+            parseInt(bits.slice(0, 8 * 7).join(""), 2)
+              .toString(16)
+              .padStart(2 * 7, "0")
+        );
 
         this.mode_s_mb_data.push(
           "BDS1: 0x" +
-          parseInt(bits.slice(8 * 7, 8 * 7 + 4).join(""), 2).toString(16).padStart(2, "0") +
-          " BDS2: 0x" +
-          parseInt(bits.slice(8 * 7 + 4, 8 * 7 + 8).join(""), 2).toString(16).padStart(2, "0") +
-          " MB Data: 0x" + parseInt(bits.slice(0, 8 * 7).join(""), 2).toString(16).padStart(2 * 7, "0")
+            parseInt(bits.slice(8 * 7, 8 * 7 + 4).join(""), 2)
+              .toString(16)
+              .padStart(2, "0") +
+            " BDS2: 0x" +
+            parseInt(bits.slice(8 * 7 + 4, 8 * 7 + 8).join(""), 2)
+              .toString(16)
+              .padStart(2, "0") +
+            " MB Data: 0x" +
+            parseInt(bits.slice(0, 8 * 7).join(""), 2)
+              .toString(16)
+              .padStart(2 * 7, "0")
         );
         start += 8;
-      } catch { }
+      } catch {}
     }
   };
 
@@ -603,7 +619,7 @@ export class Cat10 {
         var dtheta = (parseInt("0x" + buffer.slice(start + 1, start + 2).toString("hex")) * 0.15).toString(10) + "º";
         start += 2;
         this.presence.push({ DRHO: drho, DTHETA: dtheta });
-      } catch { }
+      } catch {}
     }
   };
 
