@@ -24,7 +24,7 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   let decodedMessages: (Cat10 | Cat21)[] = [];
 
   if (messageQuantity != -1) {
-    messages = messages.slice(0, 1);
+    messages = messages.slice(0, messageQuantity);
   }
 
   messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
