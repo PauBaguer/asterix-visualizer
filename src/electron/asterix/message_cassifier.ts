@@ -24,7 +24,7 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   let decodedMessages: (Cat10 | Cat21)[] = [];
 
   if (messageQuantity != -1) {
-    messages = messages.slice(0, messageQuantity);
+    messages = messages.slice(0, 1);
   }
 
   messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
@@ -33,13 +33,11 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
     messages.map(async (v, index) => {
       if (v[0] === 10) {
         cat10msg += 1;
-        // let msg = await decodeClass10Messages(v, index + 1)
-        // if (msg.test == true) {
-        //   console.log(index + cat23msg.length)
-        //   console.log(msg);
-        // }
-        // return msg;
-        return decodeClass10Messages(v, index + 1);
+        let msg = await decodeClass10Messages(v, index + 1)
+        console.log(index + cat23msg.length)
+        console.log(msg);
+        return msg;
+        //return decodeClass10Messages(v, index + 1);
       }
       //case 21
       cat21msg += 1;
@@ -185,7 +183,7 @@ export async function decodeClass10Messages(msg: Buffer, id: number): Promise<Ca
         if (fspec[16] === "1") {
           /// I010/250 Mode S MB Data
           const len = parseInt("0x" + msg.slice(offset, offset + 1).toString("hex"));
-          tasks.push(decod_msg.set_mode_s_mb_data(msg.slice(offset + 1, offset + 1 + 8 * len), len));
+          tasks.push(decod_msg.set_mode_s_mb_data(msg.slice(offset, offset + 1 + 8 * len), len));
           offset += 1 + 8 * len; //length =1+8n
         }
         if (fspec[17] === "1") {

@@ -1087,18 +1087,16 @@ export class Cat21 {
 
     for (var i = 0; i < rep; i++) {
       try {
-        var bits = BigInt("0x" + buffer.slice(start, start + 8).toString("hex"))
+        var bits = BigInt("0x" + buffer.slice(start, start + 9).toString("hex"))
           .toString(2)
           .padStart(9 * 8, "0")
           .split("");
-
-        this.mode_s_mb_data.push(
-          "BDS1: 0x" +
-          parseInt(bits.slice(8 * 7, 8 * 7 + 4).join(""), 2).toString(16).padStart(2, "0") +
-          " BDS2: 0x" +
-          parseInt(bits.slice(8 * 7 + 4, 8 * 7 + 8).join(""), 2).toString(16).padStart(2, "0") +
-          " MB Data: 0x" + parseInt(bits.slice(0, 8 * 7).join(""), 2).toString(16).padStart(2 * 7, "0")
-        );
+        var data = bits.slice(0, 8 * 7).join("");
+        var add1 = bits.slice(8 * 7, 8 * 7 + 4).join("");
+        var add2 = bits.slice(8 * 7 + 4, 8 * 7 + 8).join("");
+        this.mode_s_mb_data.push("BDS1: 0x" + add1 +
+          " BDS2: 0x" + add2 +
+          " MB Data: 0x" + data);
         start += 8;
       } catch { }
     }
