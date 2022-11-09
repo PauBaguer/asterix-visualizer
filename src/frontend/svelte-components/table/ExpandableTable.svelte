@@ -52,19 +52,17 @@
                   ><button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button
                   ></td
                 >
-                {#if msg.class === "Cat10"}
-                  <td>{msg.id}</td>
-                  <td>{msg.class}</td>
-                  <td>{msg.message_type}</td>
-                  <td>{`${msg.data_source_identifier.SIC} ${msg.data_source_identifier.SAC}`}</td>
-                  <td>{msg.time_of_day}</td>
-                  <!-- {:else if msg.class === 21}
+                <td>{msg.id}</td>
+                <td>{msg.class}</td>
+                <td>{msg.message_type}</td>
+                <td>{`${msg.data_source_identifier.SIC} ${msg.data_source_identifier.SAC}`}</td>
+                <td>{msg.time_of_day}</td>
+                <!-- {:else if msg.class === "Cat21"}
                   <td>{msg.id}</td>
                   <td>{msg.class}</td>
                   <td>{msg.service_identification}</td>
                   <td>{msg.data_source_identifier}</td>
                   <td>tbd</td> -->
-                {/if}
               </tr>
 
               <tr>
@@ -94,8 +92,19 @@
                             />
                           {:else if key === "cartesian_coordinates" && msg.class === "Cat10"}
                             <CartesianCoordinates i="{i}" j="{j}" cartesianCoordinates="{msg.cartesian_coordinates}" />
-                          {:else if msg.class === 10 && key != "id" && key != "time_of_day" && key != "message_type" && key !== "class"}
-                            <GenericComponent i="{i}" j="{j}" genericObject="{msg[key]}" dataItemName="{key}" />
+                          {:else if key != "id" && key != "time_of_day" && key != "message_type" && key !== "class"}
+                            {#if typeof msg[key] == "object"}
+                              <GenericComponent i="{i}" j="{j}" genericObject="{msg[key]}" dataItemName="{key}" />
+                            {:else}
+                              <td></td>
+                              <td></td>
+                              <td>{key}</td>
+                              <td>{msg[key]}</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                            {/if}
                           {/if}
                         {/each}
                       </tbody>
