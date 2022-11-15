@@ -6,7 +6,11 @@
     "module": "commonjs",
     "sourceMap": true,
     "stripInternal": true,
-    "lib": ["es2015", "esnext", "dom"],
+    "lib": [
+      "es2015",
+      "esnext",
+      "dom"
+    ],
     "moduleResolution": "node",
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -23,6 +27,11 @@
     "esModuleInterop": true,
     "isolatedModules": true
   },
-  "include": [".", "*.ast"],
-  "exclude": ["node_modules"]
+  "include": [
+    ".",
+    "*.ast"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

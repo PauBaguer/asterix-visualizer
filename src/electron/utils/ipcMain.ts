@@ -21,8 +21,8 @@ export async function loadFileIpc() {
 }
 
 //@ts-ignore
-export async function getMessagesIpc(event: any, messageQuantity: number) {
-  decodedMsg = await decodeMessages(messages, messageQuantity);
+export async function getMessagesIpc(event: any, messageQuantity: number, hash: string) {// TODO aixo s'utilitzar per algo??
+  await decodeMessages(messages, hash, -1);
   console.log(decodedMsg.length);
-  return await JSON.stringify(decodedMsg);
+  return await JSON.stringify(hash);
 }

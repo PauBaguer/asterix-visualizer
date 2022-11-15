@@ -1,6 +1,8 @@
+import { Types } from "mongoose";
 import { resolve } from "path";
 import { Cat10 } from "./cat10_decoder";
 import { Cat21 } from "./cat21_decoder";
+import { File, FileModel, MessageModel } from "./models";
 //import { parseCartesianCoordinate, parsePolarCoordinate } from "./cat10_msg_parser";
 
 export function sliceMainBuffer(buffer: Buffer) {
@@ -17,42 +19,49 @@ export function sliceMainBuffer(buffer: Buffer) {
   return messages;
 }
 
-export async function classifyMessages(messages: Buffer[], messageQuantity: number): Promise<(Cat10 | Cat21)[]> {
+export async function classifyMessages(messages: Buffer[], fileHash: string, start: number) {
   let cat10msg: number = 0;
   let cat21msg: number = 0;
   let cat23msg: Buffer[] = [];
-  let decodedMessages: (Cat10 | Cat21)[] = [];
-
-  if (messageQuantity != -1) {
-    messages = messages.slice(0, messageQuantity);
-  }
 
   messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
 
-  decodedMessages = await Promise.all(
+  var file: number;
+  if (start === -1) {
+    const newFile = new FileModel({
+      hash: fileHash,
+      messages: [],
+    });
+    const res = await newFile.save();
+    file = res.id;
+  }
+  else {
+    const res = await FileModel.findOne({ hash: fileHash });
+    if (!res) { console.log("Error"); return }
+    file = res.id;
+    messages = messages.slice(start);
+  }
+
+
+  await Promise.all(
     messages.map(async (v, index) => {
       if (v[0] === 10) {
         cat10msg += 1;
-        let msg = await decodeClass10Messages(v, index + 1)
-        console.log(index + cat23msg.length)
-        console.log(msg);
-        return msg;
-        //return decodeClass10Messages(v, index + 1);
+        decodeClass10Messages(v, index + 1, file)
+      } else {
+        //case 21
+        cat21msg += 1;
+        decodeClass21Messages(v, index + 1, file)
       }
-      //case 21
-      cat21msg += 1;
-      return decodeClass21Messages(v, index + 1);
     })
   );
   console.log(`Received ${cat10msg} messages from Category 10`);
   console.log(`Received ${cat21msg} messages from Category 21`);
   console.log(`Received ${cat23msg.length} messages from Category 23`);
-  console.log(decodedMessages.length);
-  return decodedMessages;
+  return;
 }
 
-export async function decodeClass10Messages(msg: Buffer, id: number): Promise<Cat10> {
-  var vec: Cat10[] = [];
+export async function decodeClass10Messages(msg: Buffer, id: number, file: number) {
 
   const fspec = BigInt("0x" + msg.slice(3, 7).toString("hex"))
     .toString(2)
@@ -258,13 +267,17 @@ export async function decodeClass10Messages(msg: Buffer, id: number): Promise<Ca
   }
   //@ts-ignore
   await Promise.all(tasks);
-
-  return decod_msg;
+  const newmsg = new MessageModel({
+    data: decod_msg,
+  });
+  const message = await newmsg.save();
+  await FileModel.findOneAndUpdate(
+    { _id: file },
+    { $addToSet: { messages: message } }
+  );
 }
 
-export async function decodeClass21Messages(msg: Buffer, id: number): Promise<Cat21> {
-  var vec21: Cat21[] = [];
-  //var test2 = 139747;
+export async function decodeClass21Messages(msg: Buffer, id: number, file: number) {
 
   const fspec = BigInt("0x" + msg.slice(3, 10).toString("hex"))
     .toString(2)
@@ -596,7 +609,14 @@ export async function decodeClass21Messages(msg: Buffer, id: number): Promise<Ca
     }
   }
   await Promise.all(tasks);
-  return decod_msg;
+  const newmsg = new MessageModel({
+    data: decod_msg,
+  });
+  const message = await newmsg.save();
+  await FileModel.findOneAndUpdate(
+    { _id: file },
+    { $addToSet: { messages: message } }
+  );
 }
 
 function variableItemOffset(buffer: Buffer, max_len: number) {

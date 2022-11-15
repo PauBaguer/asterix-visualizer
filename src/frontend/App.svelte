@@ -45,6 +45,7 @@
   import { initializeMap } from "./arcgis/map";
   import type { Cat10 } from "./custom-types/asterix/cat10";
   import type { Cat21 } from "./custom-types/asterix/cat21";
+  import { FileModel } from "./custom-types/asterix/models";
   import { initIpcMainBidirectional, ipcMainBidirectional, ipcMainOneDirection } from "./ipcMain/ipcMainCallers";
   import { parseIpcMainReceiveMessage } from "./ipcMain/ipcMainReceiveParser";
   import ExpandableTable from "./svelte-components/table/ExpandableTable.svelte";
@@ -67,7 +68,12 @@
 
   async function handleDecodeMessages() {
     const res = await ipcMainBidirectional("get-message-quantity", 20000);
-    messages = await parseIpcMainReceiveMessage(res);
+    console.log(res);
+
+    const data = await FileModel.findOne({ hash: res });
+    console.log(data?.messages.length);
+    //@ts-ignore
+    messages = await parseIpcMainReceiveMessage(data?.messages.values());
   }
 
   async function handleMapClick() {

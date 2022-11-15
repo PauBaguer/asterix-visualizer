@@ -14,7 +14,11 @@ import settings from "./utils/settings";
 import { openFilePicker, openTestFile } from "./utils/file_management";
 import { sliceMainBuffer, classifyMessages } from "./asterix/message_cassifier";
 import { getMessagesIpc, loadFileIpc } from "./utils/ipcMain";
-import { fromTwosComplement } from "./asterix/cat21_decoder";
+import { Cat21, fromTwosComplement } from "./asterix/cat21_decoder";
+import mongoose from "mongoose";
+import { FileModel } from './asterix/models';
+import { Cat10 } from "./asterix/cat10_decoder";
+const crypto = require('crypto');
 
 const isProd = process.env.NODE_ENV === "production" || app.isPackaged;
 
@@ -26,7 +30,7 @@ logger.info(settings.get("check") ? "Settings store works correctly." : "Setting
 let mainWindow: BrowserWindow | null;
 let notification: Notification | null;
 
-const createWindow = () => {
+const createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 1000,
@@ -51,6 +55,14 @@ const createWindow = () => {
     app.quit();
   });
 
+  await mongoose.connect("mongodb+srv://Admin:Admin@asterix.yjrwoyw.mongodb.net/?retryWrites=true&w=majority")
+    .then(() => {
+      console.log("Connexion establecida ^^ !");
+    })
+    .catch((_error) => {
+      console.log("Error de connexion con la base de datos :( ");
+    })
+
   if (!isProd) mainWindow.webContents.openDevTools();
 
   mainWindow.on("closed", () => {
@@ -64,18 +76,46 @@ const createWindow = () => {
   ipcMain.on("open-file-picker", async () => {
     const buffer = await openFilePicker();
     if (!buffer) return;
-    const messages = await sliceMainBuffer(buffer!);
-    const decodedMsg = await classifyMessages(messages, 20000);
-    console.log(decodedMsg.length);
-    mainWindow?.webContents.send("push-notification", await JSON.stringify(decodedMsg));
+
+    //Hash of the file
+    const hashSum = crypto.createHash('sha256');
+    hashSum.update(buffer);
+    const hash: string = hashSum.digest('hex');
+
+    var messages = await sliceMainBuffer(buffer!);
+    messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
+
+    let filedata = await FileModel.findOne({ hash: hash });
+    if (!filedata) {
+      classifyMessages(messages, hash, -1);
+    }
+    else if (filedata.messages.length < messages.length) {
+      classifyMessages(messages, hash, filedata.messages.length);
+    }
+
+    mainWindow?.webContents.send("push-notification", await JSON.stringify(hash));
   });
 
   ipcMain.on("open-test-file", async () => {
     const buffer = await openTestFile();
-    const messages = await sliceMainBuffer(buffer);
-    const decodedMsg = await classifyMessages(messages, 2000);
-    console.log(decodedMsg.length);
-    mainWindow?.webContents.send("push-notification", await JSON.stringify(decodedMsg));
+
+    //Hash of the file
+    const hashSum = crypto.createHash('sha256');
+    hashSum.update(buffer);
+    const hash: string = hashSum.digest('hex');
+
+    var messages = await sliceMainBuffer(buffer!);
+    messages = messages.filter((v) => v[0] === 10 || v[0] === 21);
+
+    let filedata = await FileModel.findOne({ hash: hash });
+    if (!filedata) {
+      classifyMessages(messages, hash, -1);
+    }
+    else if (filedata.messages.length < messages.length) {
+      classifyMessages(messages, hash, filedata.messages.length);
+    }
+
+    mainWindow?.webContents.send("push-notification", await JSON.stringify(hash));
   });
 
   ipcMain.handle("test-handle", async () => {
