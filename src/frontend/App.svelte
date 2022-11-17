@@ -61,7 +61,7 @@
   async function handleLoadFileClick() {
     const numberOfMsg = await initIpcMainBidirectional("test-receive");
     console.log(`Loaded ${numberOfMsg} messages!`);
-    const res = await ipcMainBidirectional("get-message-quantity", -1); //TODO change to -1
+    const res = await ipcMainBidirectional("get-message-quantity", 40000); //TODO change to -1
     messages = await parseIpcMainReceiveMessage(res);
   }
 
@@ -88,10 +88,10 @@
     console.log("Creating csv file");
 
     let csvContent =
-      "id,class,message_type,data_source_identifier,target_report_description,wgs_84_coordinates,polar_coordinates,cartesian_coordinates,calculated_track_velocity_polar_coordinates,calculated_track_velocity_cartesian_coordinates,mod_3A_code,flight_level,measured_height,altitude_of_primary_plot,time_of_day,track_number,track_status,calculated_acceleration,target_address,target_identification,mode_s_mb_data,target_size_and_orientation,presence,vehicle_fleet_identification,preprogrammed_message,standard_deviation_of_position,system_status,aircraft_operational_status,service_identification,service_management,emitter_category,target_report_descriptor,time_applicability_position,time_applicability_velocity,time_message_reception_position,time_message_reception_position_high,time_message_reception_velocity,time_message_reception_velocity_high,time_ASTERIX_report_transmission,quality_indicator,tarjectory_intent,wgs_84_coordinates_high,message_amplitude,geometric_height,selected_altitude,final_state_selected_altitude,air_speed,true_airspeed,magnetic_heading,barometric_vertical_rate,geometric_vertical_rate,airborne_ground_vector,track_angle_rate,target_status,mops_version,met_information,roll_angle,acas_resolution_advisory_report,surface_capabilities_and_characteristics,receiver_ID";
+      "Id,Class,Message type,Data source identifier,Target report description,WGS84 coordinates,Polar coordinates,Cartesian coordinates,Calculated track velocity polar coordinates,Calculated track velocity cartesian coordinates,Mod 3A code,Flight level,Measured height,Altitude of primary plot,Time of day,Track number,Track status,Calculated acceleration,Target address,Target identification,Mode S MB data,Target size and orientation,Presence,Vehicle fleet identification,Preprogrammed message,Standard deviation of position,System status,Aircraft operational status,Service identification,Service management,Emitter category,Target report descriptor,Time applicability position,Time applicability velocity,Time message reception position,Time message reception position high,Time message reception velocity,Time message reception velocity high,TimeASTERIX report transmission,Quality indicator,Tarjectory intent,WGS84 coordinates high,Message amplitude,Geometric height,Selected altitude,Final state selected altitude,Air speed,True airspeed,Magnetic heading,Barometric vertical rate,Geometric vertical rate,Airborne ground vector,Track angle rate,Target status,MOPS version,Met information,Roll angle,ACAS resolution advisory report,Surface capabilities and characteristics,Receiver ID \n";
 
     messages.forEach((value) => {
-      csvContent += value.csv.join(",") + "\n";
+      csvContent += '"' + value.csv.join('","') + '" \n';
     });
     const blob = new Blob(["\ufeff", csvContent], { type: "text/csv;" });
     var reader = new FileReader();
