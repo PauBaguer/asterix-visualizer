@@ -65,7 +65,7 @@ const createWindow = () => {
     const buffer = await openFilePicker();
     if (!buffer) return;
     const messages = await sliceMainBuffer(buffer!);
-    const decodedMsg = await classifyMessages(messages, 20000);
+    const decodedMsg = await classifyMessages(messages, 5);
     console.log(decodedMsg.length);
     mainWindow?.webContents.send("push-notification", await JSON.stringify(decodedMsg));
   });
