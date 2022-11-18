@@ -26,6 +26,7 @@ export interface Cat10 {
   preprogrammed_message: PreprogrammedMessage;
   standard_deviation_of_position: StandardDeviationOfPosition;
   system_status: SystemStatus;
+  csv: string[];
 }
 
 export interface DataSourceIdentifier {

@@ -101,6 +101,49 @@
   }
 
   let visibleItem = "MAP";
+  async function csv_file() {
+    console.log("Creating csv file");
+
+    let csvContent =
+      "Id,Class,Message type,Data source identifier,Target report description,WGS84 coordinates,Polar coordinates,Cartesian coordinates,Calculated track velocity polar coordinates,Calculated track velocity cartesian coordinates,Mod 3A code,Flight level,Measured height,Altitude of primary plot,Time of day,Track number,Track status,Calculated acceleration,Target address,Target identification,Mode S MB data,Target size and orientation,Presence,Vehicle fleet identification,Preprogrammed message,Standard deviation of position,System status,Aircraft operational status,Service identification,Service management,Emitter category,Target report descriptor,Time applicability position,Time applicability velocity,Time message reception position,Time message reception position high,Time message reception velocity,Time message reception velocity high,TimeASTERIX report transmission,Quality indicator,Tarjectory intent,WGS84 coordinates high,Message amplitude,Geometric height,Selected altitude,Final state selected altitude,Air speed,True airspeed,Magnetic heading,Barometric vertical rate,Geometric vertical rate,Airborne ground vector,Track angle rate,Target status,MOPS version,Met information,Roll angle,ACAS resolution advisory report,Surface capabilities and characteristics,Receiver ID \n";
+
+    messages.forEach((value) => {
+      csvContent += '"' + value.csv.join('","') + '" \n';
+    });
+    const blob = new Blob(["\ufeff", csvContent], { type: "text/csv;" });
+    var reader = new FileReader();
+    reader.onload = function (event: any) {
+      var save = document.createElement("a");
+      save.href = event.target.result;
+      save.target = "_blank";
+      var d = new Date();
+      save.download =
+        "AsterixDecode_" +
+        d.getFullYear() +
+        "-" +
+        (d.getMonth() + 1) +
+        "-" +
+        d.getDate() +
+        "T" +
+        d.getHours() +
+        "-" +
+        d.getMinutes() +
+        ".csv";
+      try {
+        var clicEvent = new MouseEvent("click", {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+        });
+      } catch (e) {
+        var clicEvent = document.createEvent("MouseEvent");
+        clicEvent.initEvent("click", true, true);
+      }
+      save.dispatchEvent(clicEvent);
+      (window.URL || window.webkitURL).revokeObjectURL(save.href);
+    };
+    reader.readAsDataURL(blob);
+  }
 </script>
 
 <main>
@@ -119,7 +162,7 @@
           ><i class="bi bi-folder2-open"></i></button
         >
 
-        <button type="button" class="btn btn-primary me-3" on:click="{handleLoadFileClick}"
+        <button type="button" class="btn btn-primary me-3" on:click="{csv_file}"
           ><i class="bi bi-filetype-csv"></i>
         </button>
         <button type="button" class="btn btn-primary" on:click="{handleLoadFileClick}"

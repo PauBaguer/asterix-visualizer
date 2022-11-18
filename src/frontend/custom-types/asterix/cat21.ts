@@ -43,6 +43,7 @@ export interface Cat21 {
   surface_capabilities_and_characteristics: SurfaceCapabilitiesAndCharacteristics;
   //data_ages
   receiver_ID: string;
+  csv: string[];
 }
 
 interface AircraftOperationalStatus {
