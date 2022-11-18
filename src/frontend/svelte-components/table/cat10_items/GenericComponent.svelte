@@ -20,8 +20,8 @@
 </tr>
 <tr>
   <td colspan="12" class="hiddenRow">
-    <div class="accordian-body collapse.show" id="{`demo${i}${j}`}">
-      <table class="table table-striped">
+    <div class="accordian-body" id="{`demo${i}${j}`}">
+      <table class="table table-striped table-bordered table-sm" cellspacing="0">
         <thead>
           <tr>
             {#each Object.keys(genericObject) as key}

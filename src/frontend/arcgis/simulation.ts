@@ -25,7 +25,8 @@ export function tickSimulation() {
     if (value.class === "Cat10") {
       if (Date.parse(value.time_of_day) > simTime) break;
 
-      //blablabla
+      if (value.message_type !== "Target Report") break;
+
       createGraphic(value);
 
       msgToPlot.splice(index, 1);

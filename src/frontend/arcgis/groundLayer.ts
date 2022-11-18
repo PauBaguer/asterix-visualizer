@@ -50,8 +50,8 @@ export function loadGroundLayer(map: ArcGISMap) {
 export function createGraphic(msg: Cat10) {
   const target_pos = computeDestinationPoint(
     { latitude: 41.295618, longitude: 2.095114 },
-    msg.polar_coordinates.r,
-    msg.polar_coordinates.theta
+    Math.sqrt(Math.pow(msg.cartesian_coordinates.x, 2) + Math.pow(msg.cartesian_coordinates.y, 2)),
+    1 / Math.tan(msg.cartesian_coordinates.y / msg.cartesian_coordinates.x)
   );
   const newPoint = new Point({
     spatialReference: SpatialReference.WGS84,
