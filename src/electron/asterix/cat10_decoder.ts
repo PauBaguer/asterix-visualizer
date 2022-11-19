@@ -57,13 +57,15 @@ export class Cat10 {
   };
 
   async set_data_source_identifier(buffer: Buffer) {
-    var sac = "0x" + buffer.slice(0, 1).toString("hex");
+    const sacbuf = buffer.slice(0, 1);
+    var sac = sacbuf.readInt8().toString();
 
-    if (sac === "0x00") {
-      sac = "0x00, Local airport Identifier";
+    if (sac === "0") {
+      sac = "0, Local airport Identifier";
     }
 
-    const sic = "0x" + buffer.slice(1, 2).toString("hex");
+    const sicbuf = buffer.slice(1, 2);
+    const sic = sicbuf.readInt8().toString();
     this.data_source_identifier = { SAC: sac, SIC: sic };
     this.csv[3] = "SAC: " + sac + " SIC: " + sic;
   }
@@ -338,7 +340,7 @@ export class Cat10 {
     var sec = parseInt("0x" + buffer.toString("hex")) / 128.0;
     var date = new Date(0);
     date.setMilliseconds(sec * 1000);
-    this.time_of_day = date.toISOString(); //.substring(11, 23); //TODO invalid time error
+    this.time_of_day = date.toISOString().substring(11, 23); //TODO invalid time error
     this.csv[14] = this.time_of_day.toString();
   };
 
@@ -551,7 +553,7 @@ export class Cat10 {
       start += 6;
     }
 
-    this.target_identification = { STI: sti, TargetIdentification: target_identification.join("") };
+    this.target_identification = { STI: sti, target_identification: target_identification.join("") };
     this.csv[19] = target_identification.join("");
   };
 
@@ -904,7 +906,7 @@ interface CalculatedAcceleration {
 
 interface TargetIdentification {
   STI: string;
-  TargetIdentification: string;
+  target_identification: string;
 }
 
 interface TargetSizeAndOrientation {

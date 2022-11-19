@@ -1,90 +1,75 @@
+<style>
+  :global(.accordion-button) {
+    padding: 0.5rem 1rem;
+  }
+</style>
+
+<script lang="ts">
+  import type { Cat10 } from "../../../custom-types/asterix/cat10";
+  import type { Cat21 } from "../../../custom-types/asterix/cat21";
+  import GenericObject from "./GenericObject.svelte";
+
+  export let msg: Cat10 | Cat21;
+  const unwanted = ["id", "message_type", "csv"];
+  let msgKeys = Object.keys(msg);
+  let msgKeysObj = msgKeys.filter((key) => typeoffkey(key) === "object");
+  let msgKeysNotObj = msgKeys.filter((key) => typeoffkey(key) !== "object");
+  msgKeysObj = msgKeysObj.sort();
+  msgKeysNotObj = msgKeysNotObj.sort();
+
+  function typeoffkey(key: string) {
+    let item: any = msg[key as keyof (Cat10 | Cat21)];
+
+    return typeof item;
+  }
+
+  function getValue(key: string) {
+    return msg[key as keyof (Cat10 | Cat21)];
+  }
+
+  function prettyKey(key: string) {
+    let s = key.replaceAll("_", " ");
+    s = s[0].toUpperCase() + s.slice(1);
+    return s;
+  }
+</script>
+
 <tr colspan="6">
   <td colspan="6">
-    <div class="accordion" id="accordionExample">
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingOne">
-          <button
-            class="accordion-button"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapseOne"
-            aria-expanded="true"
-            aria-controls="collapseOne"
-          >
-            Accordion Item #1
-          </button>
-        </h2>
-        <div
-          id="collapseOne"
-          class="accordion-collapse collapse show"
-          aria-labelledby="headingOne"
-          data-bs-parent="#accordionExample"
-        >
-          <div class="accordion-body">
-            <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin
-            adds the appropriate classes that we use to style each element. These classes control the overall
-            appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom
-            CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the
-            <code>.accordion-body</code>, though the transition does limit overflow.
+    <ul class="list-group">
+      {#each msgKeysNotObj as key}
+        {#if !unwanted.includes(key)}
+          <li class="list-group-item"><strong>{prettyKey(key)}:</strong> {getValue(key).toLocaleString()}</li>
+        {/if}
+      {/each}
+    </ul>
+    <div class="accordion" id="accordion-{msg.id}">
+      {#each msgKeysObj as key}
+        {#if !unwanted.includes(key)}
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="heading-{msg.id}-{key}">
+              <button
+                class="accordion-button"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapse-{msg.id}-{key}"
+                aria-expanded="true"
+                aria-controls="collapse-{msg.id}-{key}"
+              >
+                <strong>{prettyKey(key)}</strong>
+              </button>
+            </h2>
+            <div
+              id="collapse-{msg.id}-{key}"
+              class="accordion-collapse collapse"
+              aria-labelledby="heading-{msg.id}-{key}"
+              data-bs-parent="#accordion-{msg.id}"
+            >
+              <div class="accordion-body"><GenericObject obj="{getValue(key)}" /></div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingTwo">
-          <button
-            class="accordion-button collapsed"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapseTwo"
-            aria-expanded="false"
-            aria-controls="collapseTwo"
-          >
-            Accordion Item #2
-          </button>
-        </h2>
-        <div
-          id="collapseTwo"
-          class="accordion-collapse collapse"
-          aria-labelledby="headingTwo"
-          data-bs-parent="#accordionExample"
-        >
-          <div class="accordion-body">
-            <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse
-            plugin adds the appropriate classes that we use to style each element. These classes control the overall
-            appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom
-            CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the
-            <code>.accordion-body</code>, though the transition does limit overflow.
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingThree">
-          <button
-            class="accordion-button collapsed"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapseThree"
-            aria-expanded="false"
-            aria-controls="collapseThree"
-          >
-            Accordion Item #3
-          </button>
-        </h2>
-        <div
-          id="collapseThree"
-          class="accordion-collapse collapse"
-          aria-labelledby="headingThree"
-          data-bs-parent="#accordionExample"
-        >
-          <div class="accordion-body">
-            <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin
-            adds the appropriate classes that we use to style each element. These classes control the overall
-            appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom
-            CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the
-            <code>.accordion-body</code>, though the transition does limit overflow.
-          </div>
-        </div>
-      </div>
+        {/if}
+      {/each}
     </div>
   </td>
 </tr>
