@@ -8,12 +8,17 @@ let msgToPlot: (Cat10 | Cat21)[];
 let simStartTime = 0;
 let simTime = 0;
 const tick = 1000;
+let simEndTime = 36062 * 1000; //this is for the cat 10 file. make dynamic!!
 
 export function initializeSimulation(msgs: (Cat10 | Cat21)[]) {
   messages = msgs;
   msgToPlot = msgs;
 
-  if (messages[0].class === "Cat10") simStartTime = Date.parse(messages[0].time_of_day);
+  if (messages[0].class === "Cat10") {
+    simStartTime = getDateCat10(messages[0]).getMilliseconds();
+  } else {
+    simStartTime = getDateCat21(messages[0]).getMilliseconds();
+  }
   simTime = simStartTime;
   tickSimulation();
 }
@@ -34,4 +39,16 @@ export function tickSimulation() {
       //cat21
     }
   }
+}
+
+export function forwardsTick() {}
+
+export function backwardsTick() {}
+
+function getDateCat10(m: Cat10) {
+  return new Date("1970-01-01T" + m.time_of_day);
+}
+
+function getDateCat21(m: Cat21) {
+  return new Date(m.time_ASTERIX_report_transmission * 1000);
 }

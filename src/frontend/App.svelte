@@ -54,18 +54,24 @@
   :global(.esri-view .esri-view-surface--inset-outline:focus::after) {
     outline: none !important;
   }
+
+  #progDiv {
+    margin-bottom: 5px;
+  }
 </style>
 
 <script lang="ts">
   import { initializeMap } from "./arcgis/map";
-  import { initializeSimulation, tickSimulation } from "./arcgis/simulation";
   import type { Cat10 } from "./custom-types/asterix/cat10";
   import type { Cat21 } from "./custom-types/asterix/cat21";
   import { initIpcMainBidirectional, ipcMainBidirectional, ipcMainOneDirection } from "./ipcMain/ipcMainCallers";
   import { parseIpcMainReceiveMessage } from "./ipcMain/ipcMainReceiveParser";
   import ExpandableTable from "./svelte-components/table/ExpandableTable.svelte";
+  import Simulation from "./svelte-components/simulation/simulation.svelte";
 
   let messages: (Cat10 | Cat21)[] = [];
+  let simulationComponent: Simulation;
+  let play = false;
 
   initializeMap();
 
@@ -79,7 +85,7 @@
     console.log(`Loaded ${numberOfMsg} messages!`);
     const res = await ipcMainBidirectional("get-message-quantity", 500);
     messages = await parseIpcMainReceiveMessage(res);
-    initializeSimulation(messages);
+    simulationComponent.initializeSimulation(messages);
   }
 
   async function handleDecodeMessages() {
@@ -158,27 +164,54 @@
     </ul>
     {#if visibleItem === "MAP"}
       <div class="ontop dark" id="btn-bar">
-        <button type="button" class="btn btn-primary" on:click="{handleLoadFileClick}"
-          ><i class="bi bi-folder2-open"></i></button
-        >
+        <div id="progDiv">
+          <Simulation bind:this="{simulationComponent}" />
+        </div>
+        <div>
+          <button type="button" class="btn btn-primary" on:click="{handleLoadFileClick}"
+            ><i class="bi bi-folder2-open"></i></button
+          >
 
-        <button type="button" class="btn btn-primary me-3" on:click="{csv_file}"
-          ><i class="bi bi-filetype-csv"></i>
-        </button>
-        <button type="button" class="btn btn-primary" on:click="{handleLoadFileClick}"
-          ><i class="bi bi-arrow-90deg-left"></i></button
-        >
-        <button type="button" class="btn btn-primary" on:click="{handleLoadFileClick}"
-          ><i class="bi bi-arrow-counterclockwise"></i>
-        </button>
+          <button
+            type="button"
+            class="{messages.length > 0 ? 'btn btn-primary me-3' : 'btn btn-primary me-3 disabled'}"
+            on:click="{csv_file}"
+            ><i class="bi bi-filetype-csv"></i>
+          </button>
+          <button
+            type="button"
+            class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
+            on:click="{handleLoadFileClick}"><i class="bi bi-arrow-90deg-left"></i></button
+          >
+          <button
+            type="button"
+            class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
+            on:click="{handleLoadFileClick}"
+            ><i class="bi bi-arrow-counterclockwise"></i>
+          </button>
 
-        <button type="button" class="btn btn-primary" on:click="{handleLoadFileClick}"
-          ><i class="bi bi-play"></i>
-        </button>
+          <button
+            type="button"
+            class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
+            on:click="{() => {
+              simulationComponent.playClick();
+              play = !play;
+            }}"
+          >
+            {#if play}
+              <i class="bi bi-pause"></i>
+            {:else}
+              <i class="bi bi-play"></i>
+            {/if}
+          </button>
 
-        <button type="button" class="btn btn-primary" on:click="{tickSimulation}"
-          ><i class="bi bi-arrow-90deg-right"></i>
-        </button>
+          <button
+            type="button"
+            class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
+            on:click="{simulationComponent.tickSimulation}"
+            ><i class="bi bi-arrow-90deg-right"></i>
+          </button>
+        </div>
       </div>
       <div id="viewDiv"></div>
     {/if}
