@@ -70,27 +70,36 @@
   import Simulation from "./svelte-components/simulation/simulation.svelte";
 
   let messages: (Cat10 | Cat21)[] = [];
+  let numberOfMsg = 0;
   let simulationComponent: Simulation;
   let play = false;
 
   initializeMap();
 
-  window.electron.pushNotification((event: any, value: string) => {
-    console.log(event);
-    console.log(value);
-  });
-
   async function handleLoadFileClick() {
-    const numberOfMsg = await initIpcMainBidirectional("test-receive");
+    numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
+    const chunks = 10000;
     console.log(`Loaded ${numberOfMsg} messages!`);
-    const res = await ipcMainBidirectional("get-message-quantity", 500);
-    messages = await parseIpcMainReceiveMessage(res);
-    simulationComponent.initializeSimulation(messages);
+
+    while (messages.length < numberOfMsg) {
+      if (numberOfMsg - messages.length > chunks) {
+        const res = await ipcMainBidirectional("get-message-quantity", chunks);
+        messages.push(await parseIpcMainReceiveMessage(res));
+      } else {
+        const res = await ipcMainBidirectional("get-message-quantity", numberOfMsg - messages.length);
+        messages.push(await parseIpcMainReceiveMessage(res));
+      }
+    }
+    console.log("Finished loading");
+
+    //simulationComponent.initializeSimulation(messages);
   }
 
-  async function handleDecodeMessages() {
-    const res = await ipcMainBidirectional("get-message-quantity", 20000);
+  async function handleLoadSomeMsgs() {
+    numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
+    const res = await ipcMainBidirectional("get-message-quantity", 500);
     messages = await parseIpcMainReceiveMessage(res);
+    console.log("Finished loading");
   }
 
   async function handleMapClick() {
@@ -168,7 +177,7 @@
           <Simulation bind:this="{simulationComponent}" />
         </div>
         <div>
-          <button type="button" class="btn btn-primary" on:click="{handleLoadFileClick}"
+          <button type="button" class="btn btn-primary" on:click="{handleLoadSomeMsgs}"
             ><i class="bi bi-folder2-open"></i></button
           >
 
@@ -217,7 +226,7 @@
     {/if}
 
     {#if visibleItem === "MESSAGE_DECODER"}
-      <ExpandableTable messages="{messages}" />
+      <ExpandableTable messages="{[]}" numberOfMsg="{numberOfMsg}" />
     {/if}
   </div>
 </main>

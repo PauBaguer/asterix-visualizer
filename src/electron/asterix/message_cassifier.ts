@@ -43,7 +43,7 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
   console.log(`Received ${cat10msg} messages from Category 10`);
   console.log(`Received ${cat21msg} messages from Category 21`);
   console.log(`Received ${cat23msg.length} messages from Category 23`);
-  console.log(decodedMessages.length);
+
   return decodedMessages;
 }
 

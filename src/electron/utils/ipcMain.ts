@@ -23,6 +23,6 @@ export async function loadFileIpc() {
 //@ts-ignore
 export async function getMessagesIpc(event: any, messageQuantity: number) {
   decodedMsg = await decodeMessages(messages, messageQuantity);
-  console.log(decodedMsg.length);
+
   return await JSON.stringify(decodedMsg);
 }

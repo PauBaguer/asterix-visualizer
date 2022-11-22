@@ -9,11 +9,14 @@
   import jQuery from "jquery";
 
   import GenericProps from "./cat10_items/GenericProps.svelte";
+  import { initIpcMainBidirectional, ipcMainBidirectional, ipcMainOneDirection } from "../../ipcMain/ipcMainCallers";
+  import { parseIpcMainReceiveMessage } from "../../ipcMain/ipcMainReceiveParser";
 
   let el; //table element
   let table; // table object api
 
   onMount(async () => {
+    await load();
     table = jQuery(el).DataTable({
       rows: [
         {
@@ -50,6 +53,25 @@
   //document.getElementsByClassName("dataTables_lenght").addClass("bs-select");
 
   export let messages;
+  export let numberOfMsg;
+
+  async function load() {
+    // const chunks = 20000;
+
+    // while (messages.length < numberOfMsg) {
+    //   if (numberOfMsg - messages.length > chunks) {
+    //     const res = await ipcMainBidirectional("get-message-quantity", chunks);
+    //     messages.push(await parseIpcMainReceiveMessage(res));
+    //   } else {
+    //     const res = await ipcMainBidirectional("get-message-quantity", numberOfMsg - messages.length);
+    //     messages.push(await parseIpcMainReceiveMessage(res));
+    //   }
+    // }
+    const res = await ipcMainBidirectional("get-message-quantity", 20000);
+    messages = await parseIpcMainReceiveMessage(res);
+
+    console.log("Finished loading");
+  }
 
   //1970-01-01T08:00:01.734Z
 </script>

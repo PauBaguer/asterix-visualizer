@@ -5,9 +5,6 @@ export async function parseInitIpcMain(msg: string) {
 }
 
 export async function parseIpcMainReceiveMessage(msg: string) {
-  console.log(msg);
-
   const messages = await JSON.parse(msg);
-  console.log(messages);
   return messages;
 }
