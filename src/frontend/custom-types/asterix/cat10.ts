@@ -13,7 +13,7 @@ export interface Cat10 {
   flight_level: FlightLevel;
   measured_height: string;
   altitude_of_primary_plot: number;
-  time_of_day: string;
+  time_of_day: number;
   track_number: number;
   track_status: TrackStatus;
   calculated_acceleration: CalculatedAcceleration;

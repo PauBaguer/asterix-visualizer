@@ -67,7 +67,7 @@
     //     messages.push(await parseIpcMainReceiveMessage(res));
     //   }
     // }
-    const res = await ipcMainBidirectional("get-message-quantity", 20000);
+    const res = await ipcMainBidirectional("get-message-quantity", 2000);
     messages = await parseIpcMainReceiveMessage(res);
 
     console.log("Finished loading");
@@ -113,7 +113,7 @@
                   <td>{msg.class}</td>
                   <td>{msg.message_type}</td>
                   <td>{`SIC: ${msg.data_source_identifier.SIC}; SAC: ${msg.data_source_identifier.SAC}`}</td>
-                  <td>{msg.time_of_day}</td>
+                  <td>{new Date(msg.time_of_day * 1000).toISOString().substring(11, 23)}</td>
                 </tr>
               {:else}
                 <tr on:click="{() => trClick(msg)}" id="tr-{msg.id}">

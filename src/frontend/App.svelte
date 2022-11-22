@@ -56,7 +56,7 @@
   }
 
   #progDiv {
-    margin-bottom: 5px;
+    margin-bottom: 3px;
   }
 </style>
 
@@ -97,9 +97,10 @@
 
   async function handleLoadSomeMsgs() {
     numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
-    const res = await ipcMainBidirectional("get-message-quantity", 500);
+    const res = await ipcMainBidirectional("get-message-quantity", 10000);
     messages = await parseIpcMainReceiveMessage(res);
     console.log("Finished loading");
+    simulationComponent.initializeSimulation(messages);
   }
 
   async function handleMapClick() {
@@ -174,7 +175,11 @@
     {#if visibleItem === "MAP"}
       <div class="ontop dark" id="btn-bar">
         <div id="progDiv">
-          <Simulation bind:this="{simulationComponent}" />
+          <Simulation
+            on:stop="{() => (play = false)}"
+            on:switchplay="{() => (play = !play)}"
+            bind:this="{simulationComponent}"
+          />
         </div>
         <div>
           <button type="button" class="btn btn-primary" on:click="{handleLoadSomeMsgs}"
@@ -190,22 +195,19 @@
           <button
             type="button"
             class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
-            on:click="{handleLoadFileClick}"><i class="bi bi-arrow-90deg-left"></i></button
+            on:click="{simulationComponent.backwardsTick}"><i class="bi bi-arrow-90deg-left"></i></button
           >
           <button
             type="button"
             class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
-            on:click="{handleLoadFileClick}"
+            on:click="{simulationComponent.restartSim}"
             ><i class="bi bi-arrow-counterclockwise"></i>
           </button>
 
           <button
             type="button"
             class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
-            on:click="{() => {
-              simulationComponent.playClick();
-              play = !play;
-            }}"
+            on:click="{simulationComponent.playClick}"
           >
             {#if play}
               <i class="bi bi-pause"></i>
@@ -217,7 +219,7 @@
           <button
             type="button"
             class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
-            on:click="{simulationComponent.tickSimulation}"
+            on:click="{simulationComponent.forwardsTick}"
             ><i class="bi bi-arrow-90deg-right"></i>
           </button>
         </div>

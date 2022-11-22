@@ -13,7 +13,7 @@ export class Cat10 {
   flight_level: FlightLevel;
   measured_height: string;
   amplitude_of_primary_plot: number;
-  time_of_day: string;
+  time_of_day: number;
   track_number: number;
   track_status: TrackStatus;
   calculated_acceleration: CalculatedAcceleration;
@@ -31,7 +31,7 @@ export class Cat10 {
   constructor(id: number) {
     this.id = id;
     this.message_type = "";
-    this.time_of_day = "";
+    this.time_of_day = 0;
     this.class = "Cat10";
     this.csv = Array(60).fill(" ");
     this.csv[0] = id.toString();
@@ -338,9 +338,10 @@ export class Cat10 {
 
   set_time_of_day = async (buffer: Buffer) => {
     var sec = parseInt("0x" + buffer.toString("hex")) / 128.0;
-    var date = new Date(0);
-    date.setMilliseconds(sec * 1000);
-    this.time_of_day = date.toISOString().substring(11, 23); //TODO invalid time error
+    // var date = new Date(0);
+    // date.setMilliseconds(sec * 1000);
+    // this.time_of_day = date.toISOString().substring(11, 23); //TODO invalid time error
+    this.time_of_day = sec;
     this.csv[14] = this.time_of_day.toString();
   };
 
