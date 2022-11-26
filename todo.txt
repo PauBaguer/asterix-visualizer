@@ -8,10 +8,10 @@
     - precision accuracy -> definir areas i posar al mapa.
     - prob identifiacio / prob falsa identifiació
  - click a avio del mapa -> info => Pau
- - llegenda mapa => Pau
+ done - llegenda mapa => Pau
  - repassar format dades taula / csv => Pau i Julia
- - Posar a taula Mlat o adsb ... => Pau
- - fer visibles diferents capes per mlat, smr i adsb => Pau
+ done - Posar a taula Mlat o adsb ... => Pau
+ done - fer visibles diferents capes per mlat, smr i adsb => Pau
  
  
  

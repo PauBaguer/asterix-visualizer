@@ -42,26 +42,26 @@ function initMap() {
   });
 
   // Get the screen point from the view's click event
-  view.on("click", function (event) {
-    var screenPoint = {
-      x: event.x,
-      y: event.y,
-    };
+  // view.on("click", function (event) {
+  //   var screenPoint = {
+  //     x: event.x,
+  //     y: event.y,
+  //   };
 
-    // Search for graphics at the clicked location
-    view.hitTest(screenPoint).then(function (response) {
-      if (response.results.length) {
-        const graphic: Graphic = response.results.filter(function (result) {
-          if (result.type === "graphic") {
-            // check if the graphic belongs to the layer of interest
-            return result.graphic.layer === graphicsLayer;
-          }
-          return false;
-          // @ts-ignore
-        })[0].graphic;
-        // do something with the result graphic
-        console.log(graphic.attributes);
-      }
-    });
-  });
+  //   // Search for graphics at the clicked location
+  //   view.hitTest(screenPoint).then(function (response) {
+  //     if (response.results.length) {
+  //       const graphic: Graphic = response.results.filter(function (result) {
+  //         if (result.type === "graphic") {
+  //           // check if the graphic belongs to the layer of interest
+  //           return result.graphic.layer === graphicsLayer;
+  //         }
+  //         return false;
+  //         // @ts-ignore
+  //       })[0].graphic;
+  //       // do something with the result graphic
+  //       console.log(graphic.attributes);
+  //     }
+  //   });
+  // });
 }

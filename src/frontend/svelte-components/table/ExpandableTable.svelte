@@ -93,6 +93,7 @@
               <th>Class</th>
               <th>Message Type / Target Id</th>
               <th>Data source identifier</th>
+              <th>Instrument</th>
               <th>Time of Day</th>
             </tr>
           </thead>
@@ -113,6 +114,7 @@
                   <td>{msg.class}</td>
                   <td>{msg.message_type}</td>
                   <td>{`SIC: ${msg.data_source_identifier.SIC}; SAC: ${msg.data_source_identifier.SAC}`}</td>
+                  <td>{msg.instrument}</td>
                   <td>{new Date(msg.time_of_day * 1000).toISOString().substring(11, 23)}</td>
                 </tr>
               {:else}
@@ -130,6 +132,7 @@
                   <td>{msg.class}</td>
                   <td>{msg.target_identification}</td>
                   <td>{`SIC: ${msg.data_source_identifier.SIC}; SAC: ${msg.data_source_identifier.SAC}`}</td>
+                  <td>{msg.instrument}</td>
                   <td>{new Date(msg.time_ASTERIX_report_transmission * 1000).toISOString().substring(11, 23)}</td>
                 </tr>{/if}
             {/each}

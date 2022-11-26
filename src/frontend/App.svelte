@@ -51,6 +51,31 @@
     width: max-content;
   }
 
+  #settings {
+    bottom: 20px;
+    background-color: #222222;
+
+    padding: 10px;
+    border-radius: 10px;
+    left: 10px;
+
+    width: max-content;
+  }
+
+  #legend {
+    bottom: 20px;
+    background-color: #222222;
+
+    padding: 10px;
+    border-radius: 10px;
+    right: 10px;
+
+    width: max-content;
+  }
+  td {
+    vertical-align: middle;
+  }
+
   :global(.esri-view .esri-view-surface--inset-outline:focus::after) {
     outline: none !important;
   }
@@ -58,21 +83,49 @@
   #progDiv {
     margin-bottom: 3px;
   }
+
+  .color {
+    border-radius: 50%;
+    margin-left: 5px;
+    margin-right: 10px;
+    height: 10px;
+    width: 10px;
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+  }
+  .color-round {
+    border-radius: 50%;
+    margin-right: 10px;
+    height: 20px;
+    width: 20px;
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+  }
 </style>
 
-<script lang="ts">
+<script lang="ts" type="module">
   import { initializeMap } from "./arcgis/map";
+
+  import { fade } from "svelte/transition";
   import type { Cat10 } from "./custom-types/asterix/cat10";
   import type { Cat21 } from "./custom-types/asterix/cat21";
-  import { initIpcMainBidirectional, ipcMainBidirectional, ipcMainOneDirection } from "./ipcMain/ipcMainCallers";
+  import { initIpcMainBidirectional, ipcMainBidirectional } from "./ipcMain/ipcMainCallers";
   import { parseIpcMainReceiveMessage } from "./ipcMain/ipcMainReceiveParser";
   import ExpandableTable from "./svelte-components/table/ExpandableTable.svelte";
   import Simulation from "./svelte-components/simulation/simulation.svelte";
+  import { setSMRVisibility, setADSBVisibility, setMLATVisibility } from "./arcgis/groundLayer";
 
   let messages: (Cat10 | Cat21)[] = [];
   let numberOfMsg = 0;
   let simulationComponent: Simulation;
   let play = false;
+
+  let settings = false;
+  let btncheckSMR = true;
+  let btncheckMLAT = true;
+  let btncheckADSB = true;
 
   initializeMap();
 
@@ -160,6 +213,10 @@
     };
     reader.readAsDataURL(blob);
   }
+
+  function settingsPannel() {
+    settings = !settings;
+  }
 </script>
 
 <main>
@@ -173,6 +230,88 @@
       </li>
     </ul>
     {#if visibleItem === "MAP"}
+      {#if settings}
+        <div class="ontop dark" id="settings" transition:fade="{{ duration: 100 }}">
+          <p>Visible Layers</p>
+
+          <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+            <input
+              type="checkbox"
+              bind:checked="{btncheckSMR}"
+              on:change="{(e) => {
+                //@ts-ignore
+                setSMRVisibility(e.target.checked);
+              }}"
+              class="btn-check"
+              id="btncheckSMR"
+              autocomplete="off"
+            />
+            <label class="btn btn-outline-primary" for="btncheckSMR">SMR</label>
+
+            <input
+              type="checkbox"
+              bind:checked="{btncheckMLAT}"
+              on:change="{(e) => {
+                //@ts-ignore
+                setMLATVisibility(e.target.checked);
+              }}"
+              class="btn-check"
+              id="btncheckMLAT"
+              autocomplete="off"
+            />
+            <label class="btn btn-outline-primary" for="btncheckMLAT">MLAT</label>
+
+            <input
+              type="checkbox"
+              bind:checked="{btncheckADSB}"
+              on:change="{(e) => {
+                //@ts-ignore
+                setADSBVisibility(e.target.checked);
+              }}"
+              class="btn-check"
+              id="btncheckADSB"
+              autocomplete="off"
+            />
+            <label class="btn btn-outline-primary" for="btncheckADSB">ADSB</label>
+          </div>
+        </div>
+      {/if}
+
+      <div class="ontop dark" id="legend" transition:fade="{{ duration: 100 }}">
+        <p>Map Legend</p>
+        <div style="font-size:small">
+          <tr>
+            <td>
+              <div class="color" style="background-color: #fe0000;"></div>
+            </td>
+            <td>SMR Data Point</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="color" style="background-color: #ffeb16;"></div>
+            </td>
+            <td>MLAT Data Point</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="color" style="background-color: #6733bb;"></div>
+            </td>
+            <td>ADS-B Data Point</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="color-round" style="background-color: #fe0000;"></div>
+            </td>
+            <td> SMR Instrument </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="color-round" style="background-color: #ffeb16;"></div>
+            </td>
+            <td>MLAT Instrument</td>
+          </tr>
+        </div>
+      </div>
       <div class="ontop dark" id="btn-bar">
         <div id="progDiv">
           <Simulation
@@ -188,9 +327,12 @@
 
           <button
             type="button"
-            class="{messages.length > 0 ? 'btn btn-primary me-3' : 'btn btn-primary me-3 disabled'}"
+            class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
             on:click="{csv_file}"
             ><i class="bi bi-filetype-csv"></i>
+          </button>
+          <button type="button" class="btn btn-primary me-3" on:click="{settingsPannel}"
+            ><i class="bi bi-gear"></i>
           </button>
           <button
             type="button"

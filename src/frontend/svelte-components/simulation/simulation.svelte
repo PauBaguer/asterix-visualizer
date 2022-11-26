@@ -13,7 +13,9 @@
     createGraphicSMR,
     createGraphicMLAT,
     clearMap,
-    deleteGraphic,
+    deleteGraphicSMR,
+    deleteGraphicMLAT,
+    deleteGraphicADSB,
     createGraphicADSB,
   } from "../../arcgis/groundLayer";
   import { createEventDispatcher } from "svelte";
@@ -35,7 +37,7 @@
 
   export function initializeSimulation(msgs: (Cat10 | Cat21)[]) {
     i = 0;
-    console.log(msgs.slice(0, 10));
+
     messages = msgs;
     // msgToPlot.push(...msgs);
     // msgPlotted = [];
@@ -53,8 +55,6 @@
     }
 
     simTime = simStartTime;
-    console.log({ simStartTime, simTime, simEndTime });
-    console.log(getDateFromMilis(simTime));
   }
 
   function getTime(msg: Cat10 | Cat21) {
@@ -124,12 +124,13 @@
         //cat10
         const msg = messages[i] as Cat10;
         if (msg.message_type === "Target Report") {
-          deleteGraphic(msg);
+          if (msg.data_source_identifier.SIC == "107") deleteGraphicMLAT(msg);
+          else if (msg.data_source_identifier.SIC == "7") deleteGraphicSMR(msg);
         }
       } else {
         //cat21
         const msg = messages[i] as Cat21;
-        deleteGraphic(msg);
+        deleteGraphicADSB(msg);
       }
       i -= 1;
       if (i < 0) {
@@ -176,15 +177,11 @@
   export function forwardsTick() {
     stop();
     tickSimulation();
-    console.log(simTime);
-    console.log({ messages });
   }
 
   export function backwardsTick() {
     stop();
     tickBackSimulation();
-    console.log(simTime);
-    console.log({ messages });
   }
 
   function getDateCat10(m: Cat10) {
@@ -210,7 +207,6 @@
   {#if messages.length > 0}
     <div class="progress">
       <div id="textDiv">
-        {round(((simTime - simStartTime) / (simEndTime - simStartTime)) * 100)}%,
         {getDateFromMilis(simTime)}
       </div>
       <div

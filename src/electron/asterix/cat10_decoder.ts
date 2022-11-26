@@ -2,6 +2,7 @@ export class Cat10 {
   id: number;
   class: "Cat10";
   message_type: string;
+  instrument: string;
   data_source_identifier: DataSourceIdentifier;
   target_report_description: TargetReportDescription;
   wgs_84_coordinates: WGS_84_coordinates;
@@ -68,6 +69,7 @@ export class Cat10 {
     const sic = sicbuf.readInt8().toString();
     this.data_source_identifier = { SAC: sac, SIC: sic };
     this.csv[3] = "SAC: " + sac + " SIC: " + sic;
+    this.instrument = sic == "7" ? "SMR" : "MLAT";
   }
 
   set_target_report_description = async (buffer: Buffer) => {

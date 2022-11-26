@@ -1,6 +1,7 @@
 export class Cat21 {
   id: number;
   class: "Cat21";
+  instrument: "ADS-B";
   aircraft_operational_status: AircraftOperationalStatus;
   data_source_identifier: DataSourceIdentifier;
   service_identification: string;
@@ -71,6 +72,7 @@ export class Cat21 {
   constructor(id: number) {
     this.id = id;
     this.class = "Cat21";
+    this.instrument = "ADS-B";
     this.csv = Array(60).fill(" ");
     this.csv[0] = id.toString();
     this.csv[1] = "Cat21";
@@ -120,7 +122,7 @@ export class Cat21 {
     }
 
     const sicbuf = buffer.slice(1, 2);
-    const sic = sicbuf.readInt8().toString();
+    const sic = sicbuf.readUInt8().toString();
     this.data_source_identifier = { SAC: sac, SIC: sic };
     this.csv[3] = "SAC: " + sac + " SIC: " + sic;
   }
@@ -922,7 +924,7 @@ export class Cat21 {
   };
 
   set_flight_level = async (buffer: Buffer) => {
-    this.flight_level = (buffer.readIntBE(0, 2) / 4).toString(10) + "FL";
+    this.flight_level = "FL" + (buffer.readIntBE(0, 2) / 4).toString(10);
     this.csv[11] = this.flight_level;
   };
 
