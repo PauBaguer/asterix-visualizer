@@ -1,0 +1,30 @@
+ - hold all messages (fastly) => Julia
+        - backend server (with or without file DB)
+        - client DB or client local storage
+        - correct taula and simulation => Pau
+ - bug de la taula => Pau
+ - kml
+ - extra points => Julia
+    - precision accuracy -> definir areas i posar al mapa.
+    - prob identifiacio / prob falsa identifiació
+ - click a avio del mapa -> info => Pau
+ - llegenda mapa => Pau
+ - repassar format dades taula / csv => Pau i Julia
+ - Posar a taula Mlat o adsb ... => Pau
+ - fer visibles diferents capes per mlat, smr i adsb => Pau
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ ? - taula cat10 i cat21
+ 
+ - Memoria
+    - Planifiacio
+    - Readme
+
+
+ https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Polygon.html#rings
+ https://developers.arcgis.com/javascript/latest/api-reference/esri-geometry-Point.html#distance
