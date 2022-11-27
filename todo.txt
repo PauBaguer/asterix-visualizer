@@ -2,18 +2,18 @@
         - backend server (with or without file DB)
         - client DB or client local storage
         - correct taula and simulation => Pau
- - bug de la taula => Pau
+done - bug de la taula => Pau
  - kml
  - extra points => Julia
-    - precision accuracy -> definir areas i posar al mapa.
+    - precision accuracy -> definir areas i posar al mapa.  ==> done areas al mapa
     - prob identifiacio / prob falsa identifiació
- - click a avio del mapa -> info => Pau
+ done - click a avio del mapa -> info => Pau
  done - llegenda mapa => Pau
  - repassar format dades taula / csv => Pau i Julia
  done - Posar a taula Mlat o adsb ... => Pau
  done - fer visibles diferents capes per mlat, smr i adsb => Pau
  
- 
+ -unificar vehicles, posar icona, info extra (flightradar style)  | llista de vehicles
  
  
  

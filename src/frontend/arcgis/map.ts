@@ -2,8 +2,9 @@ import Map from "@arcgis/core/Map";
 import type Graphic from "@arcgis/core/Graphic";
 import SceneView from "@arcgis/core/views/SceneView";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference";
-import { loadGraphicsLayer, graphicsLayer } from "./graphicsLayer";
+import { loadGraphicsLayer } from "./graphicsLayer";
 import { loadGroundLayer } from "./groundLayer";
+import { loadAreasLayer } from "./areasLayer";
 
 export function initializeMap() {
   console.log("i say hi");
@@ -37,6 +38,7 @@ function initMap() {
   view.when(() => {
     console.log("Map is loaded");
 
+    loadAreasLayer(view.map);
     loadGraphicsLayer(view.map);
     loadGroundLayer(view.map);
   });

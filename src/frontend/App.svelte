@@ -52,6 +52,10 @@
   }
 
   #settings {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: center;
     bottom: 20px;
     background-color: #222222;
 
@@ -103,6 +107,16 @@
     border-style: solid;
     border-width: 1px;
   }
+
+  .color-area {
+    margin-left: 5px;
+    margin-right: 10px;
+    height: 15px;
+    width: 15px;
+    border-color: white;
+    border-style: solid;
+    border-width: 1px;
+  }
 </style>
 
 <script lang="ts" type="module">
@@ -116,8 +130,10 @@
   import ExpandableTable from "./svelte-components/table/ExpandableTable.svelte";
   import Simulation from "./svelte-components/simulation/simulation.svelte";
   import { setSMRVisibility, setADSBVisibility, setMLATVisibility } from "./arcgis/groundLayer";
+  import { setAreasLayerVisibility } from "./arcgis/areasLayer";
 
   let messages: (Cat10 | Cat21)[] = [];
+  console.log(messages);
   let numberOfMsg = 0;
   let simulationComponent: Simulation;
   let play = false;
@@ -126,6 +142,7 @@
   let btncheckSMR = true;
   let btncheckMLAT = true;
   let btncheckADSB = true;
+  let btncheckAreas = true;
 
   initializeMap();
 
@@ -159,6 +176,11 @@
   async function handleMapClick() {
     visibleItem = "MAP";
     initializeMap();
+    if (messages.length > 0) {
+      setTimeout(() => {
+        simulationComponent.initializeSimulation(messages);
+      }, 750);
+    }
   }
 
   async function handleMessageDecoderClick() {
@@ -234,7 +256,7 @@
         <div class="ontop dark" id="settings" transition:fade="{{ duration: 100 }}">
           <p>Visible Layers</p>
 
-          <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+          <div role="group" aria-label="Basic checkbox toggle button group">
             <input
               type="checkbox"
               bind:checked="{btncheckSMR}"
@@ -274,6 +296,20 @@
             />
             <label class="btn btn-outline-primary" for="btncheckADSB">ADSB</label>
           </div>
+          <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+            <input
+              type="checkbox"
+              bind:checked="{btncheckAreas}"
+              on:change="{(e) => {
+                //@ts-ignore
+                setAreasLayerVisibility(e.target.checked);
+              }}"
+              class="btn-check"
+              id="btncheckAreas"
+              autocomplete="off"
+            />
+            <label class="btn btn-outline-primary" for="btncheckAreas">MLAT Areas</label>
+          </div>
         </div>
       {/if}
 
@@ -310,6 +346,39 @@
             </td>
             <td>MLAT Instrument</td>
           </tr>
+          {#if btncheckAreas === true}
+            MLAT Performance Zones
+            <tr>
+              <td>
+                <div class="color-area" style="background-color: rgba(103, 51, 187, 0.6);"></div>
+              </td>
+              <td>Airborne</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="color-area" style="background-color: rgba(227, 139, 79, 0.8);"></div>
+              </td>
+              <td>Runway</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="color-area" style="background-color: rgba(0, 255, 0, 0.6);"></div>
+              </td>
+              <td>Taxi</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="color-area" style="background-color: rgba(255, 0, 0, 0.6);"></div>
+              </td>
+              <td>Apron</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="color-area" style="background-color: rgba(51, 51, 51, 0.8);"></div>
+              </td>
+              <td>Stand</td>
+            </tr>
+          {/if}
         </div>
       </div>
       <div class="ontop dark" id="btn-bar">
@@ -370,7 +439,9 @@
     {/if}
 
     {#if visibleItem === "MESSAGE_DECODER"}
-      <ExpandableTable messages="{[]}" numberOfMsg="{numberOfMsg}" />
+      <div>
+        <ExpandableTable messages="{[]}" numberOfMsg="{numberOfMsg}" />
+      </div>
     {/if}
   </div>
 </main>

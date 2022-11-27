@@ -8,6 +8,8 @@ import type { Cat10 } from "../custom-types/asterix/cat10";
 import type { Cat21 } from "../custom-types/asterix/cat21";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference";
 import { computeDestinationPoint } from "geolib";
+import type SceneView from "@arcgis/core/views/SceneView";
+import Sketch from "@arcgis/core/widgets/Sketch";
 
 let groundLayerSmr: GraphicsLayer;
 let groundLayerMlat: GraphicsLayer;
@@ -281,6 +283,23 @@ export function loadGroundLayer(map: ArcGISMap) {
   constLayer.elevationInfo = { mode: "on-the-ground" };
 
   constLayer.addMany([graphicsmr, graphicmlat]);
+  // let sketch = new Sketch({
+  //   layer: constLayer,
+  //   view: view,
+  // });
+
+  // sketch.on("create", function (event) {
+  //   // check if the create event's state has changed to complete indicating
+  //   // the graphic create operation is completed.
+  //   if (event.state === "complete") {
+  //     // remove the graphic from the layer. Sketch adds
+  //     // the completed graphic to the layer by default.
+  //     console.log(event.graphic);
+  //   }
+  // });
+
+  // view.ui.add(sketch, { position: "top-right" });
+
   map.add(groundLayerSmr);
   map.add(groundLayerMlat);
   map.add(groundLayerAdsb);

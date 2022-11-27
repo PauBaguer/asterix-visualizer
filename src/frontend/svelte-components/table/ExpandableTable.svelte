@@ -24,6 +24,11 @@
         },
       ],
     });
+
+    jQuery(el).on("page.dt", function () {
+      allChildComponents = {};
+      allChildComponentsKeys = Object.keys(allChildComponents);
+    });
   });
 
   let allChildComponents = {};
