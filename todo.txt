@@ -15,7 +15,7 @@ done - bug de la taula => Pau
  
  -unificar vehicles, posar icona, info extra (flightradar style)  | llista de vehicles
  
- 
+   - step Backwards a graphics layer
  
  
  

@@ -19,6 +19,7 @@
     createGraphicADSB,
   } from "../../arcgis/groundLayer";
   import { createEventDispatcher } from "svelte";
+  import { clearGraphicsLayer, parseADSBmessage, parseMLATmessage } from "../../arcgis/graphicsLayer";
 
   let messages: (Cat10 | Cat21)[] = [];
   // let msgToPlot: (Cat10 | Cat21)[] = [];
@@ -70,43 +71,25 @@
       simTime = simEndTime;
       stop();
     } else simTime += tick * slider;
-    // console.log({ simStartTime, simTime, simEndTime });
-    // console.log(getDateFromMilis(simTime));
-    // console.log(((simTime - simStartTime) / (simEndTime - simStartTime)) * 100);
 
     while (getTime(messages[i]) * 1000 < simTime) {
       if (messages[i].class === "Cat10") {
         //cat10
         const msg = messages[i] as Cat10;
         if (msg.message_type === "Target Report") {
-          if (msg.data_source_identifier.SIC == "107") createGraphicMLAT(msg);
-          else if (msg.data_source_identifier.SIC === "7") createGraphicSMR(msg);
+          if (msg.data_source_identifier.SIC == "107") {
+            createGraphicMLAT(msg);
+            parseMLATmessage(msg);
+          } else if (msg.data_source_identifier.SIC === "7") createGraphicSMR(msg);
         }
       } else {
         //cat21
         const msg = messages[i] as Cat21;
         createGraphicADSB(msg);
+        parseADSBmessage(msg);
       }
       i += 1;
     }
-
-    // for (const [index, value] of msgToPlot.entries()) {
-    //   if (value.class === "Cat10") {
-    //     if (getDateCat10(value).getTime() > simTime) {
-    //       msgPlotted.push(...msgToPlot.splice(0, index - 1));
-    //       break;
-    //     }
-
-    //     if (value.message_type !== "Target Report") {
-    //       continue;
-    //     }
-
-    //     if (value.data_source_identifier.SIC == "107") createGraphicMLAT(value);
-    //     else if (value.data_source_identifier.SIC === "7") createGraphicSMR(value);
-    //   } else {
-    //     //cat21
-    //   }
-    // }
   }
 
   function tickBackSimulation() {
@@ -114,9 +97,7 @@
     if (simTime - tick * slider < simStartTime) {
       simTime = simStartTime;
     } else simTime -= tick * slider;
-    // console.log({ simStartTime, simTime, simEndTime });
-    // console.log(getDateFromMilis(simTime));
-    // console.log(((simTime - simStartTime) / (simEndTime - simStartTime)) * 100);
+
     if (i < 0) i = 0;
 
     while (getTime(messages[i]) * 1000 > simTime) {
@@ -124,13 +105,16 @@
         //cat10
         const msg = messages[i] as Cat10;
         if (msg.message_type === "Target Report") {
-          if (msg.data_source_identifier.SIC == "107") deleteGraphicMLAT(msg);
-          else if (msg.data_source_identifier.SIC == "7") deleteGraphicSMR(msg);
+          if (msg.data_source_identifier.SIC == "107") {
+            deleteGraphicMLAT(msg);
+            parseMLATmessage(msg);
+          } else if (msg.data_source_identifier.SIC == "7") deleteGraphicSMR(msg);
         }
       } else {
         //cat21
         const msg = messages[i] as Cat21;
         deleteGraphicADSB(msg);
+        parseADSBmessage(msg);
       }
       i -= 1;
       if (i < 0) {
@@ -138,21 +122,6 @@
         break;
       }
     }
-    // for (const [index, value] of msgPlotted.reverse().entries()) {
-    //   if (value.class === "Cat10") {
-    //     if (getDateCat10(value).getTime() < simTime) {
-    //       msgToPlot = msgPlotted.splice(msgPlotted.length - index - 1, msgPlotted.length).concat(msgToPlot);
-    //       break;
-    //     }
-
-    //     if (value.message_type !== "Target Report") continue;
-    //     deleteGraphic(value);
-    //     // if (value.data_source_identifier.SIC == "107") createGraphicMLAT(value);
-    //     // else if (value.data_source_identifier.SIC === "7") createGraphicSMR(value);
-    //   } else {
-    //     //cat21
-    //   }
-    // }
   }
 
   export function playClick() {
@@ -171,6 +140,7 @@
     stop();
     simTime = 0;
     clearMap();
+    clearGraphicsLayer();
     initializeSimulation(messages);
   }
 
