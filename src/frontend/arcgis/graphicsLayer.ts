@@ -17,7 +17,7 @@ import Polyline from "@arcgis/core/geometry/Polyline";
 
 let planesLayer: GraphicsLayer;
 let pathsLayer: GraphicsLayer;
-const planeMap: Map<string, Plane> = new Map();
+export const planeMap: Map<string, Plane> = new Map();
 
 // const symbol = new SimpleMarkerSymbol({
 //   style: "circle",
