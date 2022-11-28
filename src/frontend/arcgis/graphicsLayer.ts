@@ -15,8 +15,8 @@ import type { Cat21 } from "../custom-types/asterix/cat21";
 import { getRhumbLineBearing } from "geolib";
 import Polyline from "@arcgis/core/geometry/Polyline";
 
-export let graphicsLayer: GraphicsLayer;
-
+let planesLayer: GraphicsLayer;
+let pathsLayer: GraphicsLayer;
 const planeMap: Map<string, Plane> = new Map();
 
 // const symbol = new SimpleMarkerSymbol({
@@ -29,8 +29,10 @@ const planeSymbol = new WebStyleSymbol({
 });
 
 export function loadGraphicsLayer(map: ArcGISMap) {
-  graphicsLayer = new GraphicsLayer({ elevationInfo: { mode: "relative-to-ground" } });
-  map.add(graphicsLayer);
+  planesLayer = new GraphicsLayer({ elevationInfo: { mode: "relative-to-ground" } });
+  pathsLayer = new GraphicsLayer({ elevationInfo: { mode: "relative-to-ground" } });
+  map.add(planesLayer);
+  map.add(pathsLayer);
 }
 
 export function parseMLATmessage(msg: Cat10) {
@@ -141,8 +143,8 @@ function createPlane(target_address: string) {
 
   plane.graphic = newGraphic;
   plane.pathGraphic = newPathGraphic;
-  graphicsLayer.add(plane.graphic);
-  graphicsLayer.add(plane.pathGraphic);
+  planesLayer.add(plane.graphic);
+  pathsLayer.add(plane.pathGraphic);
 }
 
 function updatePlane(msg: Cat21) {
@@ -282,8 +284,8 @@ export function deletePlane(plane: Plane) {
 
 export function removePlane(plane: Plane) {
   if (planeMap.has(plane.target_address)) {
-    graphicsLayer.remove(plane.graphic!);
-    graphicsLayer.remove(plane.pathGraphic!);
+    planesLayer.remove(plane.graphic!);
+    pathsLayer.remove(plane.pathGraphic!);
   }
   planeMap.delete(plane.target_address);
 }
@@ -299,6 +301,15 @@ function calculateHeading(plane: Plane) {
 }
 
 export function clearGraphicsLayer() {
-  graphicsLayer.removeAll();
+  planesLayer.removeAll();
+  pathsLayer.removeAll();
   planeMap.clear();
+}
+
+export function setPlanesLayerVisibility(b: boolean) {
+  planesLayer.visible = b;
+}
+
+export function setPathsLayerVisibility(b: boolean) {
+  pathsLayer.visible = b;
 }

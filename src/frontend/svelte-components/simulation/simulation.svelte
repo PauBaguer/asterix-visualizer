@@ -33,7 +33,7 @@
   const dispatch = createEventDispatcher();
 
   let i = 0;
-  let slider = 1;
+  let slider = 0.5;
   let simStartTime = 0;
   let simTime = 0;
   const tick = 1000; //1 secconds per tick

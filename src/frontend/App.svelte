@@ -131,6 +131,7 @@
   import Simulation from "./svelte-components/simulation/simulation.svelte";
   import { setSMRVisibility, setADSBVisibility, setMLATVisibility } from "./arcgis/groundLayer";
   import { setAreasLayerVisibility } from "./arcgis/areasLayer";
+  import { setPlanesLayerVisibility, setPathsLayerVisibility } from "./arcgis/graphicsLayer";
 
   let messages: (Cat10 | Cat21)[] = [];
   console.log(messages);
@@ -143,6 +144,8 @@
   let btncheckMLAT = true;
   let btncheckADSB = true;
   let btncheckAreas = true;
+  let btncheckPlanes = true;
+  let btncheckPaths = true;
 
   initializeMap();
 
@@ -309,6 +312,33 @@
               autocomplete="off"
             />
             <label class="btn btn-outline-primary" for="btncheckAreas">MLAT Areas</label>
+          </div>
+          <div role="group" aria-label="Basic checkbox toggle button group">
+            <input
+              type="checkbox"
+              bind:checked="{btncheckPlanes}"
+              on:change="{(e) => {
+                //@ts-ignore
+                setPlanesLayerVisibility(e.target.checked);
+              }}"
+              class="btn-check"
+              id="btncheckPlanes"
+              autocomplete="off"
+            />
+            <label class="btn btn-outline-primary" for="btncheckPlanes">3D Planes</label>
+
+            <input
+              type="checkbox"
+              bind:checked="{btncheckPaths}"
+              on:change="{(e) => {
+                //@ts-ignore
+                setPathsLayerVisibility(e.target.checked);
+              }}"
+              class="btn-check"
+              id="btncheckPaths"
+              autocomplete="off"
+            />
+            <label class="btn btn-outline-primary" for="btncheckPaths">3D Paths</label>
           </div>
         </div>
       {/if}
