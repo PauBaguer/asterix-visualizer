@@ -39,6 +39,13 @@ export function parseMLATmessage(msg: Cat10) {
   }
 }
 
+export function deleteMLATmessage(msg: Cat10) {
+  if (planeMap.has(msg.target_address)) {
+    const l = planeMap.get(msg.target_address)?.mlat_msgs;
+    l?.splice(l.indexOf(msg));
+  }
+}
+
 export function parseADSBmessage(msg: Cat21) {
   if (planeMap.has(msg.target_address)) {
     updatePlane(msg);
@@ -76,6 +83,18 @@ export function parseADSBmessage(msg: Cat21) {
     planeMap.set(newPlane.target_address, newPlane);
 
     createPlane(newPlane.target_address);
+  }
+}
+
+export function deleteADSBmessage(msg: Cat21) {
+  if (planeMap.has(msg.target_address)) {
+    const l = planeMap.get(msg.target_address)!.adsb_msgs;
+    l?.splice(l.indexOf(msg));
+    if (l.length == 0) {
+      removePlane(planeMap.get(msg.target_address)!);
+      return;
+    }
+    deleteupdatePlane(l[l.length - 1]);
   }
 }
 
@@ -145,7 +164,8 @@ function updatePlane(msg: Cat21) {
       msg.airborne_ground_vector.TrackAngle.substring(0, msg.airborne_ground_vector.TrackAngle.length - 4)
     );
   } else {
-    heading = calculateHeading(plane);
+    const h = calculateHeading(plane);
+    heading = h == -1 ? plane.heading : h;
   }
 
   plane.latitude = msg.wgs_84_coordinates.latitude;
@@ -187,6 +207,67 @@ function updatePlane(msg: Cat21) {
   graphic.symbol = newSymbol;
 }
 
+function deleteupdatePlane(msg: Cat21) {
+  const plane = planeMap.get(msg.target_address)!;
+
+  if (!msg.wgs_84_coordinates) return;
+  let geometric_height = 0;
+  let level = 0;
+  let heading = 0;
+  if (msg.geometric_height) {
+    geometric_height = parseFloat(msg.geometric_height.substring(0, msg.geometric_height.length - 3));
+  }
+  if (msg.flight_level) {
+    level = parseFloat(msg.flight_level.substring(2));
+  }
+  if (msg.airborne_ground_vector) {
+    heading = parseFloat(
+      msg.airborne_ground_vector.TrackAngle.substring(0, msg.airborne_ground_vector.TrackAngle.length - 4)
+    );
+  } else {
+    const h = calculateHeading(plane);
+    heading = h == -1 ? plane.heading : h;
+  }
+
+  plane.latitude = msg.wgs_84_coordinates.latitude;
+  plane.longitude = msg.wgs_84_coordinates.longitude;
+  plane.geometric_height = geometric_height;
+  plane.level = level;
+
+  const graphic = plane.graphic!;
+
+  const newPoint = new Point({
+    spatialReference: SpatialReference.WGS84,
+    latitude: plane.latitude,
+    longitude: plane.longitude,
+    hasZ: true,
+    z: plane.geometric_height * 0.3048,
+  });
+
+  const newSymbol = new PointSymbol3D({
+    symbolLayers: [
+      new ObjectSymbol3DLayer({
+        resource: {
+          // the dependencies referenced in the gltf file will be requested as well
+          href: "https://static.arcgis.com/arcgis/styleItems/RealisticTransportation/web/resource/Airplane_Large_Passenger.json",
+        },
+        heading: heading,
+        height: 12,
+        anchor: "bottom",
+      }),
+    ],
+  });
+
+  const poly = plane.pathGraphic?.geometry as Polyline;
+  poly.paths[0].splice(poly.paths[0].length - 1, 1);
+
+  const newPath = new Polyline({ paths: poly.paths, hasZ: true });
+
+  plane.pathGraphic!.geometry = newPath;
+  graphic.geometry = newPoint;
+  graphic.symbol = newSymbol;
+}
+
 export function deletePlane(plane: Plane) {
   removePlane(plane);
   planeMap.delete(plane.target_address);
@@ -202,10 +283,13 @@ export function deletePlane(plane: Plane) {
 export function removePlane(plane: Plane) {
   if (planeMap.has(plane.target_address)) {
     graphicsLayer.remove(plane.graphic!);
+    graphicsLayer.remove(plane.pathGraphic!);
   }
+  planeMap.delete(plane.target_address);
 }
 
 function calculateHeading(plane: Plane) {
+  if (!plane.adsb_msgs[plane.adsb_msgs.length - 2]) return -1;
   const origin = plane.adsb_msgs[plane.adsb_msgs.length - 2].wgs_84_coordinates_high;
   const destination = plane.adsb_msgs[plane.adsb_msgs.length - 1].wgs_84_coordinates_high;
   return getRhumbLineBearing(

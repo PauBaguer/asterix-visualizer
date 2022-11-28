@@ -19,7 +19,13 @@
     createGraphicADSB,
   } from "../../arcgis/groundLayer";
   import { createEventDispatcher } from "svelte";
-  import { clearGraphicsLayer, parseADSBmessage, parseMLATmessage } from "../../arcgis/graphicsLayer";
+  import {
+    clearGraphicsLayer,
+    deleteADSBmessage,
+    deleteMLATmessage,
+    parseADSBmessage,
+    parseMLATmessage,
+  } from "../../arcgis/graphicsLayer";
 
   let messages: (Cat10 | Cat21)[] = [];
   // let msgToPlot: (Cat10 | Cat21)[] = [];
@@ -107,14 +113,14 @@
         if (msg.message_type === "Target Report") {
           if (msg.data_source_identifier.SIC == "107") {
             deleteGraphicMLAT(msg);
-            parseMLATmessage(msg);
+            deleteMLATmessage(msg);
           } else if (msg.data_source_identifier.SIC == "7") deleteGraphicSMR(msg);
         }
       } else {
         //cat21
         const msg = messages[i] as Cat21;
         deleteGraphicADSB(msg);
-        parseADSBmessage(msg);
+        deleteADSBmessage(msg);
       }
       i -= 1;
       if (i < 0) {
