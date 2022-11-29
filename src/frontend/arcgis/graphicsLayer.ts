@@ -18,6 +18,52 @@ import { flyTo } from "./map";
 
 let planesLayer: GraphicsLayer;
 let pathsLayer: GraphicsLayer;
+
+const elem = document.querySelector("body")!;
+
+const popupTemplate = {
+  title: "{target_identification}",
+  content: [
+    {
+      type: "fields",
+      fieldInfos: [
+        {
+          fieldName: "target_identification",
+          label: "Call sign",
+        },
+        {
+          fieldName: "target_address",
+          label: "Target Address",
+        },
+        {
+          fieldName: "latitude",
+          label: "Latitude",
+        },
+        {
+          fieldName: "longitude",
+          label: "Longitude",
+        },
+        {
+          fieldName: "data_source_identifier",
+          label: "Data Source Identifier",
+        },
+        {
+          fieldName: "FL",
+          label: "Flight Level",
+        },
+        {
+          fieldName: "height",
+          label: "Height MSL",
+        },
+        {
+          fieldName: "heading",
+          label: "Heading",
+        },
+      ],
+    },
+  ],
+};
+
 export const planeMap: Map<string, Plane> = new Map();
 
 // const symbol = new SimpleMarkerSymbol({
@@ -53,7 +99,6 @@ export function parseADSBmessage(msg: Cat21) {
   if (planeMap.has(msg.target_address)) {
     updatePlane(msg);
   } else {
-    const elem = document.querySelector("body")!;
     const newPlaneEvent = new CustomEvent("new-plane", { detail: msg });
     elem.dispatchEvent(newPlaneEvent);
     if (!msg.wgs_84_coordinates) return;
@@ -97,6 +142,8 @@ export function deleteADSBmessage(msg: Cat21) {
     const l = planeMap.get(msg.target_address)!.adsb_msgs;
     l?.splice(l.indexOf(msg));
     if (l.length == 0) {
+      const newPlaneEvent = new CustomEvent("del-plane", { detail: msg });
+      elem.dispatchEvent(newPlaneEvent);
       removePlane(planeMap.get(msg.target_address)!);
       return;
     }
@@ -116,6 +163,7 @@ function createPlane(target_address: string) {
 
   const newGraphic = new Graphic({
     geometry: newPoint,
+    popupTemplate: popupTemplate,
     symbol: new PointSymbol3D({
       symbolLayers: [
         new ObjectSymbol3DLayer({
@@ -131,7 +179,12 @@ function createPlane(target_address: string) {
     }),
     attributes: {
       target_identification: plane.target_identification,
-      target_address: plane.target_identification,
+      target_address: plane.target_address,
+      latitude: Math.round(10000 * plane.latitude) / 10000,
+      longitude: Math.round(10000 * plane.longitude) / 10000,
+      FL: `FL${plane.level}`,
+      height: `${plane.geometric_height} ft`,
+      heading: `${plane.heading}º`,
     },
   });
 
@@ -178,6 +231,7 @@ function updatePlane(msg: Cat21) {
   plane.longitude = msg.wgs_84_coordinates.longitude;
   plane.geometric_height = geometric_height;
   plane.level = level;
+  plane.heading = heading;
 
   const graphic = plane.graphic!;
 
@@ -211,6 +265,15 @@ function updatePlane(msg: Cat21) {
   plane.pathGraphic!.geometry = newPath;
   graphic.geometry = newPoint;
   graphic.symbol = newSymbol;
+  graphic.attributes = {
+    target_identification: plane.target_identification,
+    target_address: plane.target_address,
+    latitude: Math.round(10000 * plane.latitude) / 10000,
+    longitude: Math.round(10000 * plane.longitude) / 10000,
+    FL: `FL${plane.level}`,
+    height: `${plane.geometric_height} ft`,
+    heading: `${plane.heading}º`,
+  };
 }
 
 function deleteupdatePlane(msg: Cat21) {
@@ -239,6 +302,7 @@ function deleteupdatePlane(msg: Cat21) {
   plane.longitude = msg.wgs_84_coordinates.longitude;
   plane.geometric_height = geometric_height;
   plane.level = level;
+  plane.heading = heading;
 
   const graphic = plane.graphic!;
 
@@ -272,6 +336,15 @@ function deleteupdatePlane(msg: Cat21) {
   plane.pathGraphic!.geometry = newPath;
   graphic.geometry = newPoint;
   graphic.symbol = newSymbol;
+  graphic.attributes = {
+    target_identification: plane.target_identification,
+    target_address: plane.target_address,
+    latitude: Math.round(10000 * plane.latitude) / 10000,
+    longitude: Math.round(10000 * plane.longitude) / 10000,
+    FL: `FL${plane.level}`,
+    height: `${plane.geometric_height} ft`,
+    heading: `${plane.heading}º`,
+  };
 }
 
 export function deletePlane(plane: Plane) {
@@ -308,6 +381,8 @@ export function clearGraphicsLayer() {
   planesLayer.removeAll();
   pathsLayer.removeAll();
   planeMap.clear();
+  const newPlaneEvent = new Event("clear-plane");
+  elem.dispatchEvent(newPlaneEvent);
 }
 
 export function setPlanesLayerVisibility(b: boolean) {

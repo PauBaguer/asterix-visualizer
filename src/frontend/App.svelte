@@ -79,10 +79,18 @@
 
   #planes {
     left: 10px;
-    bottom: 215px;
+
     background-color: #222222;
     border-radius: 10px;
-    max-height: 500px;
+  }
+  .bottom-planes {
+    bottom: 20px;
+    max-height: 650px;
+  }
+
+  .top-planes {
+    bottom: 215px;
+    max-height: 450px;
   }
   td {
     vertical-align: middle;
@@ -476,7 +484,7 @@
         </div>
       </div>
 
-      <div class="ontop" id="planes">
+      <div class="{settings ? 'top-planes ontop' : 'bottom-planes ontop'}" id="planes">
         <PlanesComponent />
       </div>
 

@@ -33,10 +33,10 @@
   const dispatch = createEventDispatcher();
 
   let i = 0;
-  let slider = 0.5;
+  let slider = 0.1;
   let simStartTime = 0;
   let simTime = 0;
-  const tick = 1000; //1 secconds per tick
+  const tick = 2000; //1 secconds per tick
   let simEndTime = 0; //this is for the cat 10 file. make dynamic!!
 
   let play = false;
@@ -133,7 +133,7 @@
   export function playClick() {
     play = !play;
     dispatch("switchplay");
-    if (play) timer = window.setInterval(tickSimulation, 100);
+    if (play) timer = window.setInterval(tickSimulation, 200);
     else clearInterval(timer);
   }
   export function stop() {

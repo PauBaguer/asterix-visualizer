@@ -15,31 +15,6 @@ let groundLayerSmr: GraphicsLayer;
 let groundLayerMlat: GraphicsLayer;
 let groundLayerAdsb: GraphicsLayer;
 
-const popupTemplate = {
-  title: "{id}",
-  content: [
-    {
-      type: "fields",
-      fieldInfos: [
-        {
-          fieldName: "instrument",
-          label: "Instrument",
-        },
-        {
-          fieldName: "expression/data_source_identifier",
-        },
-      ],
-    },
-  ],
-  expressionInfos: [
-    {
-      name: "data_source_identifier",
-      title: "Data Source Identifier",
-      expression: "$feature.cartesian_coordinates.x",
-    },
-  ],
-};
-
 const popupTemplateSMR = {
   title: "SMR point {id}",
   content: [

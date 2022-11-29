@@ -1,5 +1,4 @@
 import Map from "@arcgis/core/Map";
-import type Graphic from "@arcgis/core/Graphic";
 import SceneView from "@arcgis/core/views/SceneView";
 import SpatialReference from "@arcgis/core/geometry/SpatialReference";
 import { loadGraphicsLayer } from "./graphicsLayer";
@@ -30,7 +29,8 @@ function initMap() {
       },
       tilt: 50, // perspective in degrees
     },
-    spatialReference: SpatialReference.WGS84,
+    viewingMode: "global",
+    //  spatialReference: SpatialReference.WGS84,
 
     // The id of a DOM element (may also be an actual DOM element)
     container: "viewDiv",
@@ -48,8 +48,8 @@ function initMap() {
 export function flyTo(p: Point) {
   const newP = new Point();
 
-  newP.z = p.z + 150;
-  newP.y = p.y - 0.001;
+  newP.z = p.z + 300;
+  newP.y = p.y - 0.004;
   newP.x = p.x;
 
   view.goTo({ position: newP, heading: 0, tilt: 50 });
