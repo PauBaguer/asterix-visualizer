@@ -5,15 +5,16 @@ import SpatialReference from "@arcgis/core/geometry/SpatialReference";
 import { loadGraphicsLayer } from "./graphicsLayer";
 import { loadGroundLayer } from "./groundLayer";
 import { loadAreasLayer } from "./areasLayer";
+import Point from "@arcgis/core/geometry/Point";
 
 export function initializeMap() {
   console.log("i say hi");
 
   setTimeout(initMap, 500);
 }
-
+let view: SceneView;
 function initMap() {
-  const view = new SceneView({
+  view = new SceneView({
     // An instance of Map or WebScene
     map: new Map({
       basemap: "satellite",
@@ -42,28 +43,14 @@ function initMap() {
     loadGraphicsLayer(view.map);
     loadGroundLayer(view.map);
   });
+}
 
-  // Get the screen point from the view's click event
-  // view.on("click", function (event) {
-  //   var screenPoint = {
-  //     x: event.x,
-  //     y: event.y,
-  //   };
+export function flyTo(p: Point) {
+  const newP = new Point();
 
-  //   // Search for graphics at the clicked location
-  //   view.hitTest(screenPoint).then(function (response) {
-  //     if (response.results.length) {
-  //       const graphic: Graphic = response.results.filter(function (result) {
-  //         if (result.type === "graphic") {
-  //           // check if the graphic belongs to the layer of interest
-  //           return result.graphic.layer === graphicsLayer;
-  //         }
-  //         return false;
-  //         // @ts-ignore
-  //       })[0].graphic;
-  //       // do something with the result graphic
-  //       console.log(graphic.attributes);
-  //     }
-  //   });
-  // });
+  newP.z = p.z + 150;
+  newP.y = p.y - 0.001;
+  newP.x = p.x;
+
+  view.goTo({ position: newP, heading: 0, tilt: 50 });
 }

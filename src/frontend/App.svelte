@@ -76,6 +76,14 @@
 
     width: max-content;
   }
+
+  #planes {
+    left: 10px;
+    bottom: 215px;
+    background-color: #222222;
+    border-radius: 10px;
+    max-height: 500px;
+  }
   td {
     vertical-align: middle;
   }
@@ -129,6 +137,7 @@
   import { parseIpcMainReceiveMessage } from "./ipcMain/ipcMainReceiveParser";
   import ExpandableTable from "./svelte-components/table/ExpandableTable.svelte";
   import Simulation from "./svelte-components/simulation/simulation.svelte";
+  import PlanesComponent from "./svelte-components/planesComponent.svelte";
   import { setSMRVisibility, setADSBVisibility, setMLATVisibility } from "./arcgis/groundLayer";
   import { setAreasLayerVisibility } from "./arcgis/areasLayer";
   import { setPlanesLayerVisibility, setPathsLayerVisibility } from "./arcgis/graphicsLayer";
@@ -137,6 +146,7 @@
   console.log(messages);
   let numberOfMsg = 0;
   let simulationComponent: Simulation;
+
   let play = false;
 
   let settings = false;
@@ -465,6 +475,11 @@
           </button>
         </div>
       </div>
+
+      <div class="ontop" id="planes">
+        <PlanesComponent />
+      </div>
+
       <div id="viewDiv"></div>
     {/if}
 

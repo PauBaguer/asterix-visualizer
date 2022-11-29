@@ -14,6 +14,7 @@ import type { Cat10 } from "../custom-types/asterix/cat10";
 import type { Cat21 } from "../custom-types/asterix/cat21";
 import { getRhumbLineBearing } from "geolib";
 import Polyline from "@arcgis/core/geometry/Polyline";
+import { flyTo } from "./map";
 
 let planesLayer: GraphicsLayer;
 let pathsLayer: GraphicsLayer;
@@ -52,6 +53,9 @@ export function parseADSBmessage(msg: Cat21) {
   if (planeMap.has(msg.target_address)) {
     updatePlane(msg);
   } else {
+    const elem = document.querySelector("body")!;
+    const newPlaneEvent = new CustomEvent("new-plane", { detail: msg });
+    elem.dispatchEvent(newPlaneEvent);
     if (!msg.wgs_84_coordinates) return;
     let geometric_height = 0;
     let level = 0;
@@ -312,4 +316,11 @@ export function setPlanesLayerVisibility(b: boolean) {
 
 export function setPathsLayerVisibility(b: boolean) {
   pathsLayer.visible = b;
+}
+
+export function flyToPlane(target_address: string) {
+  if (planeMap.has(target_address)) {
+    const gr = planeMap.get(target_address)!.graphic!;
+    flyTo(gr.geometry as Point);
+  }
 }
