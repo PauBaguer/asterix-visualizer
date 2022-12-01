@@ -7,8 +7,6 @@ import { loadAreasLayer } from "./areasLayer";
 import Point from "@arcgis/core/geometry/Point";
 
 export function initializeMap() {
-  console.log("i say hi");
-
   setTimeout(initMap, 500);
 }
 let view: SceneView;
@@ -37,8 +35,6 @@ function initMap() {
   });
 
   view.when(() => {
-    console.log("Map is loaded");
-
     loadAreasLayer(view.map);
     loadGraphicsLayer(view.map);
     loadGroundLayer(view.map);

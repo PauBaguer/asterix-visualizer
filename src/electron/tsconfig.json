@@ -2,7 +2,7 @@
   "compileOnSave": true,
   "compilerOptions": {
     "outDir": "../../build",
-    "target": "ES2015",
+    "target": "ES2018",
     "module": "commonjs",
     "sourceMap": true,
     "stripInternal": true,
@@ -13,7 +13,7 @@
     "strictFunctionTypes": true,
     "noImplicitThis": true,
     "noUnusedLocals": false,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": true,

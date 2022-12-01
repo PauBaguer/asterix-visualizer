@@ -116,6 +116,10 @@ const popupTemplateMLAT = {
           fieldName: "cartesian_coordinate_y",
           label: "Cartesian Coordinate Y",
         },
+        {
+          fieldName: "track_number",
+          label: "Track Number",
+        },
       ],
     },
   ],
@@ -345,6 +349,7 @@ export function createGraphicMLAT(msg: Cat10) {
       data_source_identifier: `SIC: ${msg.data_source_identifier.SIC}; SAC: ${msg.data_source_identifier.SAC}`,
       cartesian_coordinate_x: `${msg.cartesian_coordinates.x}`,
       cartesian_coordinate_y: `${msg.cartesian_coordinates.y}`,
+      track_number: msg.track_number,
 
       latitude: target_pos.latitude,
       longitude: target_pos.longitude,

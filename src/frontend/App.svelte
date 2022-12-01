@@ -151,7 +151,7 @@
   import { setPlanesLayerVisibility, setPathsLayerVisibility } from "./arcgis/graphicsLayer";
 
   let messages: (Cat10 | Cat21)[] = [];
-  console.log(messages);
+
   let numberOfMsg = 0;
   let simulationComponent: Simulation;
 
@@ -187,11 +187,31 @@
   }
 
   async function handleLoadSomeMsgs() {
+    messages = [];
+    numberOfMsg = Number.parseInt(await initIpcMainBidirectional("file-picker"));
+    const FRAGMENTS = 1000;
+    let i = 0;
+
+    await ipcMainBidirectional("get-message-quantity", 10000);
+
+    while (i < numberOfMsg) {
+      const msgs = await ipcMainBidirectional("pass-slice");
+
+      messages = messages.concat(await parseIpcMainReceiveMessage(msgs));
+      i += FRAGMENTS;
+    }
+    console.log(`Finished loading ${messages.length} messages!`);
+
+    simulationComponent.initializeSimulation!(messages);
+  }
+
+  async function handleLoadSomeMsgs2() {
     numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
-    const res = await ipcMainBidirectional("get-message-quantity", 10000);
+    const res = await ipcMainBidirectional("get-message-quantity2", 10000);
     messages = await parseIpcMainReceiveMessage(res);
-    console.log("Finished loading");
-    simulationComponent.initializeSimulation(messages);
+    console.log(`Finished loading ${messages.length} messages!`);
+
+    simulationComponent.initializeSimulation!(messages);
   }
 
   async function handleMapClick() {
@@ -199,7 +219,7 @@
     initializeMap();
     if (messages.length > 0) {
       setTimeout(() => {
-        simulationComponent.initializeSimulation(messages);
+        simulationComponent.initializeSimulation!(messages);
       }, 750);
     }
   }
@@ -448,7 +468,7 @@
             on:click="{csv_file}"
             ><i class="bi bi-filetype-csv"></i>
           </button>
-          <button type="button" class="btn btn-primary me-3" on:click="{settingsPannel}"
+          <button type="button" class="btn btn-primary me-3" on:click="{handleLoadSomeMsgs2}"
             ><i class="bi bi-gear"></i>
           </button>
           <button
