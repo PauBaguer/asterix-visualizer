@@ -23,9 +23,9 @@ export async function loadFileIpc() {
     return;
   }
 
-  let L = messages.length > 500000 ? 400000 : messages.length;
   messages = await sliceMainBuffer(buffer);
-  console.log("About to process " + L + "messages.");
+  let L = messages.length > 500000 ? 400000 : messages.length;
+  console.log("About to process " + L + " messages.");
   return L;
 }
 
@@ -82,8 +82,8 @@ export function getMessagesIpcSlices() {
 export function tableProtocol(event: any, { page, filter, search }: { page: number; filter: any; search: string }) {
   const MSG_PER_PAGE = 15;
 
-  return {
+  return JSON.stringify({
     messages: decodedMsg.slice(page * MSG_PER_PAGE - MSG_PER_PAGE, page * MSG_PER_PAGE),
     totalMessages: decodedMsg.length,
-  };
+  });
 }

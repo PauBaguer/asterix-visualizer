@@ -133,6 +133,18 @@
     border-style: solid;
     border-width: 1px;
   }
+
+  #overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 </style>
 
 <script lang="ts" type="module">
@@ -156,6 +168,7 @@
   let simulationComponent: Simulation;
 
   let play = false;
+  let loading = false;
 
   let settings = false;
   let btncheckSMR = true;
@@ -187,6 +200,7 @@
   // }
 
   async function handleLoadSomeMsgs() {
+    loading = true;
     messages = [];
     numberOfMsg = Number.parseInt(await initIpcMainBidirectional("file-picker"));
     console.log({ numberOfMsg });
@@ -204,6 +218,7 @@
     console.log(`Finished loading ${messages.length} messages!`);
 
     simulationComponent.initializeSimulation!(messages);
+    loading = false;
   }
 
   // async function handleLoadSomeMsgs2() {
@@ -514,8 +529,18 @@
 
     {#if visibleItem === "MESSAGE_DECODER"}
       <div>
-        <ExpandableTable messages="{messages}" />
+        <ExpandableTable />
       </div>
     {/if}
   </div>
+
+  {#if loading == true}
+    <div id="overlay">
+      <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+  {/if}
 </main>
