@@ -167,29 +167,30 @@
 
   initializeMap();
 
-  async function handleLoadFileClick() {
-    numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
-    const chunks = 10000;
-    console.log(`Loaded ${numberOfMsg} messages!`);
+  // async function handleLoadFileClick() {
+  //   numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
+  //   const chunks = 10000;
+  //   console.log(`Loaded ${numberOfMsg} messages!`);
 
-    while (messages.length < numberOfMsg) {
-      if (numberOfMsg - messages.length > chunks) {
-        const res = await ipcMainBidirectional("get-message-quantity", chunks);
-        messages.push(await parseIpcMainReceiveMessage(res));
-      } else {
-        const res = await ipcMainBidirectional("get-message-quantity", numberOfMsg - messages.length);
-        messages.push(await parseIpcMainReceiveMessage(res));
-      }
-    }
-    console.log("Finished loading");
+  //   while (messages.length < numberOfMsg) {
+  //     if (numberOfMsg - messages.length > chunks) {
+  //       const res = await ipcMainBidirectional("get-message-quantity", chunks);
+  //       messages.push(await parseIpcMainReceiveMessage(res));
+  //     } else {
+  //       const res = await ipcMainBidirectional("get-message-quantity", numberOfMsg - messages.length);
+  //       messages.push(await parseIpcMainReceiveMessage(res));
+  //     }
+  //   }
+  //   console.log("Finished loading");
 
-    //simulationComponent.initializeSimulation(messages);
-  }
+  //   //simulationComponent.initializeSimulation(messages);
+  // }
 
   async function handleLoadSomeMsgs() {
     messages = [];
     numberOfMsg = Number.parseInt(await initIpcMainBidirectional("file-picker"));
-    const FRAGMENTS = 1000;
+    console.log({ numberOfMsg });
+    const FRAGMENTS = 10000;
     let i = 0;
 
     await ipcMainBidirectional("get-message-quantity", 10000);
@@ -205,14 +206,14 @@
     simulationComponent.initializeSimulation!(messages);
   }
 
-  async function handleLoadSomeMsgs2() {
-    numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
-    const res = await ipcMainBidirectional("get-message-quantity2", 10000);
-    messages = await parseIpcMainReceiveMessage(res);
-    console.log(`Finished loading ${messages.length} messages!`);
+  // async function handleLoadSomeMsgs2() {
+  //   numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
+  //   const res = await ipcMainBidirectional("get-message-quantity2", 10000);
+  //   messages = await parseIpcMainReceiveMessage(res);
+  //   console.log(`Finished loading ${messages.length} messages!`);
 
-    simulationComponent.initializeSimulation!(messages);
-  }
+  //   simulationComponent.initializeSimulation!(messages);
+  // }
 
   async function handleMapClick() {
     visibleItem = "MAP";
@@ -468,7 +469,7 @@
             on:click="{csv_file}"
             ><i class="bi bi-filetype-csv"></i>
           </button>
-          <button type="button" class="btn btn-primary me-3" on:click="{handleLoadSomeMsgs2}"
+          <button type="button" class="btn btn-primary me-3" on:click="{handleSettingsClick}"
             ><i class="bi bi-gear"></i>
           </button>
           <button
@@ -513,7 +514,7 @@
 
     {#if visibleItem === "MESSAGE_DECODER"}
       <div>
-        <ExpandableTable messages="{[]}" numberOfMsg="{numberOfMsg}" />
+        <ExpandableTable messages="{messages}" />
       </div>
     {/if}
   </div>

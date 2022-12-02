@@ -6,10 +6,10 @@ doStuff();
 async function doStuff() {
   const FRAGMENTS = 1000;
   let i = 0;
-  let L = workerData.messages.length > 50000 ? 400000 : workerData.messages.length;
+  let L = workerData.messages.length > 500000 ? 400000 : workerData.messages.length;
 
   while (i < L) {
-    const decodedMsg = await decodeMessages(workerData.messages.slice(i, i + FRAGMENTS), -1);
+    const decodedMsg = await decodeMessages(workerData.messages.slice(i, i + FRAGMENTS), -1, i);
     parentPort?.postMessage(decodedMsg);
     i += FRAGMENTS;
   }

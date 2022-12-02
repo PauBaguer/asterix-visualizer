@@ -14,7 +14,13 @@ import logger from "./utils/logger";
 import settings from "./utils/settings";
 import { openFilePicker, openTestFile } from "./utils/file_management";
 
-import { getMessagesIpc, getMessagesIpcWorker, loadFileIpc, getMessagesIpcSlices } from "./utils/ipcMain";
+import {
+  getMessagesIpc,
+  getMessagesIpcWorker,
+  loadFileIpc,
+  getMessagesIpcSlices,
+  tableProtocol,
+} from "./utils/ipcMain";
 import { fromTwosComplement } from "./asterix/cat21_decoder";
 
 const isProd = process.env.NODE_ENV === "production" || app.isPackaged;
@@ -64,6 +70,7 @@ const createWindow = () => {
   ipcMain.handle("get-message-quantity2", getMessagesIpc);
   ipcMain.handle("get-message-quantity", getMessagesIpcWorker);
   ipcMain.handle("pass-slice", getMessagesIpcSlices);
+  ipcMain.handle("table-protocol", tableProtocol);
 };
 
 app.on("ready", createWindow);

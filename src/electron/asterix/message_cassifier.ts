@@ -19,7 +19,11 @@ export function sliceMainBuffer(buffer: Buffer) {
   return messages;
 }
 
-export async function classifyMessages(messages: Buffer[], messageQuantity: number): Promise<(Cat10 | Cat21)[]> {
+export async function classifyMessages(
+  messages: Buffer[],
+  messageQuantity: number,
+  fromId: number
+): Promise<(Cat10 | Cat21)[]> {
   let cat10msg: number = 0;
   let cat21msg: number = 0;
   let cat23msg: Buffer[] = [];
@@ -35,11 +39,11 @@ export async function classifyMessages(messages: Buffer[], messageQuantity: numb
     messages.map(async (v, index) => {
       if (v[0] === 10) {
         cat10msg += 1;
-        return decodeClass10Messages(v, index + 1);
+        return decodeClass10Messages(v, index + fromId + 1);
       }
       //case 21
       cat21msg += 1;
-      return decodeClass21Messages(v, index + 1);
+      return decodeClass21Messages(v, index + fromId + 1);
     })
   );
   // console.log(`Received ${cat10msg} messages from Category 10`);
