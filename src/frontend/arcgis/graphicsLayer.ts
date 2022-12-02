@@ -82,9 +82,14 @@ export function loadGraphicsLayer(map: ArcGISMap) {
   map.add(pathsLayer);
 }
 
+const mlatTI = [];
+
 export function parseMLATmessage(msg: Cat10) {
   if (planeMap.has(msg.target_address)) {
     planeMap.get(msg.target_address)?.mlat_msgs.push(msg);
+  } else {
+    console.log("Target address of MLAT not in planes.");
+    mlatTI.push(msg.target_identification);
   }
 }
 

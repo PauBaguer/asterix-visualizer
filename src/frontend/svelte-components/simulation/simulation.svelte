@@ -92,7 +92,7 @@
         //cat21
         const msg = messages[i] as Cat21;
         createGraphicADSB(msg);
-        parseADSBmessage(msg);
+        // parseADSBmessage(msg);
       }
       i += 1;
     }

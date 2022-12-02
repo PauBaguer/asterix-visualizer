@@ -15,6 +15,8 @@
   let el; //table element
   let table; // table object api
 
+  export let numberOfMsg;
+
   onMount(async () => {
     await load();
     table = jQuery(el).DataTable({
@@ -58,24 +60,20 @@
   //document.getElementsByClassName("dataTables_lenght").addClass("bs-select");
 
   export let messages;
-  export let numberOfMsg;
 
   async function load() {
-    // const chunks = 20000;
+    messages = [];
 
-    // while (messages.length < numberOfMsg) {
-    //   if (numberOfMsg - messages.length > chunks) {
-    //     const res = await ipcMainBidirectional("get-message-quantity", chunks);
-    //     messages.push(await parseIpcMainReceiveMessage(res));
-    //   } else {
-    //     const res = await ipcMainBidirectional("get-message-quantity", numberOfMsg - messages.length);
-    //     messages.push(await parseIpcMainReceiveMessage(res));
-    //   }
-    // }
-    const res = await ipcMainBidirectional("get-message-quantity", 2000);
-    messages = await parseIpcMainReceiveMessage(res);
+    const FRAGMENTS = 1000;
+    let i = 0;
 
-    console.log("Finished loading");
+    while (i < numberOfMsg / 100) {
+      const msgs = await ipcMainBidirectional("pass-slice");
+
+      messages = messages.concat(await parseIpcMainReceiveMessage(msgs));
+      i += FRAGMENTS;
+    }
+    console.log(`Finished loading ${messages.length} messages!`);
   }
 
   //1970-01-01T08:00:01.734Z

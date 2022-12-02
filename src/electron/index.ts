@@ -13,8 +13,8 @@ import { autoUpdater } from "electron-updater";
 import logger from "./utils/logger";
 import settings from "./utils/settings";
 import { openFilePicker, openTestFile } from "./utils/file_management";
-import { sliceMainBuffer, classifyMessages } from "./asterix/message_cassifier";
-import { getMessagesIpc, loadFileIpc } from "./utils/ipcMain";
+
+import { getMessagesIpc, getMessagesIpcWorker, loadFileIpc, getMessagesIpcSlices } from "./utils/ipcMain";
 import { fromTwosComplement } from "./asterix/cat21_decoder";
 
 const isProd = process.env.NODE_ENV === "production" || app.isPackaged;
@@ -60,40 +60,11 @@ const createWindow = () => {
 
   nativeTheme.themeSource = "dark";
 
-  ipcMain.on("test", () => {
-    console.log("IPC_MAIN TEST SUCCESS");
-  });
-
-  ipcMain.on("open-file-picker", async () => {
-    const buffer = await openFilePicker();
-    if (!buffer) return;
-    const messages = await sliceMainBuffer(buffer!);
-    const decodedMsg = await classifyMessages(messages, 5);
-    console.log(decodedMsg.length);
-    mainWindow?.webContents.send("push-notification", await JSON.stringify(decodedMsg));
-  });
-
-  ipcMain.on("open-test-file", async () => {
-    const buffer = await openTestFile();
-    const messages = await sliceMainBuffer(buffer);
-    const decodedMsg = await classifyMessages(messages, 2000);
-    console.log(decodedMsg.length);
-    mainWindow?.webContents.send("push-notification", await JSON.stringify(decodedMsg));
-  });
-
-  ipcMain.handle("test-handle", async () => {
-    console.log("HIII");
-    console.log(fromTwosComplement("1010"));
-
-    console.log(fromTwosComplement("0101"));
-  });
-
-  ipcMain.handle("test-receive", loadFileIpc);
-  ipcMain.handle("get-message-quantity", getMessagesIpc);
+  ipcMain.handle("file-picker", loadFileIpc);
+  ipcMain.handle("get-message-quantity2", getMessagesIpc);
+  ipcMain.handle("get-message-quantity", getMessagesIpcWorker);
+  ipcMain.handle("pass-slice", getMessagesIpcSlices);
 };
-function timeout(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 app.on("ready", createWindow);
 

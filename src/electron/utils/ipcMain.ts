@@ -2,27 +2,78 @@ import { Cat10 } from "../asterix/cat10_decoder";
 import { Cat21 } from "../asterix/cat21_decoder";
 import { classifyMessages as decodeMessages, sliceMainBuffer } from "../asterix/message_cassifier";
 import { openFilePicker } from "./file_management";
+import { Worker } from "node:worker_threads";
 
 let buffer: Buffer | undefined;
 let messages: Buffer[];
-let cat10msg: Buffer[];
-let cat21msg: Buffer[];
 let decodedMsg: (Cat10 | Cat21)[];
+let msgDelivered = 0;
 
 export async function loadFileIpc() {
+  messages = [];
+  decodedMsg = [];
+  msgDelivered = 0;
+  //const startTime = performance.now();
   buffer = await openFilePicker();
+  // const endTime = performance.now();
+  // console.log(`Call to openFilePicker took ${endTime - startTime} milliseconds`);
+
   if (!buffer) {
     console.log("No file opened");
     return;
   }
 
   messages = await sliceMainBuffer(buffer);
+  console.log("About to process " + messages.length + "messages.");
   return messages.length;
 }
 
-//@ts-ignore
 export async function getMessagesIpc(event: any, messageQuantity: number) {
+  const startTime = performance.now();
+  console.log("Start decoding");
   decodedMsg = await decodeMessages(messages, messageQuantity);
+  const endTime = performance.now();
+  console.log(`Call to decodeMessages took ${endTime - startTime} milliseconds`);
 
-  return await JSON.stringify(decodedMsg);
+  const msgToSend = decodedMsg.slice(msgDelivered, msgDelivered + messageQuantity);
+
+  return await JSON.stringify(msgToSend);
+}
+
+export async function getMessagesIpcWorker(event: any, messageQuantity: number) {
+  const startTime = performance.now();
+  const result = (await runWorker({ messageQuantity, msgDelivered, messages })) as (Cat10 | Cat21)[];
+  const endTime = performance.now();
+  console.log(`Call to decodeMessages took ${endTime - startTime} milliseconds`);
+  console.log(`Finished worker with result: ${result.length}`);
+  decodedMsg = result;
+  return [];
+}
+
+function runWorker(workerData: any) {
+  console.log(workerData.messages.length);
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(__dirname + "/worker.js", { workerData });
+    let result: (Cat10 | Cat21)[] = [];
+    worker.on("message", (val: any) => {
+      result = result.concat(val);
+      console.log(result.length);
+    });
+    worker.on("error", reject);
+    worker.on("exit", (code) => {
+      if (code !== 0) {
+        console.log(new Error("Exit worker with code: " + code));
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
+
+export function getMessagesIpcSlices() {
+  const FRAGMENTS = 10000;
+  const ret = JSON.stringify(decodedMsg.slice(msgDelivered, msgDelivered + FRAGMENTS));
+  msgDelivered += FRAGMENTS;
+  if (msgDelivered > decodedMsg.length) msgDelivered = 0;
+  return ret;
 }

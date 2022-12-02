@@ -1,0 +1,19 @@
+FULL FILE READ AND SENT:
+
+SMR: 
+    - 2000 ms read
+    - quick send
+    - x20 sim no problem
+
+MLAT:
+    - 4000 ms read
+    - preetty quick send
+    - x20 sim no problem
+    - sim sencera no problem, molt fluid
+
+ADS-B:
+    - 17000 ms read
+    - error, invalid string lenght. => partir.
+
+All:
+    - 
