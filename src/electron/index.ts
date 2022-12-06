@@ -14,7 +14,7 @@ import logger from "./utils/logger";
 import settings from "./utils/settings";
 import { openFilePicker, openTestFile } from "./utils/file_management";
 
-import { getMessagesIpc, getMessagesIpcWorker, loadFileIpc, getMessagesIpcSlices } from "./utils/ipcMain";
+import { getMessagesIpc, getMessagesIpcWorker, loadFileIpc, getMessagesIpcSlices, probIdentification } from "./utils/ipcMain";
 import { fromTwosComplement } from "./asterix/cat21_decoder";
 
 const isProd = process.env.NODE_ENV === "production" || app.isPackaged;
@@ -43,9 +43,9 @@ const createWindow = () => {
     // process.env.NODE_ENV === "production"
     isProd
       ? // in production, use the statically build version of our application
-        `file://${join(__dirname, "public", "index.html")}`
+      `file://${join(__dirname, "public", "index.html")}`
       : // in dev, target the host and port of the local rollup web server
-        "http://localhost:5000";
+      "http://localhost:5000";
 
   mainWindow.loadURL(url).catch((err) => {
     logger.error(JSON.stringify(err));
@@ -64,6 +64,8 @@ const createWindow = () => {
   ipcMain.handle("get-message-quantity2", getMessagesIpc);
   ipcMain.handle("get-message-quantity", getMessagesIpcWorker);
   ipcMain.handle("pass-slice", getMessagesIpcSlices);
+  ipcMain.handle("performance", probIdentification);
+
 };
 
 app.on("ready", createWindow);
