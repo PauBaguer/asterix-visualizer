@@ -34,8 +34,8 @@
   }
 </script>
 
-<tr colspan="6">
-  <td colspan="6">
+<tr colspan="7">
+  <td colspan="7">
     <ul class="list-group">
       {#each msgKeysNotObj as key}
         {#if !unwanted.includes(key)}

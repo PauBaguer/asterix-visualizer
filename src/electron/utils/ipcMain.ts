@@ -43,14 +43,15 @@ export async function loadFileIpc() {
   }
 
   messages = await sliceMainBuffer(buffer);
-  console.log("About to process " + messages.length + "messages.");
-  return messages.length;
+  let L = messages.length > 500000 ? 400000 : messages.length;
+  console.log("About to process " + L + " messages.");
+  return L;
 }
 
 export async function getMessagesIpc(event: any, messageQuantity: number) {
   const startTime = performance.now();
   console.log("Start decoding");
-  decodedMsg = await decodeMessages(messages, messageQuantity);
+  decodedMsg = await decodeMessages(messages, messageQuantity, 0);
   const endTime = performance.now();
   console.log(`Call to decodeMessages took ${endTime - startTime} milliseconds`);
   const msgToSend = decodedMsg.slice(msgDelivered, msgDelivered + messageQuantity);
@@ -482,4 +483,13 @@ export function computeAccuracy() {
     StandT2_std: standT2_std,
   }
   return accuracy;
+}
+
+export function tableProtocol(event: any, { page, filter, search }: { page: number; filter: any; search: string }) {
+  const MSG_PER_PAGE = 15;
+
+  return JSON.stringify({
+    messages: decodedMsg.slice(page * MSG_PER_PAGE - MSG_PER_PAGE, page * MSG_PER_PAGE),
+    totalMessages: decodedMsg.length,
+  });
 }

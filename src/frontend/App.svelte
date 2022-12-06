@@ -133,6 +133,18 @@
     border-style: solid;
     border-width: 1px;
   }
+
+  #overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 </style>
 
 <script lang="ts" type="module">
@@ -156,6 +168,7 @@
   let simulationComponent: Simulation;
 
   let play = false;
+  let loading = false;
 
   let settings = false;
   let btncheckSMR = true;
@@ -167,29 +180,31 @@
 
   initializeMap();
 
-  async function handleLoadFileClick() {
-    numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
-    const chunks = 10000;
-    console.log(`Loaded ${numberOfMsg} messages!`);
+  // async function handleLoadFileClick() {
+  //   numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
+  //   const chunks = 10000;
+  //   console.log(`Loaded ${numberOfMsg} messages!`);
 
-    while (messages.length < numberOfMsg) {
-      if (numberOfMsg - messages.length > chunks) {
-        const res = await ipcMainBidirectional("get-message-quantity", chunks);
-        messages.push(await parseIpcMainReceiveMessage(res));
-      } else {
-        const res = await ipcMainBidirectional("get-message-quantity", numberOfMsg - messages.length);
-        messages.push(await parseIpcMainReceiveMessage(res));
-      }
-    }
-    console.log("Finished loading");
+  //   while (messages.length < numberOfMsg) {
+  //     if (numberOfMsg - messages.length > chunks) {
+  //       const res = await ipcMainBidirectional("get-message-quantity", chunks);
+  //       messages.push(await parseIpcMainReceiveMessage(res));
+  //     } else {
+  //       const res = await ipcMainBidirectional("get-message-quantity", numberOfMsg - messages.length);
+  //       messages.push(await parseIpcMainReceiveMessage(res));
+  //     }
+  //   }
+  //   console.log("Finished loading");
 
-    //simulationComponent.initializeSimulation(messages);
-  }
+  //   //simulationComponent.initializeSimulation(messages);
+  // }
 
   async function handleLoadSomeMsgs() {
+    loading = true;
     messages = [];
     numberOfMsg = Number.parseInt(await initIpcMainBidirectional("file-picker"));
-    const FRAGMENTS = 1000;
+    console.log({ numberOfMsg });
+    const FRAGMENTS = 10000;
     let i = 0;
 
     await ipcMainBidirectional("get-message-quantity", 10000);
@@ -203,16 +218,17 @@
     console.log(`Finished loading ${messages.length} messages!`);
 
     simulationComponent.initializeSimulation!(messages);
+    loading = false;
   }
 
-  async function handleLoadSomeMsgs2() {
-    numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
-    const res = await ipcMainBidirectional("get-message-quantity2", 10000);
-    messages = await parseIpcMainReceiveMessage(res);
-    console.log(`Finished loading ${messages.length} messages!`);
+  // async function handleLoadSomeMsgs2() {
+  //   numberOfMsg = Number.parseInt(await initIpcMainBidirectional("test-receive"));
+  //   const res = await ipcMainBidirectional("get-message-quantity2", 10000);
+  //   messages = await parseIpcMainReceiveMessage(res);
+  //   console.log(`Finished loading ${messages.length} messages!`);
 
-    simulationComponent.initializeSimulation!(messages);
-  }
+  //   simulationComponent.initializeSimulation!(messages);
+  // }
 
   async function handleMapClick() {
     visibleItem = "MAP";
@@ -468,7 +484,7 @@
             on:click="{csv_file}"
             ><i class="bi bi-filetype-csv"></i>
           </button>
-          <button type="button" class="btn btn-primary me-3" on:click="{handleLoadSomeMsgs2}"
+          <button type="button" class="btn btn-primary me-3" on:click="{handleSettingsClick}"
             ><i class="bi bi-gear"></i>
           </button>
           <button
@@ -513,8 +529,18 @@
 
     {#if visibleItem === "MESSAGE_DECODER"}
       <div>
-        <ExpandableTable messages="{[]}" numberOfMsg="{numberOfMsg}" />
+        <ExpandableTable />
       </div>
     {/if}
   </div>
+
+  {#if loading == true}
+    <div id="overlay">
+      <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+  {/if}
 </main>
