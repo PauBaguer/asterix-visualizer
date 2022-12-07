@@ -633,7 +633,7 @@ export class Cat10 {
         var add2 = bits.slice(8 * 7 + 4, 8 * 7 + 8).join("");
         this.mode_s_mb_data.push("BDS1: 0x" + add1 + " BDS2: 0x" + add2 + " MB Data: 0x" + data);
         start += 8;
-      } catch {}
+      } catch { }
     }
     this.csv[20] = this.mode_s_mb_data.join(" / ");
   }
@@ -708,7 +708,7 @@ export class Cat10 {
         start += 2;
         this.presence.push({ DRHO: drho, DTHETA: dtheta });
         this.csv[22] = this.csv[21] + "/ " + "DRHO: " + drho + " DTHETA: " + dtheta;
-      } catch {}
+      } catch { }
     }
   }
 

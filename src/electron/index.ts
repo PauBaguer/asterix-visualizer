@@ -14,12 +14,14 @@ import logger from "./utils/logger";
 import settings from "./utils/settings";
 import { openFilePicker, openTestFile } from "./utils/file_management";
 
+
 import {
   getMessagesIpc,
   getMessagesIpcWorker,
   loadFileIpc,
   getMessagesIpcSlices,
   tableProtocol,
+  parametersResults,
 } from "./utils/ipcMain";
 import { fromTwosComplement } from "./asterix/cat21_decoder";
 
@@ -49,9 +51,9 @@ const createWindow = () => {
     // process.env.NODE_ENV === "production"
     isProd
       ? // in production, use the statically build version of our application
-        `file://${join(__dirname, "public", "index.html")}`
+      `file://${join(__dirname, "public", "index.html")}`
       : // in dev, target the host and port of the local rollup web server
-        "http://localhost:5000";
+      "http://localhost:5000";
 
   mainWindow.loadURL(url).catch((err) => {
     logger.error(JSON.stringify(err));
@@ -71,6 +73,8 @@ const createWindow = () => {
   ipcMain.handle("get-message-quantity", getMessagesIpcWorker);
   ipcMain.handle("pass-slice", getMessagesIpcSlices);
   ipcMain.handle("table-protocol", tableProtocol);
+  ipcMain.handle("parameters-results", parametersResults);
+
 };
 
 app.on("ready", createWindow);

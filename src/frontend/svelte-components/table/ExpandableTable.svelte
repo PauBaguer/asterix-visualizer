@@ -17,35 +17,27 @@
   import { ipcMainBidirectional } from "../../ipcMain/ipcMainCallers";
   import { parseIpcMainReceiveMessage } from "../../ipcMain/ipcMainReceiveParser";
   import GenericProps from "./cat10_items/GenericProps.svelte";
-
   const MSG_PER_PAGE = 15;
   //export let messages: (Cat10 | Cat21)[];
   let renderedMessges: (Cat10 | Cat21)[] = []; //messages.slice(0, MSG_PER_PAGE);
-
   let pageArray: number[] = [];
-
   let activePage = 1;
   let displayedPageArray: number[] = [];
-
   let allChildComponents = new Map<number, GenericProps>();
   let allChildComponentsKeys = Array.from(allChildComponents.keys());
   loadMessages();
-
   async function loadMessages() {
     const resp = await parseIpcMainReceiveMessage(
       await ipcMainBidirectional("table-protocol", { page: activePage, filter: "", search: "" })
     );
     const parsedResp: { messages: (Cat10 | Cat21)[]; totalMessages: number } = resp;
-
     console.log({ resp });
     console.log({ parsedResp });
-
     renderedMessges = parsedResp.messages;
     const pageNumber = Math.round(parsedResp.totalMessages / MSG_PER_PAGE);
     pageArray = Array.from({ length: pageNumber }, (_, i) => i + 1);
     pageArray.slice(0, 7);
   }
-
   function handlePageClick(page: number) {
     if (pageArray && pageArray.includes(page)) {
       activePage = page;
@@ -60,7 +52,6 @@
       loadMessages();
     }
   }
-
   function trClick(msg: Cat10 | Cat21) {
     let tr = document.getElementById(`tr-${msg.id}`);
     let tbody = document.querySelector("tbody");
@@ -70,7 +61,6 @@
       allChildComponentsKeys = Array.from(allChildComponents.keys());
     } else {
       // Open this row
-
       if (tbody && tr) {
         let arr = Array.from(tbody.children);
         let nexttr = arr[arr.indexOf(tr) + 1];

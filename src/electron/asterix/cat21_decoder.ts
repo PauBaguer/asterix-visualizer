@@ -68,6 +68,7 @@ export class Cat21 {
   ACAS_Resolution_Advisory_age: number;
   Surface_Capabilities_and_Characteristics_age: number;
   csv: string[];
+  Pic_accuracy: number;
 
   constructor(id: number) {
     this.id = id;
@@ -666,48 +667,63 @@ export class Cat21 {
     switch (bits.slice(24, 28).join("")) {
       case "0000":
         pic = "No integrity (or > 20.0 NM)";
+        this.Pic_accuracy = 0;
         break;
       case "0001":
         pic = "< 20.0 NM";
+        this.Pic_accuracy = 1;
         break;
       case "0010":
         pic = "< 10.0 NM";
+        this.Pic_accuracy = 2;
         break;
       case "0011":
         pic = "< 8.0 NM";
+        this.Pic_accuracy = 3;
         break;
       case "0100":
         pic = "< 4.0 NM";
+        this.Pic_accuracy = 4;
         break;
       case "0101":
         pic = "< 2.0 NM";
+        this.Pic_accuracy = 5;
         break;
       case "0110":
         pic = "< 1.0 NM";
+        this.Pic_accuracy = 6;
         break;
       case "0111":
         pic = "< 0.6 NM";
+        this.Pic_accuracy = 7;
         break;
       case "1000":
         pic = "< 0.5 NM";
+        this.Pic_accuracy = 8;
         break;
       case "1001":
         pic = "< 0.3 NM";
+        this.Pic_accuracy = 9;
         break;
       case "1010":
         pic = "< 0.2 NM";
+        this.Pic_accuracy = 10;
         break;
       case "1011":
         pic = "< 0.1 NM";
+        this.Pic_accuracy = 11;
         break;
       case "1100":
         pic = "< 0.04 NM";
+        this.Pic_accuracy = 12;
         break;
       case "1101":
         pic = "< 0.013 NM";
+        this.Pic_accuracy = 13;
         break;
       case "1110":
         pic = "< 0.004 NM";
+        this.Pic_accuracy = 14;
         break;
       case "1111":
         pic = "Not defined";
@@ -1274,7 +1290,7 @@ export class Cat21 {
         var add2 = bits.slice(8 * 7 + 4, 8 * 7 + 8).join("");
         this.mode_s_mb_data.push("BDS1: 0x" + add1 + " BDS2: 0x" + add2 + " MB Data: 0x" + data);
         start += 8;
-      } catch {}
+      } catch { }
     }
     this.csv[20] = this.mode_s_mb_data.join(" / ");
   }
@@ -1335,12 +1351,12 @@ export class Cat21 {
 
     var lw = "";
     switch (
-      BigInt("0x" + buffer.slice(1, 2).toString("hex"))
-        .toString(2)
-        .padStart(8, "0")
-        .split("")
-        .slice(4, 8)
-        .join("")
+    BigInt("0x" + buffer.slice(1, 2).toString("hex"))
+      .toString(2)
+      .padStart(8, "0")
+      .split("")
+      .slice(4, 8)
+      .join("")
     ) {
       case "0000":
         lw = "L < 15   W < 11.5";
@@ -1677,7 +1693,7 @@ interface SurfaceCapabilitiesAndCharacteristics {
   LW?: string;
 }
 
-interface WGS_84_coordinates {
+export interface WGS_84_coordinates {
   latitude: number;
   longitude: number;
 }
