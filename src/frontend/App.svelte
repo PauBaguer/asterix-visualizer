@@ -200,9 +200,9 @@
   // }
 
   async function handleLoadSomeMsgs() {
-    loading = true;
     messages = [];
     numberOfMsg = Number.parseInt(await initIpcMainBidirectional("file-picker"));
+    loading = true;
     console.log({ numberOfMsg });
     const FRAGMENTS = 10000;
     let i = 0;

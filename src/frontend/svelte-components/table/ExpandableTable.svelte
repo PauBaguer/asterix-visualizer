@@ -2,6 +2,13 @@
   #cont {
     padding-top: 10px;
   }
+  #filters {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: center;
+  }
 </style>
 
 <script lang="ts">
@@ -76,6 +83,35 @@
 </script>
 
 <div class="container" id="cont">
+  <div id="filters">
+    <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+      <input type="checkbox" class="btn-check" id="btnchecksmr" autocomplete="off" />
+      <label class="btn btn-outline-primary" for="btnchecksmr">SMR</label>
+
+      <input type="checkbox" class="btn-check" id="btncheckmlat" autocomplete="off" />
+      <label class="btn btn-outline-primary" for="btncheckmlat">MLAT</label>
+
+      <input type="checkbox" class="btn-check" id="btncheckadsb" autocomplete="off" />
+      <label class="btn btn-outline-primary" for="btncheckadsb">ADSB</label>
+    </div>
+    <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+      <input type="checkbox" class="btn-check" id="btncheck10" autocomplete="off" />
+      <label class="btn btn-outline-primary" for="btncheck10">Cat10</label>
+
+      <input type="checkbox" class="btn-check" id="btncheck21" autocomplete="off" />
+      <label class="btn btn-outline-primary" for="btncheck21">Cat21</label>
+    </div>
+    <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+      <input type="checkbox" class="btn-check" id="btnchecktr" autocomplete="off" />
+      <label class="btn btn-outline-primary" for="btnchecktr">Target Report</label>
+
+      <input type="checkbox" class="btn-check" id="btncheckmlatsouc" autocomplete="off" />
+      <label class="btn btn-outline-primary" for="btncheckmlatsouc">Start of Update Cycle</label>
+
+      <input type="checkbox" class="btn-check" id="btncheckpsm" autocomplete="off" />
+      <label class="btn btn-outline-primary" for="btncheckpsm">Periodic Status Message</label>
+    </div>
+  </div>
   {#if renderedMessges.length > 0}
     <div class="col-md-16">
       <div class="panel panel-default">
