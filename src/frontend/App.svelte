@@ -305,19 +305,33 @@
 
 <main>
   <div class="{visibleItem === 'MAP' ? 'main overflow' : 'main'}">
-    <ul class="nav nav-tabs">
-      <li class="nav-item" on:click="{handleMapClick}">
-        <a class="{visibleItem === 'MAP' ? 'nav-link active' : 'nav-link'}" href="#a">MAP</a>
-      </li>
-      <li class="nav-item" on:click="{handleMessageDecoderClick}">
-        <a class="{visibleItem === 'MESSAGE_DECODER' ? 'nav-link active' : 'nav-link'}" href="#a">Table view</a>
-      </li>
-      <li class="nav-item" on:click="{handleParametersResultsClick}">
-        <a class="{visibleItem === 'PARAMETERS_RESULTS' ? 'nav-link active' : 'nav-link'}" href="#a"
-          >ED-117 Parameters</a
-        >
-      </li>
-    </ul>
+    {#if messages.length > 0}
+      <ul class="nav nav-tabs">
+        <li class="nav-item" on:click="{handleMapClick}">
+          <a class="{visibleItem === 'MAP' ? 'nav-link active' : 'nav-link'}" href="#a">MAP</a>
+        </li>
+        <li class="nav-item" on:click="{handleMessageDecoderClick}">
+          <a class="{visibleItem === 'MESSAGE_DECODER' ? 'nav-link active' : 'nav-link'}" href="#a">Table view</a>
+        </li>
+        <li class="nav-item" on:click="{handleParametersResultsClick}">
+          <a class="{visibleItem === 'PARAMETERS_RESULTS' ? 'nav-link active' : 'nav-link'}" href="#a"
+            >ED-117 Parameters</a
+          >
+        </li>
+      </ul>
+    {:else}
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link active" href="#a">MAP</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#a">Table view</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#a">ED-117 Parameters</a>
+        </li>
+      </ul>
+    {/if}
     {#if visibleItem === "MAP"}
       {#if settings}
         <div class="ontop dark" id="settings" transition:fade="{{ duration: 100 }}">
