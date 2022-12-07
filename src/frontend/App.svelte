@@ -508,7 +508,7 @@
             on:click="{csv_file}"
             ><i class="bi bi-filetype-csv"></i>
           </button>
-          <button type="button" class="btn btn-primary me-3" on:click="{handleSettingsClick}"
+          <button type="button" class="btn btn-primary me-3" on:click="{settingsPannel}"
             ><i class="bi bi-gear"></i>
           </button>
           <button

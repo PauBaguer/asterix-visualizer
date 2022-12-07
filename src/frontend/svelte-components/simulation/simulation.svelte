@@ -22,9 +22,9 @@
   import {
     clearGraphicsLayer,
     deleteADSBmessage,
-    deleteMLATmessage,
     parseADSBmessage,
-    parseMLATmessage,
+    addPath,
+    shortenPath,
   } from "../../arcgis/graphicsLayer";
 
   let messages: (Cat10 | Cat21)[] = [];
@@ -33,6 +33,7 @@
   const dispatch = createEventDispatcher();
 
   let i = 0;
+  let j = 0;
   let slider = 0.1;
   let simStartTime = 0;
   let simTime = 0;
@@ -71,7 +72,7 @@
     return -1;
   }
 
-  function tickSimulation() {
+  async function tickSimulation() {
     if (simTime === simEndTime) return;
     if (simTime + tick * slider > simEndTime) {
       simTime = simEndTime;
@@ -85,15 +86,38 @@
         if (msg.message_type === "Target Report") {
           if (msg.data_source_identifier.SIC == "107") {
             createGraphicMLAT(msg);
-            parseMLATmessage(msg);
+            // parseMLATmessage(msg);
           } else if (msg.data_source_identifier.SIC === "7") createGraphicSMR(msg);
         }
       } else {
         //cat21
         const msg = messages[i] as Cat21;
         createGraphicADSB(msg);
-        // parseADSBmessage(msg);
+        parseADSBmessage(msg);
       }
+
+      const eraseTime = simTime - 1 * 60 * 1000; //min to sec to ms
+      if (eraseTime > simStartTime) {
+        while (getTime(messages[j]) * 1000 < eraseTime) {
+          if (messages[j].class === "Cat10") {
+            //cat10
+            const msg = messages[j] as Cat10;
+            if (msg.message_type === "Target Report") {
+              if (msg.data_source_identifier.SIC == "107") {
+                deleteGraphicMLAT(msg);
+                // parseMLATmessage(msg);
+              } else if (msg.data_source_identifier.SIC === "7") deleteGraphicSMR(msg);
+            }
+          } else {
+            //cat21
+            const msg = messages[j] as Cat21;
+            deleteGraphicADSB(msg);
+            shortenPath(msg);
+          }
+          j += 1;
+        }
+      }
+
       i += 1;
     }
   }
@@ -113,7 +137,7 @@
         if (msg.message_type === "Target Report") {
           if (msg.data_source_identifier.SIC == "107") {
             deleteGraphicMLAT(msg);
-            deleteMLATmessage(msg);
+            // deleteMLATmessage(msg);
           } else if (msg.data_source_identifier.SIC == "7") deleteGraphicSMR(msg);
         }
       } else {
@@ -122,6 +146,30 @@
         deleteGraphicADSB(msg);
         deleteADSBmessage(msg);
       }
+
+      const eraseTime = simTime - 1 * 60 * 1000; //min to sec to ms
+      if (eraseTime > simStartTime) {
+        while (getTime(messages[j]) * 1000 > eraseTime) {
+          if (messages[j].class === "Cat10") {
+            //cat10
+            const msg = messages[j] as Cat10;
+
+            if (msg.message_type === "Target Report") {
+              if (msg.data_source_identifier.SIC == "107") {
+                createGraphicMLAT(msg);
+                // parseMLATmessage(msg);
+              } else if (msg.data_source_identifier.SIC === "7") createGraphicSMR(msg);
+            }
+          } else {
+            //cat21
+            const msg = messages[j] as Cat21;
+            createGraphicADSB(msg);
+            addPath(msg);
+          }
+          j -= 1;
+        }
+      }
+
       i -= 1;
       if (i < 0) {
         i = 0;

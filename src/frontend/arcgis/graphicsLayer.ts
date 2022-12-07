@@ -70,10 +70,6 @@ export const planeMap: Map<string, Plane> = new Map();
 //   style: "circle",
 //   color: "#009900",
 // });
-const planeSymbol = new WebStyleSymbol({
-  name: "Airplane_Private",
-  styleName: "EsriRealisticTransportationStyle",
-});
 
 export function loadGraphicsLayer(map: ArcGISMap) {
   planesLayer = new GraphicsLayer({ elevationInfo: { mode: "relative-to-ground" } });
@@ -84,21 +80,21 @@ export function loadGraphicsLayer(map: ArcGISMap) {
 
 const mlatTI = [];
 
-export function parseMLATmessage(msg: Cat10) {
-  if (planeMap.has(msg.target_address)) {
-    planeMap.get(msg.target_address)?.mlat_msgs.push(msg);
-  } else {
-    console.log("Target address of MLAT not in planes.");
-    mlatTI.push(msg.target_identification);
-  }
-}
+// export function parseMLATmessage(msg: Cat10) {
+//   if (planeMap.has(msg.target_address)) {
+//     planeMap.get(msg.target_address)?.mlat_msgs.push(msg);
+//   } else {
+//     console.log("Target address of MLAT not in planes.");
+//     mlatTI.push(msg.target_identification);
+//   }
+// }
 
-export function deleteMLATmessage(msg: Cat10) {
-  if (planeMap.has(msg.target_address)) {
-    const l = planeMap.get(msg.target_address)?.mlat_msgs;
-    l?.splice(l.indexOf(msg));
-  }
-}
+// export function deleteMLATmessage(msg: Cat10) {
+//   if (planeMap.has(msg.target_address)) {
+//     const l = planeMap.get(msg.target_address)?.mlat_msgs;
+//     l?.splice(l.indexOf(msg));
+//   }
+// }
 
 export function parseADSBmessage(msg: Cat21) {
   if (planeMap.has(msg.target_address)) {
@@ -127,7 +123,7 @@ export function parseADSBmessage(msg: Cat21) {
       latitude: msg.wgs_84_coordinates.latitude,
       level,
       geometric_height,
-      mlat_msgs: [],
+      // mlat_msgs: [],
       adsb_msgs: [msg],
       target_identification: msg.target_identification,
       target_address: msg.target_address,
@@ -352,6 +348,42 @@ function deleteupdatePlane(msg: Cat21) {
   };
 }
 
+export function shortenPath(msg: Cat21) {
+  const plane = planeMap.get(msg.target_address)!;
+  plane.adsb_msgs.splice(0, 1);
+
+  if (plane && plane.pathGraphic) {
+    const poly = plane.pathGraphic?.geometry as Polyline;
+    poly.paths[0].splice(0, 1);
+
+    const newPath = new Polyline({ paths: poly.paths, hasZ: true });
+
+    plane.pathGraphic!.geometry = newPath;
+  }
+}
+
+export function addPath(msg: Cat21) {
+  const plane = planeMap.get(msg.target_address)!;
+  plane.adsb_msgs = [msg].concat(plane.adsb_msgs);
+
+  if (plane && plane.pathGraphic) {
+    let geometric_height = 0;
+
+    if (msg.geometric_height) {
+      geometric_height = parseFloat(msg.geometric_height.substring(0, msg.geometric_height.length - 3));
+    }
+
+    const poly = plane.pathGraphic?.geometry as Polyline;
+    const path = [[msg.wgs_84_coordinates.longitude, msg.wgs_84_coordinates.latitude, geometric_height]].concat(
+      poly.paths[0]
+    );
+
+    const newPath = new Polyline({ paths: [path], hasZ: true });
+
+    plane.pathGraphic!.geometry = newPath;
+  }
+}
+
 export function deletePlane(plane: Plane) {
   removePlane(plane);
   planeMap.delete(plane.target_address);
@@ -376,6 +408,7 @@ function calculateHeading(plane: Plane) {
   if (!plane.adsb_msgs[plane.adsb_msgs.length - 2]) return -1;
   const origin = plane.adsb_msgs[plane.adsb_msgs.length - 2].wgs_84_coordinates_high;
   const destination = plane.adsb_msgs[plane.adsb_msgs.length - 1].wgs_84_coordinates_high;
+  if (!(origin && destination)) return 0;
   return getRhumbLineBearing(
     { latitude: origin.latitude, longitude: origin.longitude },
     { latitude: destination.latitude, longitude: destination.longitude }

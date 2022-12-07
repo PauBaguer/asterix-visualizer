@@ -12,6 +12,6 @@ export interface Plane {
   graphic: Graphic | undefined;
   pathGraphic: Graphic | undefined;
   heading: number;
-  mlat_msgs: Cat10[];
+
   adsb_msgs: Cat21[];
 }
