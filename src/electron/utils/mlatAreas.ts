@@ -226,13 +226,13 @@ export function getAreaLayerPoint(lat: number, lon: number) {
 
   if (isPointInPolygon(point, standNW) || isPointInPolygon(point, standNE)) { return "StandT2"; }
 
+  const distance = getDistance(point, { latitude: 41.29706278, longitude: 2.078447222 }) / 1852;
+
   if (isPointInPolygon(point, airborne1) || isPointInPolygon(point, airborne2) || isPointInPolygon(point, airborne3) || isPointInPolygon(point, airborne4) || isPointInPolygon(point, airborne5) || isPointInPolygon(point, airborne6)) {
-    const distance = getDistance(point, { latitude: 41.29706278, longitude: 2.078447222 }) / 1852;
     if (distance < 2.5) { return "Airbone2.5"; }
-    if (distance <= 5) { return "Airbone5"; }
-    return "Airbone10";
   }
-  return "";
+  if (distance <= 5) { return "Airbone5"; }
+  return "Airbone10";
 }
 
 export function isPointInArea(lat: number, lon: number, areas: string[]) {
