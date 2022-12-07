@@ -234,3 +234,48 @@ export function getAreaLayerPoint(lat: number, lon: number) {
   }
   return "";
 }
+
+export function isPointInArea(lat: number, lon: number, areas: string[]) {
+  let point = { latitude: lat, longitude: lon };
+
+  let res = areas.findIndex((area) => {
+    switch (area) {
+      case "RWY": {
+        if (isPointInPolygon(point, rwy06R) || isPointInPolygon(point, rwy06L) || isPointInPolygon(point, rwy20)) {
+          return true;
+        }
+        break;
+      }
+      case "Taxi": {
+        if (isPointInPolygon(point, taxi)) {
+          return true;
+        }
+        break;
+      }
+      case "Apron": {
+        if (isPointInPolygon(point, apronWest) || isPointInPolygon(point, apronEast) || isPointInPolygon(point, apronTop)) {
+          return true;
+        }
+        break;
+      }
+      case "Stand": {
+        if (isPointInPolygon(point, standSW) || isPointInPolygon(point, standSE) || isPointInPolygon(point, standNW) || isPointInPolygon(point, standNE)) {
+          return true;
+        }
+        break;
+      }
+      case "Airbone": {
+        if (isPointInPolygon(point, airborne1) || isPointInPolygon(point, airborne2) || isPointInPolygon(point, airborne3) || isPointInPolygon(point, airborne4) || isPointInPolygon(point, airborne5) || isPointInPolygon(point, airborne6)) {
+          return true;
+        }
+        break;
+      }
+    }
+    return false;
+  });
+  if (res === -1) {
+    return false;
+  }
+  return true;
+
+}

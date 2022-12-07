@@ -156,6 +156,7 @@
   import { initIpcMainBidirectional, ipcMainBidirectional } from "./ipcMain/ipcMainCallers";
   import { parseIpcMainReceiveMessage } from "./ipcMain/ipcMainReceiveParser";
   import ExpandableTable from "./svelte-components/table/ExpandableTable.svelte";
+  import ParametersTable from "./svelte-components/parameters/parameters.svelte";
   import Simulation from "./svelte-components/simulation/simulation.svelte";
   import PlanesComponent from "./svelte-components/planesComponent.svelte";
   import { setSMRVisibility, setADSBVisibility, setMLATVisibility } from "./arcgis/groundLayer";
@@ -244,6 +245,10 @@
     visibleItem = "MESSAGE_DECODER";
   }
 
+  async function handleParametersResultsClick() {
+    visibleItem = "PARAMETERS_RESULTS";
+  }
+
   async function handleSettingsClick() {
     visibleItem = "SETTINGS";
   }
@@ -306,6 +311,11 @@
       </li>
       <li class="nav-item" on:click="{handleMessageDecoderClick}">
         <a class="{visibleItem === 'MESSAGE_DECODER' ? 'nav-link active' : 'nav-link'}" href="#a">Table view</a>
+      </li>
+      <li class="nav-item" on:click="{handleParametersResultsClick}">
+        <a class="{visibleItem === 'PARAMETERS_RESULTS' ? 'nav-link active' : 'nav-link'}" href="#a"
+          >ED-117 Parameters</a
+        >
       </li>
     </ul>
     {#if visibleItem === "MAP"}
@@ -530,6 +540,11 @@
     {#if visibleItem === "MESSAGE_DECODER"}
       <div>
         <ExpandableTable />
+      </div>
+    {/if}
+    {#if visibleItem === "PARAMETERS_RESULTS"}
+      <div>
+        <ParametersTable />
       </div>
     {/if}
   </div>

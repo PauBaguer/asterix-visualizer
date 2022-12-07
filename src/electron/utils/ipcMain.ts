@@ -3,7 +3,7 @@ import { Cat21, WGS_84_coordinates } from "../asterix/cat21_decoder";
 import { classifyMessages as decodeMessages, sliceMainBuffer } from "../asterix/message_cassifier";
 import { openFilePicker } from "./file_management";
 import { Worker } from "node:worker_threads";
-import { getAreaLayerPoint } from "./mlatAreas";
+import { getAreaLayerPoint, isPointInArea } from "./mlatAreas";
 import computeDestinationPoint from "geolib/es/computeDestinationPoint";
 import { getDistance } from "geolib";
 import { rmSync } from "node:fs";
@@ -67,22 +67,9 @@ export async function getMessagesIpcWorker(event: any, messageQuantity: number) 
   console.log(`Finished worker with result: ${result.length}`);
   decodedMsg = result;
 
-  let res = await probIdentification();
-  console.log("This is the performance " + res.RWY24L);
-  console.log("This is the performance " + res.RWY24R);
-  console.log("This is the performance " + res.RWY02);
-  console.log("This is the performance " + res.Airbone2);
-  console.log("This is the performance " + res.Airbone5);
-  console.log("This is the performance " + res.Airbone10);
-  console.log("This is the performance " + res.ApronT1);
-  console.log("This is the performance " + res.ApronT2);
-  console.log("This is the performance " + res.Taxi);
-  console.log("This is the performance " + res.StandT1);
-  console.log("This is the performance " + res.StandT2);
+  await probIdentification();
 
   await computeAccuracy();
-  console.log(accuracy);
-
 
   return [];
 }
@@ -200,17 +187,17 @@ export function probIdentification() {
     }
   });
   prob_identification = {
-    RWY24L: rwy24l / (rwy24l + rwy24l_f),
-    RWY24R: rwy24r / (rwy24r + rwy24r_f),
-    RWY02: rwy2 / (rwy2 + rwy2_f),
-    Taxi: taxi / (taxi + taxi_f),
-    ApronT1: apronT1 / (apronT1 + apronT1_f),
-    ApronT2: apronT2 / (apronT2 + apronT2_f),
-    StandT1: standT1 / (standT1 + standT1_f),
-    StandT2: standT2 / (standT2 + standT2_f),
-    Airbone2: airbone2 / (airbone2 + airbone2_f),
-    Airbone5: airbone5 / (airbone5 + airbone5_f),
-    Airbone10: airbone10 / (airbone10 + airbone10_f),
+    RWY24L: rwy24l_f / (rwy24l + rwy24l_f),
+    RWY24R: rwy24r_f / (rwy24r + rwy24r_f),
+    RWY02: rwy2_f / (rwy2 + rwy2_f),
+    Taxi: taxi_f / (taxi + taxi_f),
+    ApronT1: apronT1_f / (apronT1 + apronT1_f),
+    ApronT2: apronT2_f / (apronT2 + apronT2_f),
+    StandT1: standT1_f / (standT1 + standT1_f),
+    StandT2: standT2_f / (standT2 + standT2_f),
+    Airbone2: airbone2_f / (airbone2 + airbone2_f),
+    Airbone5: airbone5_f / (airbone5 + airbone5_f),
+    Airbone10: airbone10_f / (airbone10 + airbone10_f),
   };
   return prob_identification;
 }
@@ -485,11 +472,55 @@ export function computeAccuracy() {
   return accuracy;
 }
 
+export function parametersResults() {
+  return JSON.stringify({
+    probIden: prob_identification,
+    accuracy_res: accuracy,
+  });
+}
+
 export function tableProtocol(event: any, { page, filter, search }: { page: number; filter: any; search: string }) {
   const MSG_PER_PAGE = 15;
+  filter = { Category: ["Cat10"], Instrument: ["MLAT"], Area: ["RWY"] }
+  const computeArea = (filter.Area.length === 0 || filter.Area.length === 5);
+
+  const msgfilter = decodedMsg.filter((msg) => {
+    if (filter.Category.includes(msg.class) && filter.Instrument.includes(msg.instrument)) {
+      if (!computeArea) {
+        switch (msg.class) {
+          case "Cat10": {
+            if (msg.cartesian_coordinates !== undefined) {
+              const target_pos = computeDestinationPoint(
+                { latitude: 41.29706278, longitude: 2.078447222 },
+                Math.sqrt(Math.pow(msg.cartesian_coordinates.x, 2) + Math.pow(msg.cartesian_coordinates.y, 2)),
+                (Math.atan2(msg.cartesian_coordinates.x, msg.cartesian_coordinates.y) * 180) / Math.PI
+              );
+              return isPointInArea(target_pos.latitude, target_pos.longitude, filter.Area);
+            }
+            break;
+          }
+          case "Cat21": {
+            if (msg.wgs_84_coordinates !== undefined) {
+              return isPointInArea(msg.wgs_84_coordinates.latitude, msg.wgs_84_coordinates.longitude, filter.Area);
+            }
+            break;
+          }
+        }
+      }
+      return true;
+    }
+    return false;
+  });
+
 
   return JSON.stringify({
-    messages: decodedMsg.slice(page * MSG_PER_PAGE - MSG_PER_PAGE, page * MSG_PER_PAGE),
-    totalMessages: decodedMsg.length,
+    messages: msgfilter.slice(page * MSG_PER_PAGE - MSG_PER_PAGE, page * MSG_PER_PAGE),
+    totalMessages: msgfilter.length,
   });
+}
+
+interface Filter {
+  Category: string[];
+  Instrument: string[];
+  Area: string[];
 }
