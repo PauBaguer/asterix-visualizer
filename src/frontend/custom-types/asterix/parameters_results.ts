@@ -1,15 +1,20 @@
 export interface ProbIdentification {
-    RWY24L: number;
-    RWY24R: number;
-    RWY02: number;
-    Taxi: number;
-    ApronT1: number;
-    ApronT2: number;
-    StandT1: number;
-    StandT2: number;
-    Airbone2: number;
-    Airbone5: number;
-    Airbone10: number;
+    RWY24L: Counter;
+    RWY24R: Counter;
+    RWY02: Counter;
+    Taxi: Counter;
+    ApronT1: Counter;
+    ApronT2: Counter;
+    StandT1: Counter;
+    StandT2: Counter;
+    Airbone2: Counter;
+    Airbone5: Counter;
+    Airbone10: Counter;
+}
+
+interface Counter {
+    Correct: number;
+    False: number;
 }
 
 export interface AccuracyResults {
@@ -58,5 +63,23 @@ export interface AccuracyResults {
     StandT2_max: number;
     StandT2_average: number;
     StandT2_std: number;
+
+    Maneouvering_95max: number;
+    Maneouvering_99max: number;
+    Maneouvering_average: number;
+    Maneouvering_std: number;
+
+    Apron_95max: number;
+    Apron_99max: number;
+    Apron_average: number;
+    Apron_std: number;
+
+    Stand_max: number;
+    Stand_average: number;
+    Stand_std: number;
+
+    Airbone_95max: number;
+    Airbone_average: number;
+    Airbone_std: number;
 
 }
