@@ -37,6 +37,7 @@ let notification: Notification | null;
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
+    autoHideMenuBar: true,
     width: 1400,
     height: 1000,
     icon: "assets/asterix_color.png",

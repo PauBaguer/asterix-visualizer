@@ -1,21 +1,19 @@
 {
-  "name": "electron-svelte-typescript",
-  "description": "Template for desktop apps written with Electron, Svelte and Typescript.",
+  "name": "asterix-message-decoder",
+  "description": "Message decoder and data visualizer for Asterix files.",
   "version": "0.1.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fuzzc0re/electron-svelte-typescript.git"
+    "url": "git+https://github.com/PauBaguer/asterix-visualizer.git"
   },
   "author": {
-    "name": "fuzzc0re",
-    "email": "fuzzc0re@protonmail.com",
-    "url": "https://github.com/fuzzc0re"
+    "name": "PauBaguer",
+    "email": "pau.baguer@upc.edu"
   },
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/fuzzc0re/electron-svelte-typescript/issues"
-  },
   "keywords": [
+    "asterix",
+    "arcgis",
     "electron",
     "svelte",
     "typescript",
@@ -27,7 +25,7 @@
     "electron-updater",
     "rollup"
   ],
-  "homepage": "https://github.com/fuzzc0re/electron-svelte-typescript#readme",
+  "homepage": "https://github.com/PauBaguer/asterix-visualizer",
   "main": "build/index.js",
   "scripts": {
     "prestart": "cross-env NODE_ENV=development NODE_OPTIONS='--max-old-space-size=8192' node scripts/preBuild.js",
@@ -109,13 +107,21 @@
     "typescript": "^4.3.4"
   },
   "build": {
-    "productName": "Electron Svelte Typescript",
-    "appId": "electron.svelte.typescript",
+    "productName": "ASTERIX Message Decoder",
+    "appId": "org.upc.alumni",
     "copyright": "Copyright © 2021 ${author}",
     "win": {
+      "icon": "./assets/icon.png",
       "target": [
         "nsis"
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "./assets/icon.ico",
+      "uninstallerIcon": "./assets/icon.ico",
+      "installerHeaderIcon": "./assets/icon.ico"
     },
     "mac": {
       "target": [
@@ -140,13 +146,10 @@
       {
         "from": "./assets",
         "to": "assets"
-      }
-    ],
-    "publish": [
+      },
       {
-        "provider": "github",
-        "owner": "fuzzc0re",
-        "repo": "electron-svelte-typescript"
+        "from": "./assets",
+        "to": "build"
       }
     ]
   }

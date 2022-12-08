@@ -25,6 +25,8 @@
     parseADSBmessage,
     addPath,
     shortenPath,
+    clearSeeAll,
+    seeAll,
   } from "../../arcgis/graphicsLayer";
 
   let messages: (Cat10 | Cat21)[] = [];
@@ -96,7 +98,7 @@
         parseADSBmessage(msg);
       }
 
-      const eraseTime = simTime - 1 * 60 * 1000; //min to sec to ms
+      const eraseTime = simTime - 10 * 60 * 1000; //min to sec to ms
       if (eraseTime > simStartTime) {
         while (getTime(messages[j]) * 1000 < eraseTime) {
           if (messages[j].class === "Cat10") {
@@ -147,7 +149,7 @@
         deleteADSBmessage(msg);
       }
 
-      const eraseTime = simTime - 1 * 60 * 1000; //min to sec to ms
+      const eraseTime = simTime - 10 * 60 * 1000; //min to sec to ms
       if (eraseTime > simStartTime) {
         while (getTime(messages[j]) * 1000 > eraseTime) {
           if (messages[j].class === "Cat10") {
@@ -181,6 +183,10 @@
   export function playClick() {
     play = !play;
     dispatch("switchplay");
+    if (seeAllBool) {
+      seeAllBool = false;
+      clearSeeAll();
+    }
     if (play) timer = window.setInterval(tickSimulation, 200);
     else clearInterval(timer);
   }
@@ -206,6 +212,22 @@
   export function backwardsTick() {
     stop();
     tickBackSimulation();
+  }
+  let seeAllBool = false;
+  export function seeAllPlanes() {
+    if (seeAllBool) {
+      seeAllBool = false;
+      clearSeeAll();
+    } else {
+      if (play) {
+        play = false;
+
+        dispatch("switchplay");
+        clearInterval(timer);
+      }
+      seeAllBool = true;
+      seeAll();
+    }
   }
 
   function getDateCat10(m: Cat10) {

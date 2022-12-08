@@ -41,10 +41,12 @@ function initMap() {
   });
 }
 
-export function flyTo(p: Point) {
+export async function flyTo(p: Point) {
   const newP = new Point();
+  const ground = await view.map.ground.queryElevation(p);
+  const groundgeom = ground.geometry as Point;
 
-  newP.z = p.z + 300;
+  newP.z = p.z + 300 + groundgeom.z;
   newP.y = p.y - 0.004;
   newP.x = p.x;
 

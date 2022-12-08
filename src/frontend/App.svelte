@@ -203,9 +203,10 @@
   // }
 
   async function handleLoadSomeMsgs() {
+    numberOfMsg = Number.parseInt(await initIpcMainBidirectional("file-picker"));
+    if (!numberOfMsg) return;
     performanceData = false;
     messages = [];
-    numberOfMsg = Number.parseInt(await initIpcMainBidirectional("file-picker"));
     loading = true;
     console.log({ numberOfMsg });
     const FRAGMENTS = 10000;
@@ -240,6 +241,7 @@
 
   async function handleMapClick() {
     visibleItem = "MAP";
+
     initializeMap();
     if (messages.length > 0) {
       setTimeout(() => {
@@ -249,10 +251,12 @@
   }
 
   async function handleMessageDecoderClick() {
+    if (visibleItem === "MAP") simulationComponent.restartSim();
     visibleItem = "MESSAGE_DECODER";
   }
 
   async function handleParametersResultsClick() {
+    if (visibleItem === "MAP") simulationComponent.restartSim();
     visibleItem = "PARAMETERS_RESULTS";
   }
 
@@ -512,7 +516,12 @@
             on:click="{simulationComponent.restartSim}"
             ><i class="bi bi-arrow-counterclockwise"></i>
           </button>
-
+          <button
+            type="button"
+            class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
+            on:click="{simulationComponent.seeAllPlanes}"
+            ><i class="bi bi-airplane"></i>
+          </button>
           <button
             type="button"
             class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"

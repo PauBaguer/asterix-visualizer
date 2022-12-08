@@ -3,6 +3,7 @@ import { Cat21 } from "../asterix/cat21_decoder";
 import { classifyMessages as decodeMessages, sliceMainBuffer } from "../asterix/message_cassifier";
 import { openFilePicker, saveFileCsv, saveFileKml } from "./file_management";
 import { Worker } from "node:worker_threads";
+import { Notification } from "electron";
 const JsonSearch = require("search-array").default;
 
 let buffer: Buffer | undefined;
@@ -12,13 +13,17 @@ let msgDelivered = 0;
 let performanceData: any;
 
 export async function loadFileIpc() {
+  //const startTime = performance.now();
+  const res = await openFilePicker();
+  if (!res) return;
+
+  buffer = res;
+  // const endTime = performance.now();
+
+  // console.log(`Call to openFilePicker took ${endTime - startTime} milliseconds`);
   messages = [];
   decodedMsg = [];
   msgDelivered = 0;
-  //const startTime = performance.now();
-  buffer = await openFilePicker();
-  // const endTime = performance.now();
-  // console.log(`Call to openFilePicker took ${endTime - startTime} milliseconds`);
 
   if (!buffer) {
     console.log("No file opened");
@@ -71,12 +76,14 @@ export async function writeCsvFile() {
   if (!picker.filePath) return;
   await runWorkercsv({ messagesLength: decodedMsg.length, filePath: picker.filePath });
   console.log(`${picker.filePath} written`);
+  new Notification({ title: "ASTERIX Message Decoder", body: "CSV file successfully written" }).show();
 }
 
 export async function writeKmlFile() {
   const picker = await saveFileKml();
   if (!picker.filePath) return;
   await runWorkerkml({ messagesLength: decodedMsg.length, filePath: picker.filePath });
+  new Notification({ title: "ASTERIX Message Decoder", body: "KML file successfully written" }).show();
   console.log(`${picker.filePath} written`);
 }
 
@@ -87,7 +94,6 @@ function runWorker(workerData: any) {
     let result: (Cat10 | Cat21)[] = [];
     worker.on("message", (val: any) => {
       result = result.concat(val);
-      console.log(result.length);
     });
     worker.on("error", reject);
     worker.on("exit", (code) => {

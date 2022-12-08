@@ -18,6 +18,12 @@ import { flyTo } from "./map";
 
 let planesLayer: GraphicsLayer;
 let pathsLayer: GraphicsLayer;
+let selectedPlane: string | null = null;
+
+const pathsymbol = new SimpleLineSymbol({
+  color: [0, 0, 0, 1],
+  width: 4,
+});
 
 const elem = document.querySelector("body")!;
 
@@ -78,8 +84,6 @@ export function loadGraphicsLayer(map: ArcGISMap) {
   map.add(pathsLayer);
 }
 
-const mlatTI = [];
-
 // export function parseMLATmessage(msg: Cat10) {
 //   if (planeMap.has(msg.target_address)) {
 //     planeMap.get(msg.target_address)?.mlat_msgs.push(msg);
@@ -98,7 +102,11 @@ const mlatTI = [];
 
 export function parseADSBmessage(msg: Cat21) {
   if (planeMap.has(msg.target_address)) {
-    updatePlane(msg);
+    planeMap.get(msg.target_address)?.adsb_msgs.push(msg);
+    if (msg.target_address === selectedPlane) {
+      updatePlane(msg);
+    }
+    //updatePath(msg);
   } else {
     const newPlaneEvent = new CustomEvent("new-plane", { detail: msg });
     elem.dispatchEvent(newPlaneEvent);
@@ -106,21 +114,21 @@ export function parseADSBmessage(msg: Cat21) {
     let geometric_height = 0;
     let level = 0;
     let heading = 0;
-    if (msg.geometric_height) {
-      geometric_height = parseFloat(msg.geometric_height.substring(0, msg.geometric_height.length - 3));
-    }
-    if (msg.flight_level) {
-      level = parseFloat(msg.flight_level.substring(2));
-    }
-    if (msg.airborne_ground_vector) {
-      heading = parseFloat(
-        msg.airborne_ground_vector.TrackAngle.substring(0, msg.airborne_ground_vector.TrackAngle.length - 4)
-      );
-    }
+    // if (msg.geometric_height) {
+    //   geometric_height = parseFloat(msg.geometric_height.substring(0, msg.geometric_height.length - 3));
+    // }
+    // if (msg.flight_level) {
+    //   level = parseFloat(msg.flight_level.substring(2));
+    // }
+    // if (msg.airborne_ground_vector) {
+    //   heading = parseFloat(
+    //     msg.airborne_ground_vector.TrackAngle.substring(0, msg.airborne_ground_vector.TrackAngle.length - 4)
+    //   );
+    // }
 
     const newPlane: Plane = {
-      longitude: msg.wgs_84_coordinates.longitude,
-      latitude: msg.wgs_84_coordinates.latitude,
+      longitude: 0,
+      latitude: 0,
       level,
       geometric_height,
       // mlat_msgs: [],
@@ -134,7 +142,7 @@ export function parseADSBmessage(msg: Cat21) {
 
     planeMap.set(newPlane.target_address, newPlane);
 
-    createPlane(newPlane.target_address);
+    //    createPlane(newPlane.target_address);
   }
 }
 
@@ -145,15 +153,45 @@ export function deleteADSBmessage(msg: Cat21) {
     if (l.length == 0) {
       const newPlaneEvent = new CustomEvent("del-plane", { detail: msg });
       elem.dispatchEvent(newPlaneEvent);
-      removePlane(planeMap.get(msg.target_address)!);
+      deletePlane(planeMap.get(msg.target_address)!);
       return;
     }
-    deleteupdatePlane(l[l.length - 1]);
+    if (selectedPlane === msg.target_address) {
+      deleteupdatePlane(l[l.length - 1]);
+    }
   }
 }
 
 function createPlane(target_address: string) {
   const plane = planeMap.get(target_address)!;
+  const msg = plane.adsb_msgs[plane.adsb_msgs.length - 1];
+  if (!msg) return;
+  if (!msg.wgs_84_coordinates) return;
+
+  let geometric_height = 0;
+  let level = 0;
+  let heading = 0;
+  if (msg.geometric_height) {
+    geometric_height = parseFloat(msg.geometric_height.substring(0, msg.geometric_height.length - 3));
+  }
+  if (msg.flight_level) {
+    level = parseFloat(msg.flight_level.substring(2));
+  }
+  if (msg.airborne_ground_vector) {
+    heading = parseFloat(
+      msg.airborne_ground_vector.TrackAngle.substring(0, msg.airborne_ground_vector.TrackAngle.length - 4)
+    );
+  } else {
+    const h = calculateHeading(plane);
+    heading = h == -1 ? plane.heading : h;
+  }
+
+  plane.latitude = msg.wgs_84_coordinates.latitude;
+  plane.longitude = msg.wgs_84_coordinates.longitude;
+  plane.geometric_height = geometric_height;
+  plane.level = level;
+  plane.heading = heading;
+
   const newPoint = new Point({
     spatialReference: SpatialReference.WGS84,
     latitude: plane.latitude,
@@ -189,14 +227,24 @@ function createPlane(target_address: string) {
     },
   });
 
-  const newPath = new Polyline({ paths: [[[newPoint.x, newPoint.y, newPoint.z]]], hasZ: true });
+  const paths: number[][][] = [[[]]];
+
+  plane.adsb_msgs.forEach((v) => {
+    if (!v.wgs_84_coordinates) return;
+    let geometric_height = 0;
+    if (v.geometric_height) {
+      geometric_height = parseFloat(v.geometric_height.substring(0, v.geometric_height.length - 3));
+    }
+
+    paths[0].push([v.wgs_84_coordinates.longitude, v.wgs_84_coordinates.latitude, geometric_height * 0.3048]);
+  });
+  paths[0].shift();
+
+  const newPath = new Polyline({ paths, hasZ: true });
 
   const newPathGraphic = new Graphic({
     geometry: newPath,
-    symbol: new SimpleLineSymbol({
-      color: [0, 0, 0, 1],
-      width: 4,
-    }),
+    symbol: pathsymbol,
   });
 
   plane.graphic = newGraphic;
@@ -207,7 +255,6 @@ function createPlane(target_address: string) {
 
 function updatePlane(msg: Cat21) {
   const plane = planeMap.get(msg.target_address)!;
-  plane.adsb_msgs.push(msg);
 
   if (!msg.wgs_84_coordinates) return;
   let geometric_height = 0;
@@ -275,6 +322,41 @@ function updatePlane(msg: Cat21) {
     height: `${plane.geometric_height} ft`,
     heading: `${plane.heading}º`,
   };
+}
+
+function updatePath(msg: Cat21) {
+  const plane = planeMap.get(msg.target_address)!;
+
+  if (!msg.wgs_84_coordinates) return;
+  let geometric_height = 0;
+  if (msg.geometric_height) {
+    geometric_height = parseFloat(msg.geometric_height.substring(0, msg.geometric_height.length - 3));
+  }
+
+  const newPoint = new Point({
+    spatialReference: SpatialReference.WGS84,
+    latitude: msg.wgs_84_coordinates.latitude,
+    longitude: msg.wgs_84_coordinates.longitude,
+    hasZ: true,
+    z: geometric_height * 0.3048,
+  });
+
+  if (!plane.pathGraphic) {
+    const newPath = new Polyline({ paths: [[]], hasZ: true });
+    const newPathGraphic = new Graphic({
+      geometry: newPath,
+      symbol: pathsymbol,
+    });
+    plane.pathGraphic = newPathGraphic;
+    pathsLayer.add(plane.pathGraphic);
+  }
+
+  const poly = plane.pathGraphic?.geometry as Polyline;
+  poly.paths[0].push([newPoint.x, newPoint.y, newPoint.z]);
+
+  const newPath = new Polyline({ paths: poly.paths, hasZ: true });
+
+  plane.pathGraphic!.geometry = newPath;
 }
 
 function deleteupdatePlane(msg: Cat21) {
@@ -351,22 +433,22 @@ function deleteupdatePlane(msg: Cat21) {
 export function shortenPath(msg: Cat21) {
   const plane = planeMap.get(msg.target_address)!;
 
-  if (plane && plane.pathGraphic) {
-    plane.adsb_msgs.shift();
+  if (!plane) return;
+  plane.adsb_msgs.shift();
+  if (selectedPlane === msg.target_address) {
     const poly = plane.pathGraphic?.geometry as Polyline;
     poly.paths[0].splice(0, 1);
-
     const newPath = new Polyline({ paths: poly.paths, hasZ: true });
-
     plane.pathGraphic!.geometry = newPath;
   }
 }
 
 export function addPath(msg: Cat21) {
   const plane = planeMap.get(msg.target_address)!;
+  if (!plane) return;
   plane.adsb_msgs = [msg].concat(plane.adsb_msgs);
 
-  if (plane && plane.pathGraphic) {
+  if (selectedPlane === msg.target_address) {
     let geometric_height = 0;
 
     if (msg.geometric_height) {
@@ -385,6 +467,7 @@ export function addPath(msg: Cat21) {
 }
 
 export function deletePlane(plane: Plane) {
+  if (selectedPlane === plane.target_address) selectedPlane = null;
   removePlane(plane);
   planeMap.delete(plane.target_address);
 }
@@ -396,12 +479,11 @@ export function deletePlane(plane: Plane) {
 //   } else createPlane(plane);
 // }
 
-export function removePlane(plane: Plane) {
+function removePlane(plane: Plane) {
   if (planeMap.has(plane.target_address)) {
     planesLayer.remove(plane.graphic!);
     pathsLayer.remove(plane.pathGraphic!);
   }
-  planeMap.delete(plane.target_address);
 }
 
 function calculateHeading(plane: Plane) {
@@ -433,7 +515,53 @@ export function setPathsLayerVisibility(b: boolean) {
 
 export function flyToPlane(target_address: string) {
   if (planeMap.has(target_address)) {
-    const gr = planeMap.get(target_address)!.graphic!;
-    flyTo(gr.geometry as Point);
+    const msgs = planeMap.get(target_address)!.adsb_msgs!;
+    const msg = msgs[msgs.length - 1];
+    let geometric_height = 0;
+
+    if (msg.geometric_height) {
+      geometric_height = parseFloat(msg.geometric_height.substring(0, msg.geometric_height.length - 3));
+      flyTo(
+        new Point({
+          latitude: msg.wgs_84_coordinates.latitude,
+          longitude: msg.wgs_84_coordinates.longitude,
+          z: geometric_height * 0.3048,
+        })
+      );
+    }
   }
+}
+
+export function selectPlane(target_address: string) {
+  if (selectedPlane) {
+    if (planeMap.has(selectedPlane)) {
+      removePlane(planeMap.get(selectedPlane)!);
+    }
+  }
+
+  selectedPlane = target_address;
+  createPlane(target_address);
+}
+
+export function unselectPlane() {
+  if (selectedPlane) {
+    if (planeMap.has(selectedPlane)) {
+      removePlane(planeMap.get(selectedPlane)!);
+    }
+  }
+  selectedPlane = null;
+}
+
+export function seeAll() {
+  const newPlaneEvent = new CustomEvent("unsel");
+  elem.dispatchEvent(newPlaneEvent);
+  unselectPlane();
+  planeMap.forEach((v, k) => {
+    createPlane(k);
+  });
+}
+
+export function clearSeeAll() {
+  planesLayer.removeAll();
+  pathsLayer.removeAll();
 }
