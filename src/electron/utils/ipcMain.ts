@@ -52,10 +52,11 @@ export async function getMessagesIpcWorker(event: any, messageQuantity: number) 
   console.log(`Call to decodeMessages took ${endTime - startTime} milliseconds`);
   console.log(`Finished worker with result: ${result.length}`);
   decodedMsg = result;
-
-  performanceData = await runWorker2({ decodedMsg });
-
   return [];
+}
+
+export async function computeParametersIpcWorker() {
+  performanceData = await runWorker2({ decodedMsg });
 }
 
 function runWorker(workerData: any) {

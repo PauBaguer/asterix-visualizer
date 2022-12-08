@@ -209,7 +209,7 @@
     let i = 0;
 
     await ipcMainBidirectional("get-message-quantity", 10000);
-
+    ipcMainBidirectional("compute-parameters");
     while (i < numberOfMsg) {
       const msgs = await ipcMainBidirectional("pass-slice");
 

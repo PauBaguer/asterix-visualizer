@@ -13,7 +13,7 @@ export interface ProbIdentification {
 }
 
 interface Counter {
-    Correct: number;
+    Total: number;
     False: number;
 }
 
@@ -77,9 +77,5 @@ export interface AccuracyResults {
     Stand_max: number;
     Stand_average: number;
     Stand_std: number;
-
-    Airbone_95max: number;
-    Airbone_average: number;
-    Airbone_std: number;
 
 }

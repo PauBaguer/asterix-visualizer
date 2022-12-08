@@ -21,6 +21,7 @@ import {
   loadFileIpc,
   getMessagesIpcSlices,
   tableProtocol,
+  computeParametersIpcWorker,
   parametersResults,
 } from "./utils/ipcMain";
 import { fromTwosComplement } from "./asterix/cat21_decoder";
@@ -73,6 +74,7 @@ const createWindow = () => {
   ipcMain.handle("get-message-quantity", getMessagesIpcWorker);
   ipcMain.handle("pass-slice", getMessagesIpcSlices);
   ipcMain.handle("table-protocol", tableProtocol);
+  ipcMain.handle("compute-parameters", computeParametersIpcWorker);
   ipcMain.handle("parameters-results", parametersResults);
 
 };

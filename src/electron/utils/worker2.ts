@@ -32,35 +32,42 @@ export function probIdentification() {
             let res = hash.get(ta);
             if (res !== undefined) {
                 if (res?.target_identification === msg.target_identification.target_identification) {
-                    switch (zone) {
-                        case "RWY24L": rwy24l++; break
-                        case "RWY24R": rwy24r++; break
-                        case "RWY02": rwy2++; break
-                        case "ApronT1": apronT1++; break
-                        case "ApronT2": apronT2++; break
-                        case "Taxi": taxi++; break
-                        case "StandT1": standT1++; break
-                        case "StandT2": standT2++; break
-                        case "Airbone2.5": airbone2++; break
-                        case "Airbone5": airbone5++; break
-                        case "Airbone10": airbone10++; break
+                    while (msg.time_of_day >= res.time + sec) {
+                        switch (zone) {
+                            case "RWY24L": rwy24l++; break
+                            case "RWY24R": rwy24r++; break
+                            case "RWY02": rwy2++; break
+                            case "ApronT1": apronT1++; break
+                            case "ApronT2": apronT2++; break
+                            case "Taxi": taxi++; break
+                            case "StandT1": standT1++; break
+                            case "StandT2": standT2++; break
+                            case "Airbone2.5": airbone2++; break
+                            case "Airbone5": airbone5++; break
+                            case "Airbone10": airbone10++; break
+                        }
+                        res.time += sec;
                     }
-                    res.time = msg.time_of_day;
                     hash.set(ta, res);
+
                 } else {
                     if (res?.time + sec > msg.time_of_day) {
-                        switch (zone) {
-                            case "RWY24L": rwy24l_f++; break
-                            case "RWY24R": rwy24r_f++; break
-                            case "RWY02": rwy2_f++; break
-                            case "ApronT1": apronT1_f++; break
-                            case "ApronT2": apronT2_f++; break
-                            case "Taxi": taxi_f++; break
-                            case "StandT1": standT1_f++; break
-                            case "StandT2": standT2_f++; break
-                            case "Airbone2.5": airbone2_f++; break
-                            case "Airbone5": airbone5_f++; break
-                            case "Airbone10": airbone10_f++; break
+                        if (!res.false_detection) {
+                            switch (zone) {
+                                case "RWY24L": rwy24l_f++; break
+                                case "RWY24R": rwy24r_f++; break
+                                case "RWY02": rwy2_f++; break
+                                case "ApronT1": apronT1_f++; break
+                                case "ApronT2": apronT2_f++; break
+                                case "Taxi": taxi_f++; break
+                                case "StandT1": standT1_f++; break
+                                case "StandT2": standT2_f++; break
+                                case "Airbone2.5": airbone2_f++; break
+                                case "Airbone5": airbone5_f++; break
+                                case "Airbone10": airbone10_f++; break
+                            }
+                            res.false_detection = true;
+                            hash.set(ta, res);
                         }
                     } else {
                         switch (zone) {
@@ -76,12 +83,12 @@ export function probIdentification() {
                             case "Airbone5": airbone5++; break
                             case "Airbone10": airbone10++; break
                         }
-                        hash.set(ta, { target_identification: msg.target_identification.target_identification, time: msg.time_of_day });
+                        hash.set(ta, { target_identification: msg.target_identification.target_identification, time: msg.time_of_day, false_detection: false });
                     }
                 }
 
             } else {
-                hash.set(ta, { target_identification: msg.target_identification.target_identification, time: msg.time_of_day })
+                hash.set(ta, { target_identification: msg.target_identification.target_identification, time: msg.time_of_day, false_detection: false })
                 switch (zone) {
                     case "RWY24L": rwy24l++; break
                     case "RWY24R": rwy24r++; break
@@ -101,17 +108,17 @@ export function probIdentification() {
     });
 
     let prob_identification = {
-        RWY24L: { Correct: rwy24l, False: rwy24l_f },
-        RWY24R: { Correct: rwy24r, False: rwy24r_f },
-        RWY02: { Correct: rwy2, False: rwy2_f },
-        Taxi: { Correct: taxi, False: taxi_f },
-        ApronT1: { Correct: apronT1, False: apronT1_f },
-        ApronT2: { Correct: apronT2, False: apronT2_f },
-        StandT1: { Correct: standT1, False: standT1_f },
-        StandT2: { Correct: standT2, False: standT2_f },
-        Airbone2: { Correct: airbone2, False: airbone2_f },
-        Airbone5: { Correct: airbone5, False: airbone5_f },
-        Airbone10: { Correct: airbone10, False: airbone10_f },
+        RWY24L: { Total: rwy24l, False: rwy24l_f },
+        RWY24R: { Total: rwy24r, False: rwy24r_f },
+        RWY02: { Total: rwy2, False: rwy2_f },
+        Taxi: { Total: taxi, False: taxi_f },
+        ApronT1: { Total: apronT1, False: apronT1_f },
+        ApronT2: { Total: apronT2, False: apronT2_f },
+        StandT1: { Total: standT1, False: standT1_f },
+        StandT2: { Total: standT2, False: standT2_f },
+        Airbone2: { Total: airbone2, False: airbone2_f },
+        Airbone5: { Total: airbone5, False: airbone5_f },
+        Airbone10: { Total: airbone10, False: airbone10_f },
     };
     return prob_identification;
 }
@@ -119,6 +126,7 @@ export function probIdentification() {
 export interface HashObject {
     target_identification: String,
     time: number,
+    false_detection: boolean,
 }
 
 export interface ProbIdentification {
@@ -136,7 +144,7 @@ export interface ProbIdentification {
 }
 
 interface Counter {
-    Correct: number;
+    Total: number;
     False: number;
 }
 
@@ -200,10 +208,6 @@ export interface AccuracyResults {
     Stand_max: number;
     Stand_average: number;
     Stand_std: number;
-
-    Airbone_95max: number;
-    Airbone_average: number;
-    Airbone_std: number;
 
 }
 
@@ -372,11 +376,6 @@ export function computeAccuracy() {
     const apron_average = apron.reduce((partialSum, a) => partialSum + a, 0) / apron.length;
     const apron_std = Math.sqrt(apron.reduce((partialSum, a) => partialSum + Math.pow(a - apron_average, 2), 0) / apron.length);
 
-    const airbone = airbone2.concat(airbone5, airbone10);
-    const airbone_95 = airbone.sort(function (a, b) { return b - a }).slice(Math.round(airbone.length * 0.05))[0]
-    const airbone_average = airbone.reduce((partialSum, a) => partialSum + a, 0) / airbone.length;
-    const airbone_std = Math.sqrt(airbone.reduce((partialSum, a) => partialSum + Math.pow(a - airbone_average, 2), 0) / airbone.length);
-
     const stand = standT1.concat(standT2);
     const stand_max = stand.sort(function (a, b) { return b - a }).slice(Math.round(stand.length * 0.05))[0]
     const stand_average = stand.reduce((partialSum, a) => partialSum + a, 0) / stand.length;
@@ -399,7 +398,7 @@ export function computeAccuracy() {
         RWY2_average: rwy2_average,
         RWY2_std: rwy2_std,
 
-        apronT1_95max: taxi_95,
+        Taxi_95max: taxi_95,
         Taxi_99max: taxi_99,
         Taxi_average: taxi_average,
         Taxi_std: taxi_std,
@@ -444,9 +443,6 @@ export function computeAccuracy() {
         Stand_average: stand_average,
         Stand_std: stand_std,
 
-        Airbone_95max: airbone_95,
-        Airbone_average: airbone_average,
-        Airbone_std: airbone_std
     }
     return accuracy;
 }
