@@ -26,6 +26,20 @@ Frontend</h4>
   <p>Following the algorithm shown in the following figure, we obtain the counters for each of the airport areas, both for false and correct identifications, the probability of false identification being the negative cases divided by the sum of both.</p>
     <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/ProbFalseIdentification.png">
   <h6>Results</h6>
+  <br>
+  <h4>Position Accuracy</h4>
+  <p>In document ED-117, it states that the maximum error between the received horizontal position of a target and
+          its real position, based on the area in which the aircraft is located, must be:
+          <br /> &nbsp;&nbsp;- Maneuvering area and Apron: Maximum error of 7.5 m 95% of the time. And a maximum error
+          of 12 m 99% of the time.
+          <br /> &nbsp;&nbsp;- Stand: Maximum error of 20 m averaged in periods of 5 seconds.
+          <br /> &nbsp;&nbsp;- Type 4 area: Maximum error of 20 m 95% of the time.
+          <br /> &nbsp;&nbsp;- Type 5 area: Maximum error of 40 m 95% of the time.
+  </p>
+  <h6>Implementation</h6>
+  <p>To proceed with the accuracy calculation, the aircraft must be equipped with dgps to be able to extract its data, and therefore its exact real position. Since we do not require these data in our test files, the ADS-B info is used as a reference. To reduce the errors in the calculations we will consider as valid the ADS-B messages with a Position Integrity Category &lt; 0.3 NM. To find the MLAT and ADS-B pairs, messages with the same target address and closest in time will be searched within a 50 ms search window.
+
+  <h6>Results</h6>
 
 </details>
 
@@ -34,14 +48,13 @@ Frontend</h4>
 
 </details>
 
-<h3>       <picture><img src = "https://github.com/0xAbdulKhalid/0xAbdulKhalid/raw/main/assets/mdImages/about_me.gif" width = 25px></picture> Contributors</h3>
+<h3>       <picture><img src = "https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/about_me.gif" width = 25px></picture> Contributors</h3>
 
 - Júlia Alós
 - Pau Baguer
 
 
 <div align="center">
-  <a href="https://1999azzar.github.io/1999AZZAR/">
-  <img  src="https://github.com/1999AZZAR/1999AZZAR/blob/main/resources/img/grid-snake.svg"
-       alt="snake" /></a>
+  <img  src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/grid-snake.svg"
+       alt="snake" />
 </div>
