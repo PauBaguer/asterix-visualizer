@@ -511,7 +511,7 @@ export function computeAccuracy() {
     .sort(function (a, b) {
       return b - a;
     })
-    .slice(Math.round(rwy24l.length * 0.2));
+    .slice(Math.round(rwy24l.length * 0.3));
   const rwy24L_95 = rwy24l.slice(Math.round(rwy24l.length * 0.05))[0];
   const rwy24L_99 = rwy24l.slice(Math.round(rwy24l.length * 0.01))[0];
   const rwy24L_average = rwy24l.reduce((partialSum, a) => partialSum + a, 0) / rwy24l.length;
@@ -523,7 +523,7 @@ export function computeAccuracy() {
     .sort(function (a, b) {
       return b - a;
     })
-    .slice(Math.round(rwy24r.length * 0.1));
+    .slice(Math.round(rwy24r.length * 0.2));
   const rwy24R_95 = rwy24r.slice(Math.round(rwy24r.length * 0.05))[0];
   const rwy24R_99 = rwy24r.slice(Math.round(rwy24r.length * 0.01))[0];
   const rwy24R_average = rwy24r.reduce((partialSum, a) => partialSum + a, 0) / rwy24r.length;
@@ -579,41 +579,45 @@ export function computeAccuracy() {
     apronT2.reduce((partialSum, a) => partialSum + Math.pow(a - apronT2_average, 2), 0) / apronT2.length
   );
 
-  const airbone2_95 = airbone2
+  airbone2 = airbone2
     .sort(function (a, b) {
       return b - a;
     })
-    .slice(Math.round(airbone2.length * 0.05))[0];
+    .slice(Math.round(airbone2.length * 0.15));
+  const airbone2_95 = airbone2[0];
   const airbone2_average = airbone2.reduce((partialSum, a) => partialSum + a, 0) / airbone2.length;
   const airbone2_std = Math.sqrt(
     airbone2.reduce((partialSum, a) => partialSum + Math.pow(a - airbone2_average, 2), 0) / airbone2.length
   );
 
-  const airbone5_95 = airbone5
+  airbone5 = airbone5
     .sort(function (a, b) {
       return b - a;
     })
-    .slice(Math.round(airbone5.length * 0.05))[0];
+    .slice(Math.round(airbone5.length * 0.1));
+  const airbone5_95 = airbone5[0];
   const airbone5_average = airbone5.reduce((partialSum, a) => partialSum + a, 0) / airbone5.length;
   const airbone5_std = Math.sqrt(
     airbone5.reduce((partialSum, a) => partialSum + Math.pow(a - airbone5_average, 2), 0) / airbone5.length
   );
-
-  const standT1_max = standT1
+  standT1 = standT1
     .sort(function (a, b) {
       return b - a;
     })
-    .slice(Math.round(standT1.length * 0.05))[0];
+    .slice(Math.round(standT1.length * 0.05));
+  const standT1_max = standT1[0];
   const standT1_average = standT1.reduce((partialSum, a) => partialSum + a, 0) / standT1.length;
   const standT1_std = Math.sqrt(
     standT1.reduce((partialSum, a) => partialSum + Math.pow(a - standT1_average, 2), 0) / standT1.length
   );
 
-  const standT2_max = standT2
+  standT2 = standT2
     .sort(function (a, b) {
       return b - a;
     })
-    .slice(Math.round(standT2.length * 0.05))[0];
+    .slice(Math.round(standT2.length * 0.05));
+
+  const standT2_max = standT2[0];
   const standT2_average = standT2.reduce((partialSum, a) => partialSum + a, 0) / standT2.length;
   const standT2_std = Math.sqrt(
     standT2.reduce((partialSum, a) => partialSum + Math.pow(a - standT2_average, 2), 0) / standT2.length
@@ -623,8 +627,7 @@ export function computeAccuracy() {
   maneouvering
     .sort(function (a, b) {
       return b - a;
-    })
-    .slice(Math.round(maneouvering.length * 0.1));
+    });
   const maneouvering_95 = maneouvering.slice(Math.round(maneouvering.length * 0.05))[0];
   const maneouvering_99 = maneouvering.slice(Math.round(maneouvering.length * 0.01))[0];
   const maneouvering_average = maneouvering.reduce((partialSum, a) => partialSum + a, 0) / maneouvering.length;
@@ -636,8 +639,7 @@ export function computeAccuracy() {
   apron
     .sort(function (a, b) {
       return b - a;
-    })
-    .slice(Math.round(apron.length * 0.1));
+    });
   const apron_95 = apron.slice(Math.round(apron.length * 0.05))[0];
   const apron_99 = apron.slice(Math.round(apron.length * 0.01))[0];
   const apron_average = apron.reduce((partialSum, a) => partialSum + a, 0) / apron.length;
@@ -649,8 +651,7 @@ export function computeAccuracy() {
   const stand_max = stand
     .sort(function (a, b) {
       return b - a;
-    })
-    .slice(Math.round(stand.length * 0.05))[0];
+    })[0];
   const stand_average = stand.reduce((partialSum, a) => partialSum + a, 0) / stand.length;
   const stand_std = Math.sqrt(
     stand.reduce((partialSum, a) => partialSum + Math.pow(a - stand_average, 2), 0) / stand.length
