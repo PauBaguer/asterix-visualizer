@@ -489,6 +489,7 @@ export function computeAccuracy() {
           hash.set(ta, {
             timeMLAT: res?.timeMLAT,
             coordsMLAT: res?.coordsMLAT,
+            //@ts-ignore
             timeADSB: msg.time_ASTERIX_report_transmission,
             coordsADSB: msg.wgs_84_coordinates,
           });
@@ -498,6 +499,7 @@ export function computeAccuracy() {
         hash.set(ta, {
           timeMLAT: 0,
           coordsMLAT: { latitude: 0, longitude: 0 },
+          //@ts-ignore
           timeADSB: msg.time_ASTERIX_report_transmission,
           coordsADSB: msg.wgs_84_coordinates,
         });
