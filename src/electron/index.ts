@@ -20,7 +20,6 @@ import {
   loadFileIpc,
   getMessagesIpcSlices,
   tableProtocol,
-  computeParametersIpcWorker,
   parametersResults,
   startCalculationOfPerformanceData,
   writeCsvFile,
@@ -75,7 +74,6 @@ const createWindow = () => {
   ipcMain.handle("get-message-quantity", getMessagesIpcWorker);
   ipcMain.handle("pass-slice", getMessagesIpcSlices);
   ipcMain.handle("table-protocol", tableProtocol);
-  ipcMain.handle("compute-parameters", computeParametersIpcWorker);
   ipcMain.handle("parameters-results", parametersResults);
   ipcMain.handle("start-calculation-of-performance-data", startCalculationOfPerformanceData);
   ipcMain.handle("save-csv", writeCsvFile);
