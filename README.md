@@ -15,7 +15,6 @@ Backend</h4>
 Frontend</h4>
   
 </details>
-
 <details>
   <summary><h3><img src="https://media.giphy.com/media/iY8CRBdQXODJSCERIr/giphy.gif" width="25"> Eurocae ED-117 Parameters</h3></summary>  
   <h4>Probability of false identification</h4>
@@ -60,9 +59,32 @@ Frontend</h4>
 </details>
 
 <details>
-  <summary><h3>😄 How it works</h3></summary>  
+  <summary><h3>😄 How it works</h3></summary>
+  <h5>Installation</h5>
+  <p>Download the executable for Windows https://drive.google.com/file/d/1XoyGfE5QBPgHJeWnLBNFW0jxYp-_xzOt/view</p>
+  <h5>First steps</h5>
+  <p align="justify">On the main page you will find the main commands. Insert the ASTERIX file to be decoded, export the decoded data to csv or the routes to kml and control the simulation as you like.</p>
+  <p align="justify">When all the messages are properly processed you will be able to navigate through the different tabs and all the information obtained.</p>
+  <br>
+  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/GeneralSettings.gif" width = 48%>
+  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/Navbar.gif" width = 48%>
+
+  <h5>Explore all the data</h5>
+  <p align="justify">Look at all the information that the different data items of the messages offer you. Filter by category, by system, by type of message. Search for a specific target address, target identification or track number and much more.</p>
+    <br>
+  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/Table.gif.gif" width = 80%>
+  <h5>Export data to csv</h5>
+    <div align="center">
+  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DataCsv.gif" width = 80%>
+  </div>
+  <h5>Export routes to kml</h5>
+    <div align="center">
+  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DataKml.gif" width = 80%>
+  </div>
+
 
 </details>
+<i class="fa-regular fa-up-right-from-square"></i>
 
 <h3>       <picture><img src = "https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/about_me.gif" width = 25px></picture> Contributors</h3>
 
