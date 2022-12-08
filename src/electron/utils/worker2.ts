@@ -47,6 +47,7 @@ export function probIdentification() {
                             case "Airbone10": airbone10++; break
                         }
                         res.time += sec;
+                        res.false_detection = false;
                     }
                     hash.set(ta, res);
 
