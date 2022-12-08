@@ -21,3 +21,8 @@ export async function openTestFile() {
   const buffer = await fs.readFile(join(__dirname.replace("build", "src/electron"), "201002-lebl-080001_smr.ast"));
   return buffer;
 }
+
+export async function saveFileCsv() {
+  const res = await dialog.showSaveDialog({ filters: [{ name: "CSV", extensions: ["csv"] }] });
+  return res;
+}

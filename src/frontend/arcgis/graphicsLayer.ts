@@ -350,9 +350,9 @@ function deleteupdatePlane(msg: Cat21) {
 
 export function shortenPath(msg: Cat21) {
   const plane = planeMap.get(msg.target_address)!;
-  plane.adsb_msgs.splice(0, 1);
 
   if (plane && plane.pathGraphic) {
+    plane.adsb_msgs.shift();
     const poly = plane.pathGraphic?.geometry as Polyline;
     poly.paths[0].splice(0, 1);
 

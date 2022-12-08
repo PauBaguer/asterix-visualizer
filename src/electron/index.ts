@@ -14,7 +14,6 @@ import logger from "./utils/logger";
 import settings from "./utils/settings";
 import { openFilePicker, openTestFile } from "./utils/file_management";
 
-
 import {
   getMessagesIpc,
   getMessagesIpcWorker,
@@ -22,6 +21,8 @@ import {
   getMessagesIpcSlices,
   tableProtocol,
   parametersResults,
+  startCalculationOfPerformanceData,
+  writeCsvFile,
 } from "./utils/ipcMain";
 import { fromTwosComplement } from "./asterix/cat21_decoder";
 
@@ -51,9 +52,9 @@ const createWindow = () => {
     // process.env.NODE_ENV === "production"
     isProd
       ? // in production, use the statically build version of our application
-      `file://${join(__dirname, "public", "index.html")}`
+        `file://${join(__dirname, "public", "index.html")}`
       : // in dev, target the host and port of the local rollup web server
-      "http://localhost:5000";
+        "http://localhost:5000";
 
   mainWindow.loadURL(url).catch((err) => {
     logger.error(JSON.stringify(err));
@@ -74,7 +75,8 @@ const createWindow = () => {
   ipcMain.handle("pass-slice", getMessagesIpcSlices);
   ipcMain.handle("table-protocol", tableProtocol);
   ipcMain.handle("parameters-results", parametersResults);
-
+  ipcMain.handle("start-calculation-of-performance-data", startCalculationOfPerformanceData);
+  ipcMain.handle("save-csv", writeCsvFile);
 };
 
 app.on("ready", createWindow);

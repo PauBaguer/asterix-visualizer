@@ -1,11 +1,8 @@
 import { Cat10 } from "../asterix/cat10_decoder";
-import { Cat21, WGS_84_coordinates } from "../asterix/cat21_decoder";
+import { Cat21 } from "../asterix/cat21_decoder";
 import { classifyMessages as decodeMessages, sliceMainBuffer } from "../asterix/message_cassifier";
-import { openFilePicker } from "./file_management";
+import { openFilePicker, saveFileCsv } from "./file_management";
 import { Worker } from "node:worker_threads";
-import { getAreaLayerPoint, isPointInArea } from "./mlatAreas";
-import computeDestinationPoint from "geolib/es/computeDestinationPoint";
-import { getDistance } from "geolib";
 const JsonSearch = require("search-array").default;
 
 let buffer: Buffer | undefined;
@@ -29,7 +26,7 @@ export async function loadFileIpc() {
   }
 
   messages = await sliceMainBuffer(buffer);
-  let L = messages.length > 500000 ? 300000 : messages.length;
+  let L = messages.length > 5000000 ? 300000 : messages.length;
   console.log("About to process " + L + " messages.");
   return L;
 }
@@ -47,15 +44,33 @@ export async function getMessagesIpc(event: any, messageQuantity: number) {
 
 export async function getMessagesIpcWorker(event: any, messageQuantity: number) {
   const startTime = performance.now();
-  const result = (await runWorker({ messageQuantity, msgDelivered, messages })) as (Cat10 | Cat21)[];
+  // const slice1 = messages.slice(0, 250000);
+  // const slice2 = messages.slice(250000, messages.length);
+  const result = (await runWorker({ messages })) as (Cat10 | Cat21)[];
+  //const result2 = (await runWorker({ messages: slice2 })) as (Cat10 | Cat21)[];
   const endTime = performance.now();
   console.log(`Call to decodeMessages took ${endTime - startTime} milliseconds`);
-  console.log(`Finished worker with result: ${result.length}`);
-  decodedMsg = result;
-
-  performanceData = await runWorker2({ decodedMsg });
+  decodedMsg = result; //.concat(result2);
 
   return [];
+}
+
+export async function startCalculationOfPerformanceData() {
+  //const slice = decodedMsg.filter((v) => v.instrument !== "SMR");
+
+  console.log(`Starting performance calculations with ${decodedMsg.length} messages.`);
+  const startTimeP = performance.now();
+
+  performanceData = await runWorker2({ messagesLength: decodedMsg.length });
+  const endTimeP = performance.now();
+  console.log(`Call to performanceData took ${endTimeP - startTimeP} milliseconds`);
+}
+
+export async function writeCsvFile() {
+  const picker = await saveFileCsv();
+  if (!picker.filePath) return;
+  await runWorkercsv({ messagesLength: decodedMsg.length, filePath: picker.filePath });
+  console.log(`${picker.filePath} written`);
 }
 
 function runWorker(workerData: any) {
@@ -84,7 +99,6 @@ function runWorker2(workerData: any) {
     let result: any;
     worker.on("message", (val: any) => {
       result = val;
-      console.log(result);
     });
     worker.on("error", reject);
     worker.on("exit", (code) => {
@@ -94,6 +108,36 @@ function runWorker2(workerData: any) {
         resolve(result);
       }
     });
+    if (decodedMsg.length > 300000) {
+      worker.postMessage(decodedMsg.slice(0, 300000));
+      worker.postMessage(decodedMsg.slice(300000, decodedMsg.length));
+    } else {
+      worker.postMessage(decodedMsg);
+    }
+  });
+}
+
+function runWorkercsv(workerData: any) {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(__dirname + "/csv_worker.js", { workerData });
+    let result: any;
+    worker.on("message", (val: any) => {
+      result = val;
+    });
+    worker.on("error", reject);
+    worker.on("exit", (code) => {
+      if (code !== 0) {
+        console.log(new Error("Exit worker with code: " + code));
+      } else {
+        resolve(result);
+      }
+    });
+    if (decodedMsg.length > 300000) {
+      worker.postMessage(decodedMsg.slice(0, 300000));
+      worker.postMessage(decodedMsg.slice(300000, decodedMsg.length));
+    } else {
+      worker.postMessage(decodedMsg);
+    }
   });
 }
 
@@ -123,8 +167,8 @@ const MSG_PER_PAGE = 15;
 
 export function tableProtocol(event: any, { page, filter, search }: { page: number; filter: Filter; search: string }) {
   // filter = { Category: ["Cat10"], Instrument: ["MLAT"], Area: ["RWY"] }
-  console.log({ filter });
-  console.log({ search });
+  // console.log({ filter });
+  // console.log({ search });
 
   if (!msgFiltered) msgFiltered = decodedMsg;
 
@@ -154,8 +198,6 @@ export function tableProtocol(event: any, { page, filter, search }: { page: numb
   oldSearch = search;
 
   if (search !== "") {
-    console.log("Search!");
-
     const searcher = new JsonSearch(msgFiltered);
 
     msgFiltered = searcher.query(search) as (Cat10 | Cat21)[];

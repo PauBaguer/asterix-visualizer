@@ -6,7 +6,7 @@ doStuff();
 async function doStuff() {
   const FRAGMENTS = 1000;
   let i = 0;
-  let L = workerData.messages.length > 500000 ? 300000 : workerData.messages.length;
+  let L = workerData.messages.length > 5000000 ? 300000 : workerData.messages.length;
 
   while (i < L) {
     const decodedMsg = await decodeMessages(workerData.messages.slice(i, i + FRAGMENTS), -1, i);

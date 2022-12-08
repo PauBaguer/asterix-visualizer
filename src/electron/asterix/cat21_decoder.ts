@@ -67,16 +67,16 @@ export class Cat21 {
   Roll_Angle_age: number;
   ACAS_Resolution_Advisory_age: number;
   Surface_Capabilities_and_Characteristics_age: number;
-  csv: string[];
+  //csv: string[];
   Pic_accuracy: number;
 
   constructor(id: number) {
     this.id = id;
     this.class = "Cat21";
     this.instrument = "ADS-B";
-    this.csv = Array(60).fill(" ");
-    this.csv[0] = id.toString();
-    this.csv[1] = "Cat21";
+    // this.csv = Array(60).fill(" ");
+    // this.csv[0] = id.toString();
+    // this.csv[1] = "Cat21";
   }
 
   async set_aircraft_operational_status(buffer: Buffer) {
@@ -110,8 +110,8 @@ export class Cat21 {
     var sa = bits[7] === "0" ? "Antenna Diversity" : "Single Antenna only";
 
     this.aircraft_operational_status = { RA: ra, TC: tc, TS: ts, ARV: arv, CDTI: cdti, TCAS: tcas, SA: sa };
-    this.csv[27] =
-      "RA: " + ra + " TC: " + tc + " TS: " + ts + " ARV: " + arv + " CDTI:" + cdti + " TCAS: " + tcas + " SA: " + sa;
+    //this.csv[27] =
+    //"RA: " + ra + " TC: " + tc + " TS: " + ts + " ARV: " + arv + " CDTI:" + cdti + " TCAS: " + tcas + " SA: " + sa;
   }
 
   async set_data_source_identifier(buffer: Buffer) {
@@ -125,17 +125,17 @@ export class Cat21 {
     const sicbuf = buffer.slice(1, 2);
     const sic = sicbuf.readUInt8().toString();
     this.data_source_identifier = { SAC: sac, SIC: sic };
-    this.csv[3] = "SAC: " + sac + " SIC: " + sic;
+    //  this.csv[3] = "SAC: " + sac + " SIC: " + sic;
   }
 
   async set_service_identification(buffer: Buffer) {
     this.service_identification = "0x" + buffer.toString("hex");
-    this.csv[28] = this.service_identification;
+    //  this.csv[28] = this.service_identification;
   }
 
   async set_service_management(buffer: Buffer) {
     this.service_management = (parseInt("0x" + buffer.slice(0, 1).toString("hex")) * 0.5).toString(10) + " s";
-    this.csv[29] = this.service_management;
+    // this.csv[29] = this.service_management;
   }
 
   async set_emitter_category(buffer: Buffer) {
@@ -200,7 +200,7 @@ export class Cat21 {
       default:
         this.emitter_category = "Reserved";
     }
-    this.csv[30] = this.emitter_category;
+    // this.csv[30] = this.emitter_category;
   }
 
   async set_target_report_descriptor(buffer: Buffer) {
@@ -248,7 +248,7 @@ export class Cat21 {
 
     if (len === 1) {
       this.target_report_descriptor = { ATP: atp, ARC: arc, RC: rc, RAB: rab };
-      this.csv[31] = "ATP: " + atp + " ARC: " + arc + " RC: " + rc + " RAB: " + rab;
+      //  this.csv[31] = "ATP: " + atp + " ARC: " + arc + " RC: " + rc + " RAB: " + rab;
       return;
     }
 
@@ -290,27 +290,27 @@ export class Cat21 {
         SAA: saa,
         CL: cl,
       };
-      this.csv[31] =
-        "ATP: " +
-        atp +
-        " ARC: " +
-        arc +
-        " RC: " +
-        rc +
-        " RAB: " +
-        rab +
-        " DCR: " +
-        dcr +
-        " GBS: " +
-        gbs +
-        " SIM: " +
-        sim +
-        " TST: " +
-        tst +
-        " SAA: " +
-        saa +
-        " CL: " +
-        cl;
+      // this.csv[31] =
+      //   "ATP: " +
+      //   atp +
+      //   " ARC: " +
+      //   arc +
+      //   " RC: " +
+      //   rc +
+      //   " RAB: " +
+      //   rab +
+      //   " DCR: " +
+      //   dcr +
+      //   " GBS: " +
+      //   gbs +
+      //   " SIM: " +
+      //   sim +
+      //   " TST: " +
+      //   tst +
+      //   " SAA: " +
+      //   saa +
+      //   " CL: " +
+      //   cl;
 
       return;
     }
@@ -339,59 +339,59 @@ export class Cat21 {
       RCF: rcf,
     };
 
-    this.csv[31] =
-      "ATP: " +
-      atp +
-      " ARC: " +
-      arc +
-      " RC: " +
-      rc +
-      " RAB: " +
-      rab +
-      " DCR: " +
-      dcr +
-      " GBS: " +
-      gbs +
-      " SIM: " +
-      sim +
-      " TST: " +
-      tst +
-      " SAA: " +
-      saa +
-      " CL: " +
-      cl +
-      " IPC: " +
-      ipc +
-      " NOGO: " +
-      nogo +
-      " CPR: " +
-      cpr +
-      " LDPJ: " +
-      ldpj +
-      " RCF: " +
-      rcf;
+    // this.csv[31] =
+    //   "ATP: " +
+    //   atp +
+    //   " ARC: " +
+    //   arc +
+    //   " RC: " +
+    //   rc +
+    //   " RAB: " +
+    //   rab +
+    //   " DCR: " +
+    //   dcr +
+    //   " GBS: " +
+    //   gbs +
+    //   " SIM: " +
+    //   sim +
+    //   " TST: " +
+    //   tst +
+    //   " SAA: " +
+    //   saa +
+    //   " CL: " +
+    //   cl +
+    //   " IPC: " +
+    //   ipc +
+    //   " NOGO: " +
+    //   nogo +
+    //   " CPR: " +
+    //   cpr +
+    //   " LDPJ: " +
+    //   ldpj +
+    //   " RCF: " +
+    //   rcf;
   }
 
   async set_mod_3A_code(buffer: Buffer) {
     this.mod_3A_code = parseInt("0x" + buffer.toString("hex"))
       .toString(8)
       .padStart(4, "0");
-    this.csv[10] = this.mod_3A_code;
+    //  this.csv[10] = this.mod_3A_code;
   }
 
   async set_time_applicability_position(buffer: Buffer) {
     this.time_applicability_position = Math.round((parseInt("0x" + buffer.toString("hex")) / 128.0) * 10) / 10;
-    this.csv[32] = this.time_applicability_position.toString();
+    //    this.csv[32] = this.time_applicability_position.toString();
   }
 
   async set_time_applicability_velocity(buffer: Buffer) {
     this.time_applicability_velocity = Math.round((parseInt("0x" + buffer.toString("hex")) / 128.0) * 10) / 10;
-    this.csv[33] = this.time_applicability_velocity.toString();
+    //  this.csv[33] = this.time_applicability_velocity.toString();
   }
 
   async set_time_message_reception_position(buffer: Buffer) {
     this.time_message_reception_position = Math.round((parseInt("0x" + buffer.toString("hex")) / 128.0) * 10) / 10;
-    this.csv[34] = this.time_message_reception_position.toString();
+    //   this.csv[34] = this.time_message_reception_position.toString();
   }
 
   async set_time_message_reception_position_high(buffer: Buffer) {
@@ -409,12 +409,12 @@ export class Cat21 {
 
     this.time_message_reception_position_high =
       (parseInt("0x" + buffer.toString("hex")) + fsi) * Math.pow(2, -30) * Math.pow(2, 9); //[ns]
-    this.csv[35] = this.time_message_reception_position_high.toString();
+    //   this.csv[35] = this.time_message_reception_position_high.toString();
   }
 
   async set_time_message_reception_velocity(buffer: Buffer) {
     this.time_message_reception_velocity = Math.round((parseInt("0x" + buffer.toString("hex")) / 128.0) * 10) / 10;
-    this.csv[36] = this.time_message_reception_velocity.toString();
+    // this.csv[36] = this.time_message_reception_velocity.toString();
   }
 
   async set_time_message_reception_velocity_high(buffer: Buffer) {
@@ -431,17 +431,17 @@ export class Cat21 {
 
     this.time_message_reception_velocity_high =
       (parseInt("0x" + buffer.toString("hex")) + fsi) * Math.pow(2, -30) * Math.pow(2, 9); //[ns]
-    this.csv[37] = this.time_message_reception_velocity_high.toString();
+    //   this.csv[37] = this.time_message_reception_velocity_high.toString();
   }
 
   async set_time_ASTERIX_report_transmission(buffer: Buffer) {
     this.time_ASTERIX_report_transmission = Math.round((parseInt("0x" + buffer.toString("hex")) / 128.0) * 10) / 10;
-    this.csv[38] = this.time_ASTERIX_report_transmission.toString();
+    //  this.csv[38] = this.time_ASTERIX_report_transmission.toString();
   }
 
   async set_target_address(buffer: Buffer) {
     this.target_address = "0x" + buffer.toString("hex");
-    this.csv[18] = this.target_address;
+    //  this.csv[18] = this.target_address;
   }
 
   async set_quality_indicator(buffer: Buffer) {
@@ -513,7 +513,7 @@ export class Cat21 {
 
     if (bits[7] == "0") {
       this.quality_indicator = { NUCr_or_NACv: nucr_or_nacv, NUCp_or_NIC: nucp_or_nic };
-      this.csv[39] = "NUCr_or_NACv: " + nucr_or_nacv + " NUCp_or_NIC: " + nucp_or_nic;
+      //    this.csv[39] = "NUCr_or_NACv: " + nucr_or_nacv + " NUCp_or_NIC: " + nucp_or_nic;
       return;
     }
 
@@ -584,17 +584,17 @@ export class Cat21 {
         SIL: sil,
         NACp: nacp,
       };
-      this.csv[39] =
-        "NUCr_or_NACv: " +
-        nucr_or_nacv +
-        " NUCp_or_NIC: " +
-        nucp_or_nic +
-        " NICBARO: " +
-        nicbaro +
-        " SIL: " +
-        sil +
-        " NACP: " +
-        nacp;
+      // this.csv[39] =
+      //   "NUCr_or_NACv: " +
+      //   nucr_or_nacv +
+      //   " NUCp_or_NIC: " +
+      //   nucp_or_nic +
+      //   " NICBARO: " +
+      //   nicbaro +
+      //   " SIL: " +
+      //   sil +
+      //   " NACP: " +
+      //   nacp;
       return;
     }
 
@@ -645,21 +645,21 @@ export class Cat21 {
         SDA: sda,
         GVA: gva,
       };
-      this.csv[39] =
-        "NUCr_or_NACv: " +
-        nucr_or_nacv +
-        " NUCp_or_NIC: " +
-        nucp_or_nic +
-        " NICBARO: " +
-        nicbaro +
-        " SIL: " +
-        sil +
-        " NACP: " +
-        nacp +
-        " SILsupplement: " +
-        sil_s +
-        " GVA: " +
-        gva;
+      // this.csv[39] =
+      //   "NUCr_or_NACv: " +
+      //   nucr_or_nacv +
+      //   " NUCp_or_NIC: " +
+      //   nucp_or_nic +
+      //   " NICBARO: " +
+      //   nicbaro +
+      //   " SIL: " +
+      //   sil +
+      //   " NACP: " +
+      //   nacp +
+      //   " SILsupplement: " +
+      //   sil_s +
+      //   " GVA: " +
+      //   gva;
       return;
     }
 
@@ -740,23 +740,23 @@ export class Cat21 {
       GVA: gva,
       PIC: pic,
     };
-    this.csv[39] =
-      "NUCr_or_NACv: " +
-      nucr_or_nacv +
-      " NUCp_or_NIC: " +
-      nucp_or_nic +
-      " NICBARO: " +
-      nicbaro +
-      " SIL: " +
-      sil +
-      " NACP: " +
-      nacp +
-      " SILsupplement: " +
-      sil_s +
-      " GVA: " +
-      gva +
-      " PIC: " +
-      pic;
+    // this.csv[39] =
+    //   "NUCr_or_NACv: " +
+    //   nucr_or_nacv +
+    //   " NUCp_or_NIC: " +
+    //   nucp_or_nic +
+    //   " NICBARO: " +
+    //   nicbaro +
+    //   " SIL: " +
+    //   sil +
+    //   " NACP: " +
+    //   nacp +
+    //   " SILsupplement: " +
+    //   sil_s +
+    //   " GVA: " +
+    //   gva +
+    //   " PIC: " +
+    //   pic;
   }
 
   async set_trajectory_intent(buffer: Buffer, tis: boolean, tid: boolean, rep: number) {
@@ -775,7 +775,7 @@ export class Cat21 {
       nvb = bits[0] === "0" ? "Trajectory Intent Data is valid" : "Trajectory Intent Data is not valid";
       if (!tid) {
         this.tarjectory_intent = { TIS: tis, NAV: nav, NVB: nvb, TID: tid };
-        this.csv[40] = "TIS: " + tis + " NAV: " + nav + " NVB: " + nvb + " TID: " + tid;
+        //   this.csv[40] = "TIS: " + tis + " NAV: " + nav + " NVB: " + nvb + " TID: " + tid;
         return;
       }
       offset++;
@@ -877,11 +877,11 @@ export class Cat21 {
       }
       if (!tis) {
         this.tarjectory_intent = { TIS: tis, TID: tid, TIDvec: vec };
-        this.csv[40] = "TIS: " + tis + " TID: " + tid;
+        //  this.csv[40] = "TIS: " + tis + " TID: " + tid;
         return;
       } else {
         this.tarjectory_intent = { TIS: tis, NAV: nav, NVB: nvb, TID: tid, TIDvec: vec };
-        this.csv[40] = "TIS: " + tis + " NAV: " + nav + " NVB: " + nvb + " TID: " + tid;
+        //  this.csv[40] = "TIS: " + tis + " NAV: " + nav + " NVB: " + nvb + " TID: " + tid;
       }
     }
   }
@@ -904,7 +904,7 @@ export class Cat21 {
       latitude: lat,
       longitude: lon,
     };
-    this.csv[5] = "Latitude: " + lat + " Longitude: " + lon;
+    // this.csv[5] = "Latitude: " + lat + " Longitude: " + lon;
   }
 
   async set_wgs_84_coordinates_high(buffer: Buffer) {
@@ -917,7 +917,7 @@ export class Cat21 {
         latitude: lat,
         longitude: lon,
       };
-      this.csv[41] = "Latitude: " + lat + " Longitude: " + lon;
+      //  this.csv[41] = "Latitude: " + lat + " Longitude: " + lon;
     } catch (e) {
       if (e instanceof RangeError) {
         // Output expected ERR_BUFFER_OUT_OF_BOUNDS RangeErrors.
@@ -931,17 +931,17 @@ export class Cat21 {
 
   async set_message_amplitude(buffer: Buffer) {
     this.message_amplitude = buffer.readIntBE(0, 1).toString(10) + " dBm";
-    this.csv[42] = this.message_amplitude;
+    //  this.csv[42] = this.message_amplitude;
   }
 
   async set_geometric_height(buffer: Buffer) {
     this.geometric_height = (buffer.readIntBE(0, 2) * 6.25).toString(10) + " ft";
-    this.csv[43] = this.geometric_height;
+    // this.csv[43] = this.geometric_height;
   }
 
   async set_flight_level(buffer: Buffer) {
     this.flight_level = "FL" + (buffer.readIntBE(0, 2) / 4).toString(10);
-    this.csv[11] = this.flight_level;
+    //  this.csv[11] = this.flight_level;
   }
 
   async set_selected_altitude(buffer: Buffer) {
@@ -967,7 +967,7 @@ export class Cat21 {
     }
     const altitude = (fromTwosComplement(bits.slice(3, 16).join("")) * 25).toString(10) + " fl";
     this.selected_altitude = { SAS: sas, Source: source, Altitude: altitude };
-    this.csv[44] = "SAS: " + sas + " Source: " + source + " Altitude: " + altitude;
+    //  this.csv[44] = "SAS: " + sas + " Source: " + source + " Altitude: " + altitude;
   }
 
   async set_final_state_selected_altitude(buffer: Buffer) {
@@ -981,7 +981,7 @@ export class Cat21 {
 
     const altitude = (fromTwosComplement(bits.slice(3, 16).join("")) * 25).toString(10) + " fl";
     this.final_state_selected_altitude = { MV: mv, AH: ah, AM: am, Altitude: altitude };
-    this.csv[45] = "MV: " + mv + " AH: " + ah + " AM: " + am + " Altitude: " + altitude;
+    //  this.csv[45] = "MV: " + mv + " AH: " + ah + " AM: " + am + " Altitude: " + altitude;
   }
 
   async set_air_speed(buffer: Buffer) {
@@ -994,7 +994,7 @@ export class Cat21 {
       bits[0] === "0"
         ? "IAS: " + (speed * Math.pow(2, -14)).toString(10) + " NM/s"
         : "Mach: " + (speed * 0.001).toString(10);
-    this.csv[46] = this.air_speed;
+    //  this.csv[46] = this.air_speed;
   }
 
   async set_true_airspeed(buffer: Buffer) {
@@ -1004,12 +1004,12 @@ export class Cat21 {
       .split("");
     this.true_airspeed =
       bits[0] === "0" ? parseInt(bits.slice(1, 16).join(""), 2).toString(10) + " knot" : "Value exceeds defined range";
-    this.csv[47] = this.true_airspeed;
+    //   this.csv[47] = this.true_airspeed;
   }
 
   async set_magnetic_heading(buffer: Buffer) {
     this.magnetic_heading = ((parseInt("0x" + buffer.toString("hex")) * 360) / Math.pow(2, 16)).toString(10) + " deg";
-    this.csv[48] = this.magnetic_heading;
+    // this.csv[48] = this.magnetic_heading;
   }
 
   async set_barometric_vertical_rate(buffer: Buffer) {
@@ -1021,7 +1021,7 @@ export class Cat21 {
       bits[0] === "0"
         ? (fromTwosComplement(bits.slice(1, 16).join("")) * 6.25).toString(10) + " feet/minute"
         : "Value exceeds defined range";
-    this.csv[49] = this.barometric_vertical_rate;
+    //this.csv[49] = this.barometric_vertical_rate;
   }
 
   async set_geometric_vertical_rate(buffer: Buffer) {
@@ -1033,7 +1033,7 @@ export class Cat21 {
       bits[0] === "0"
         ? (fromTwosComplement(bits.slice(1, 16).join("")) * 6.25).toString(10) + " feet/minute"
         : "Value exceeds defined range";
-    this.csv[50] = this.geometric_vertical_rate;
+    //  this.csv[50] = this.geometric_vertical_rate;
   }
 
   async set_airborne_ground_vector(buffer: Buffer) {
@@ -1047,12 +1047,12 @@ export class Cat21 {
         : "Value exceeds defined range";
     const ta = (parseInt("0x" + buffer.slice(2, 4).toString("hex")) * 360) / Math.pow(2, 16) + " deg";
     this.airborne_ground_vector = { GroundSpeed: gs, TrackAngle: ta };
-    this.csv[51] = "GroundSpeed: " + gs + " TrackAngle: " + ta;
+    //  this.csv[51] = "GroundSpeed: " + gs + " TrackAngle: " + ta;
   }
 
   async set_track_number(buffer: Buffer) {
     this.track_number = parseInt("0x" + buffer.toString("hex"));
-    this.csv[15] = this.track_number.toString();
+    //   this.csv[15] = this.track_number.toString();
   }
 
   async set_track_angle_rate(buffer: Buffer) {
@@ -1064,7 +1064,7 @@ export class Cat21 {
             .padStart(10, "0")
         ) / 32
       ).toString(10) + " deg/s";
-    this.csv[52] = this.track_angle_rate.toString();
+    //  this.csv[52] = this.track_angle_rate.toString();
   }
 
   async set_target_identification(buffer: Buffer) {
@@ -1081,7 +1081,7 @@ export class Cat21 {
     }
 
     this.target_identification = target_identification.join("");
-    this.csv[19] = target_identification.join("");
+    //   this.csv[19] = target_identification.join("");
   }
 
   ti_parse(bits: string[]) {
@@ -1192,7 +1192,7 @@ export class Cat21 {
     }
 
     this.target_status = { ICF: icf, LNAV: lnav, PS: ps, SS: ss };
-    this.csv[53] = "ICF: " + icf + " LNAV: " + lnav + " PS: " + ps + " SS: " + ss;
+    //  this.csv[53] = "ICF: " + icf + " LNAV: " + lnav + " PS: " + ps + " SS: " + ss;
   }
 
   async set_mops_version(buffer: Buffer) {
@@ -1233,7 +1233,7 @@ export class Cat21 {
         ltt = "Not assigned";
     }
     this.mops_version = { VNS: vns, VN: vn, LTT: ltt };
-    this.csv[54] = "VNS: " + vns + " VN: " + vn + " LTT: " + ltt;
+    //    this.csv[54] = "VNS: " + vns + " VN: " + vn + " LTT: " + ltt;
   }
 
   async set_met_information(buffer: Buffer, fields: string[]) {
@@ -1268,12 +1268,12 @@ export class Cat21 {
       }
     });
     this.met_information = { WS: ws, WD: wd, TMP: tmp, TRB: trb };
-    this.csv[55] = "WS: " + ws + " WD: " + wd + " TMP: " + tmp + " TRB: " + trb;
+    // this.csv[55] = "WS: " + ws + " WD: " + wd + " TMP: " + tmp + " TRB: " + trb;
   }
 
   async set_roll_angle(buffer: Buffer) {
     this.roll_angle = (buffer.readIntBE(0, 2) * 0.01).toString(10) + " deg";
-    this.csv[56] = this.roll_angle;
+    // this.csv[56] = this.roll_angle;
   }
 
   async set_mode_s_mb_data(buffer: Buffer, rep: number) {
@@ -1290,9 +1290,9 @@ export class Cat21 {
         var add2 = bits.slice(8 * 7 + 4, 8 * 7 + 8).join("");
         this.mode_s_mb_data.push("BDS1: 0x" + add1 + " BDS2: 0x" + add2 + " MB Data: 0x" + data);
         start += 8;
-      } catch { }
+      } catch {}
     }
-    this.csv[20] = this.mode_s_mb_data.join(" / ");
+    //  this.csv[20] = this.mode_s_mb_data.join(" / ");
   }
 
   async set_acas_resolution_advisory_report(buffer: Buffer) {
@@ -1310,23 +1310,23 @@ export class Cat21 {
       TTI: bits.slice(28, 30).join(""),
       TID: bits.slice(30).join(""),
     };
-    this.csv[57] =
-      "TYP: " +
-      bits.slice(0, 5).join("") +
-      " STYP: " +
-      bits.slice(5, 8).join("") +
-      " ARA: " +
-      bits.slice(8, 16).join("") +
-      " RAC: " +
-      bits.slice(16, 26).join("") +
-      " RAT: " +
-      bits[26] +
-      " MTE: " +
-      bits[27] +
-      " TTI: " +
-      bits.slice(28, 30).join("") +
-      " TID: " +
-      bits.slice(30).join("");
+    // this.csv[57] =
+    //   "TYP: " +
+    //   bits.slice(0, 5).join("") +
+    //   " STYP: " +
+    //   bits.slice(5, 8).join("") +
+    //   " ARA: " +
+    //   bits.slice(8, 16).join("") +
+    //   " RAC: " +
+    //   bits.slice(16, 26).join("") +
+    //   " RAT: " +
+    //   bits[26] +
+    //   " MTE: " +
+    //   bits[27] +
+    //   " TTI: " +
+    //   bits.slice(28, 30).join("") +
+    //   " TID: " +
+    //   bits.slice(30).join("");
   }
 
   async set_surface_capabilities_and_characteristics(buffer: Buffer) {
@@ -1345,18 +1345,18 @@ export class Cat21 {
 
     if (bits[7] === "0") {
       this.surface_capabilities_and_characteristics = { POA: poa, CDTI: cdti, B2low: b2, RAS: ras, IDENT: ident };
-      this.csv[58] = "POA: " + poa + " CDTI: " + cdti + " B2low: " + b2 + " RAS: " + ras + " IDENT: " + ident;
+      //    this.csv[58] = "POA: " + poa + " CDTI: " + cdti + " B2low: " + b2 + " RAS: " + ras + " IDENT: " + ident;
       return;
     }
 
     var lw = "";
     switch (
-    BigInt("0x" + buffer.slice(1, 2).toString("hex"))
-      .toString(2)
-      .padStart(8, "0")
-      .split("")
-      .slice(4, 8)
-      .join("")
+      BigInt("0x" + buffer.slice(1, 2).toString("hex"))
+        .toString(2)
+        .padStart(8, "0")
+        .split("")
+        .slice(4, 8)
+        .join("")
     ) {
       case "0000":
         lw = "L < 15   W < 11.5";
@@ -1408,8 +1408,8 @@ export class Cat21 {
         break;
     }
     this.surface_capabilities_and_characteristics = { POA: poa, CDTI: cdti, B2low: b2, RAS: ras, IDENT: ident, LW: lw };
-    this.csv[58] =
-      "POA: " + poa + " CDTI: " + cdti + " B2low: " + b2 + " RAS: " + ras + " IDENT: " + ident + " LW: " + lw;
+    // this.csv[58] =
+    //   "POA: " + poa + " CDTI: " + cdti + " B2low: " + b2 + " RAS: " + ras + " IDENT: " + ident + " LW: " + lw;
   }
 
   async set_data_ages(buffer: Buffer) {
@@ -1563,7 +1563,7 @@ export class Cat21 {
 
   async set_receiver_ID(buffer: Buffer) {
     this.receiver_ID = "0x" + buffer.toString("hex").padStart(2, "0");
-    this.csv[59] = this.receiver_ID;
+    // this.csv[59] = this.receiver_ID;
   }
 }
 
