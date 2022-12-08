@@ -1,7 +1,7 @@
 import { Cat10 } from "../asterix/cat10_decoder";
 import { Cat21 } from "../asterix/cat21_decoder";
 import { classifyMessages as decodeMessages, sliceMainBuffer } from "../asterix/message_cassifier";
-import { openFilePicker, saveFileCsv } from "./file_management";
+import { openFilePicker, saveFileCsv, saveFileKml } from "./file_management";
 import { Worker } from "node:worker_threads";
 const JsonSearch = require("search-array").default;
 
@@ -73,6 +73,13 @@ export async function writeCsvFile() {
   console.log(`${picker.filePath} written`);
 }
 
+export async function writeKmlFile() {
+  const picker = await saveFileKml();
+  if (!picker.filePath) return;
+  await runWorkerkml({ messagesLength: decodedMsg.length, filePath: picker.filePath });
+  console.log(`${picker.filePath} written`);
+}
+
 function runWorker(workerData: any) {
   console.log(workerData.messages.length);
   return new Promise((resolve, reject) => {
@@ -120,6 +127,30 @@ function runWorker2(workerData: any) {
 function runWorkercsv(workerData: any) {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__dirname + "/csv_worker.js", { workerData });
+    let result: any;
+    worker.on("message", (val: any) => {
+      result = val;
+    });
+    worker.on("error", reject);
+    worker.on("exit", (code) => {
+      if (code !== 0) {
+        console.log(new Error("Exit worker with code: " + code));
+      } else {
+        resolve(result);
+      }
+    });
+    if (decodedMsg.length > 300000) {
+      worker.postMessage(decodedMsg.slice(0, 300000));
+      worker.postMessage(decodedMsg.slice(300000, decodedMsg.length));
+    } else {
+      worker.postMessage(decodedMsg);
+    }
+  });
+}
+
+function runWorkerkml(workerData: any) {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(__dirname + "/kml_worker.js", { workerData });
     let result: any;
     worker.on("message", (val: any) => {
       result = val;

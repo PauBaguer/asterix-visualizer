@@ -12,7 +12,6 @@ import { autoUpdater } from "electron-updater";
 
 import logger from "./utils/logger";
 import settings from "./utils/settings";
-import { openFilePicker, openTestFile } from "./utils/file_management";
 
 import {
   getMessagesIpc,
@@ -23,8 +22,8 @@ import {
   parametersResults,
   startCalculationOfPerformanceData,
   writeCsvFile,
+  writeKmlFile,
 } from "./utils/ipcMain";
-import { fromTwosComplement } from "./asterix/cat21_decoder";
 
 const isProd = process.env.NODE_ENV === "production" || app.isPackaged;
 
@@ -77,6 +76,7 @@ const createWindow = () => {
   ipcMain.handle("parameters-results", parametersResults);
   ipcMain.handle("start-calculation-of-performance-data", startCalculationOfPerformanceData);
   ipcMain.handle("save-csv", writeCsvFile);
+  ipcMain.handle("save-kml", writeKmlFile);
 };
 
 app.on("ready", createWindow);

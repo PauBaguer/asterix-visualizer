@@ -26,3 +26,8 @@ export async function saveFileCsv() {
   const res = await dialog.showSaveDialog({ filters: [{ name: "CSV", extensions: ["csv"] }] });
   return res;
 }
+
+export async function saveFileKml() {
+  const res = await dialog.showSaveDialog({ filters: [{ name: "KML", extensions: ["kml"] }] });
+  return res;
+}

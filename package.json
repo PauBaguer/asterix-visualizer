@@ -61,9 +61,11 @@
   },
   "dependencies": {
     "@arcgis/core": "^4.24.7",
+    "@maphubs/tokml": "^0.6.1",
     "electron-log": "^4.3.5",
     "electron-store": "^8.0.0",
     "electron-updater": "^5.2.1",
+    "geojson": "^0.5.0",
     "geolib": "^3.3.3",
     "search-array": "^1.6.0"
   },
@@ -73,6 +75,7 @@
     "@rollup/plugin-typescript": "^8.2.1",
     "@tsconfig/svelte": "^3.0.0",
     "@types/clean-css": "^4.2.4",
+    "@types/geojson": "^7946.0.10",
     "@types/html-minifier": "^4.0.0",
     "@types/node": "^18.7.14",
     "@typescript-eslint/eslint-plugin": "^5.9.0",

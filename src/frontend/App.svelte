@@ -269,6 +269,14 @@
     console.log("CSV file written");
   }
 
+  async function kml_file() {
+    console.log("Creating kml file");
+
+    await ipcMainBidirectional("save-kml");
+
+    console.log("KML file written");
+  }
+
   function settingsPannel() {
     settings = !settings;
   }
@@ -483,6 +491,12 @@
             class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
             on:click="{csv_file}"
             ><i class="bi bi-filetype-csv"></i>
+          </button>
+          <button
+            type="button"
+            class="{messages.length > 0 ? 'btn btn-primary' : 'btn btn-primary disabled'}"
+            on:click="{kml_file}"
+            ><i class="bi bi-file-earmark-image"></i>
           </button>
           <button type="button" class="btn btn-primary me-3" on:click="{settingsPannel}"
             ><i class="bi bi-gear"></i>
