@@ -3,7 +3,7 @@
 <h4 align="center">Asterix decorated is an application that allows the decoding of ASTERIX messages and its graphic representation over time, for Cat10 (SMR and MLAT) and Cat21 (ADS-B).</h4>
 </div>
 
-<h2>Windows Insaller <a href="https://drive.google.com/file/d/1WlXx4roW8zsHD-r-6kqVpVRViwYNzflQ/view?usp=sharing" >Download Link!</a></h2>
+<h2>Windows Insaller <a href="https://drive.google.com/file/d/1WlXx4roW8zsHD-r-6kqVpVRViwYNzflQ/view?usp=sharing" >Download Link</a>!</h2>
 
 <details>
   <summary><h3>👋 Introduction</h3></summary>
