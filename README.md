@@ -90,6 +90,10 @@ Frontend</h4>
 
 - Júlia Alós
 - Pau Baguer
+- Dani Román
+- Adrià Calvo
+- Andrea Pujals
+- Mireia Carvajal
 
 
 <div align="center">
