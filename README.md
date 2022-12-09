@@ -517,7 +517,7 @@ export interface Plane {
        <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/MapSimulation.gif" width = 80%>
   </div>
   <h5>Explore all the data</h5>
-  <p align="justify">Look at all the information that the different data items of the messages offer you. Filter by category, by system, by type of message. Search for a specific target address, target identification or track number and much more.</p>
+  <p align="justify">Look at all the information that the different data items of the messages offer you. Filter by category, by system, by type of message. Search for a specific target address, target identification or track number and more.</p>
     <br>
       <div align="center">
   <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/Table.gif" width = 80%>
