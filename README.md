@@ -1,6 +1,6 @@
 <div align="center">
-<h1 align="center">Asterix decoder</h1>
-<h4 align="center">Asterix decorated is an application that allows the decoding of ASTERIX messages and its graphic representation over time, for Cat10 (SMR and MLAT) and Cat21 (ADS-B).</h4>
+<h1 align="center">ASTERIX Message decoder<img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/asterix_color.png" width="40"></h1>
+<h4 align="center">Asterix message decorated is an application that allows the decoding of ASTERIX messages and its graphic representation over time, for Cat10 (SMR and MLAT) and Cat21 (ADS-B).</h4>
 </div>
 
 <h2>Windows Insaller <a href="https://drive.google.com/file/d/1WlXx4roW8zsHD-r-6kqVpVRViwYNzflQ/view?usp=sharing" >Download Link</a>!</h2>
@@ -90,26 +90,40 @@ Main Data Classes</h4>
 <details>
   <summary><h3>😄 How it works</h3></summary>
   <h5>Installation</h5>
-  <p>Download the executable for Windows https://drive.google.com/file/d/1XoyGfE5QBPgHJeWnLBNFW0jxYp-_xzOt/view</p>
+  <p>Download the <a href="https://drive.google.com/file/d/1WlXx4roW8zsHD-r-6kqVpVRViwYNzflQ/view?usp=sharing" >executable</a> for Windows</p>
   <h5>First steps</h5>
   <p align="justify">On the main page you will find the main commands. Insert the ASTERIX file to be decoded, export the decoded data to csv or the routes to kml and control the simulation as you like.</p>
-  <p align="justify">When all the messages are properly processed you will be able to navigate through the different tabs and all the information obtained.</p>
-  <br>
-  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/GeneralSettings.gif" width = 48%>
-  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/Navbar.gif" width = 48%>
-
+  <p align="justify">The simulation controls allow you to start, stop and restart the simulation. Also, move forwards and backwards, and change the speed of the simulation time. Decide what traffic you want to see and if you want to see or hide the different areas of the airport. By clicking on the path of an airplane you will be able to consult the main information that its message contained at that moment, you can also view the airplanes in 3D!</p>
+    <br>
+  
+  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/GeneralSettings.gif" width = 49%>
+  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/Navbar.gif" width = 49%>
+      <h5>Map and simulation</h5>
+  <p align="justify">The simulation controls allow you to start, stop and restart the simulation. Also, move forwards and backwards, and change the speed of the simulation time. Decide what traffic you want to see and if you want to see or hide the different areas of the airport. By clicking on the path of an airplane you will be able to consult the main information that its message contained at that moment, you can also view the airplanes in 3D!</p>
+    <div align="center">
+       <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DemoFalseIdentification.PNG" width = 80%>
+  </div>
   <h5>Explore all the data</h5>
   <p align="justify">Look at all the information that the different data items of the messages offer you. Filter by category, by system, by type of message. Search for a specific target address, target identification or track number and much more.</p>
     <br>
-  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/Table.gif.gif" width = 80%>
-  <h5>Export data to csv</h5>
+      <div align="center">
+  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/Table.gif" width = 80%>
+  </div>
+  <h5>Export data to csv...</h5>
     <div align="center">
   <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DataCsv.gif" width = 80%>
   </div>
-  <h5>Export routes to kml</h5>
+  <h5>Export routes to kml...</h5>
     <div align="center">
   <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DataKml.gif" width = 80%>
   </div>
+    <h5>EUROCAE ED-117 parameters</h5>
+    <p align="justify">When the decoded file contains traffic from the MLAT system, the software itself will calculate the Probability False Identification and Position Accuracy parameters, to verify the operation of the sensors.</p>
+    <div align="center">
+       <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DemoFalseIdentification.PNG" width = 80%>
+  <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DemoAccuracy.PNG" width = 80%>
+  </div>
+
 
 </details>
 <i class="fa-regular fa-up-right-from-square"></i>
