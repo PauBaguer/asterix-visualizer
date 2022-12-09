@@ -62,7 +62,7 @@ Given the nature of the Javascript language, only a few data classes have been u
 <details>
   <summary><h5>Cat10</h5></summary>
 
-<code lang="ts">
+```ts
 export class Cat10 {
   id: number;
   class: "Cat10";
@@ -95,7 +95,7 @@ export class Cat10 {
 
 [...]
 }
-</code>
+```
 
 </details>
 
