@@ -26,23 +26,29 @@
   <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
 General Structure Diagram</h4>
 
-This Application has been created using the Web technologies explained in a section below. As a consequence the primary languages used have been Javascript (as Typescript), HTML and CSS.
-
-The general architecture of the program consists on two main threads provided by an Electron App. All Electron Apps have two main processes called Main and Renderer. They can be thought of a typical server-client relation where the Renderer is a Web client and the Main thread is the server. Communication between both of them is handled by the Inter-process communication (IPC) which is a fast HTTP based information exchange. Both threads have its Workers. Workers allow the creation of new processes that are separate from the parent process thus not blocking the application on calculation-intensive tasks. Heavy calculations like file decoding, file writing and performance parameters calculations have been offloaded to Workers.
-
-The Main thread consists on the main file (index.ts) that will launch the application and the Renderer thread. On the other hand, several functions (IPC-triggered functions) will be executed based on events sent by the Renderer (such as open a file, or give me the first 10 messages from a list). The functions are:
-
+<p align="justify">This Application has been created using the Web technologies explained in a section below. As a consequence the primary languages used have been Javascript (as Typescript), HTML and CSS.</p>
+<p align="justify">The general architecture of the program consists on two main threads provided by an Electron App. All Electron Apps have two main processes called Main and Renderer. They can be thought of a typical server-client relation where the Renderer is a Web client and the Main thread is the server. Communication between both of them is handled by the Inter-process communication (IPC) which is a fast HTTP based information exchange. Both threads have its Workers. Workers allow the creation of new processes that are separate from the parent process thus not blocking the application on calculation-intensive tasks. Heavy calculations like file decoding, file writing and performance parameters calculations have been offloaded to Workers.</p>
+<p align="justify">The Main thread consists on the main file (index.ts) that will launch the application and the Renderer thread. On the other hand, several functions (IPC-triggered functions) will be executed based on events sent by the Renderer (such as open a file, or give me the first 10 messages from a list). The functions are:
+<br>
 - loadFileIpc: open the file picker and load a file.
+<br>
 - sliceMainBuffer: divide a file Buffer into several Buffers containing individual messages.
+<br>
 - getMessagesIpcWorker: decode all the buffers in a Worker. Calls the cat10_decoder and cat21_decoder classes which handle the decoding of each message.
+<br>
 - getMessagesIpcSlices: send me 10000 messages.
+<br>
 - startCalculationOfPerformanceData: start the calculation of the performance parameters.
+<br>
 - parametersResults: send me the results from the parameter calculation.
+<br>
 - writeCsvFile: Write a csv file in a separate Worker.
+<br>
 - writeKmlFile: Write a kml file in a separate Worker.
+<br>
 - tableProtocol: Apply filters, search and give me the messages I need to render in the table based on current page.
-
-The Renderer thread is divided in files describing the rendered objects and pages (.svelte) and the scripts (.ts) which handle the Map and Simulation logic. The main HTTP based Svelte files are App.svelte (general structure and Map), ExpandableTable.svelte (Table view) and Parameters.svelte (performance parameters view). The scripts consist on map.ts (initializing the map), graphicsLayer.ts (3D objects logic and layer management), groundLayer.ts (ground markers and layer management) and areaLayer.ts (ground areas definition). Finally Simulation.svelte handles the Sim logic and its rendered controls. Some of this work is distributed to Web-workers for a smoother operation.
+</p>
+<p align="justify">The Renderer thread is divided in files describing the rendered objects and pages (.svelte) and the scripts (.ts) which handle the Map and Simulation logic. The main HTTP based Svelte files are App.svelte (general structure and Map), ExpandableTable.svelte (Table view) and Parameters.svelte (performance parameters view). The scripts consist on map.ts (initializing the map), graphicsLayer.ts (3D objects logic and layer management), groundLayer.ts (ground markers and layer management) and areaLayer.ts (ground areas definition). Finally Simulation.svelte handles the Sim logic and its rendered controls. Some of this work is distributed to Web-workers for a smoother operation.</p>
 
 <div align="center">
     <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/asterix_arq.drawio.png"  width = 80%>
@@ -210,8 +216,8 @@ export class Cat10 {
 
 </details>
 
-Cat10 contains all the data items that can appear in Eurocontrol's SURVAILLANCE DATA EXCHANGE Part 7: Category 010 document. This will consist on the transmission of data by mainly airport sensors.
-During decoding this class is going to be utilized to parse all the binary data in to the corresponding fields.
+<p align="justify">Cat10 contains all the data items that can appear in Eurocontrol's SURVAILLANCE DATA EXCHANGE Part 7: Category 010 document. This will consist on the transmission of data by mainly airport sensors.<br>
+During decoding this class is going to be utilized to parse all the binary data in to the corresponding fields.</p>
 
 <details>
   <summary><h5>Cat21 (click to expand)</h5></summary>
@@ -425,8 +431,8 @@ export interface WGS_84_coordinates {
 
 </details>
 
-Cat21 contains all the data items that can appear in Eurocontrol's SURVAILLANCE DATA EXCHANGE Part 12: Category 021 document. This will consist on ADS-B reports.
-During decoding this class is going to be utilized to parse all the binary data in to the corresponding fields.
+<p align="justify">Cat21 contains all the data items that can appear in Eurocontrol's SURVAILLANCE DATA EXCHANGE Part 12: Category 021 document. This will consist on ADS-B reports.<br>
+During decoding this class is going to be utilized to parse all the binary data in to the corresponding fields.</p>
 
 <details>
   <summary><h5>Plane (click to expand)</h5></summary>
@@ -447,8 +453,8 @@ export interface Plane {
 ```
 
 </details>
-  Type class that marks a template for the information related with a Plane. This template is used for keeping track of the different planes during simulation. A derivative of this interface is also used holding SMR, MLAT and ADS-B information.
-  Messages are discriminated by track number or target address depending on application.
+ <p align="justify"> Type class that marks a template for the information related with a Plane. This template is used for keeping track of the different planes during simulation. A derivative of this interface is also used holding SMR, MLAT and ADS-B information.<br>
+  Messages are discriminated by track number or target address depending on application.</p>
 </details>
 <details>
   <summary><h3><img src="https://media.giphy.com/media/iY8CRBdQXODJSCERIr/giphy.gif" width="25"> Eurocae ED-117 Parameters</h3></summary>  
@@ -507,7 +513,7 @@ export interface Plane {
       <h5>Map and simulation</h5>
   <p align="justify">The simulation controls allow you to start, stop and restart the simulation. Also, move forwards and backwards, and change the speed of the simulation time. Decide what traffic you want to see and if you want to see or hide the different areas of the airport. By clicking on the path of an airplane you will be able to consult the main information that its message contained at that moment, you can also view the airplanes in 3D!</p>
     <div align="center">
-       <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DemoFalseIdentification.PNG" width = 80%>
+       <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/MapSimulation.gif" width = 80%>
   </div>
   <h5>Explore all the data</h5>
   <p align="justify">Look at all the information that the different data items of the messages offer you. Filter by category, by system, by type of message. Search for a specific target address, target identification or track number and much more.</p>
