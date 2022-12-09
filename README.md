@@ -534,13 +534,13 @@ export interface Plane {
 
 <h3>📄 Bibliography</h3>
 
-<div class="csl-entry"><i>EUROPEAN ORGANISATION FOR THE SAFETY OF AIR NAVIGATION EUROPEAN AIR TRAFFIC MANAGEMENT EUROCONTROL STANDARD DOCUMENT FOR SURVEILLANCE DATA EXCHANGE Part 7 : Category 010 Transmission of Monosensor Surface Movement Data</i>. (n.d.).</div>
+<div class="csl-entry"><i> - EUROPEAN ORGANISATION FOR THE SAFETY OF AIR NAVIGATION EUROPEAN AIR TRAFFIC MANAGEMENT EUROCONTROL STANDARD DOCUMENT FOR SURVEILLANCE DATA EXCHANGE Part 7 : Category 010 Transmission of Monosensor Surface Movement Data</i>. (n.d.).</div>
 
-<div class="csl-entry"><i>EUROPEAN ORGANISATION FOR THE SAFETY OF AIR NAVIGATION SURVEILLANCE DATA EXCHANGE Part 12 : Category 021 ADS-B Reports</i>. (n.d.).</div>
+<div class="csl-entry"><i> - EUROPEAN ORGANISATION FOR THE SAFETY OF AIR NAVIGATION SURVEILLANCE DATA EXCHANGE Part 12 : Category 021 ADS-B Reports</i>. (n.d.).</div>
 
-<div class="csl-entry"><i>All Purpose Structured EUROCONTROL Surveillance Information Exchange (ASTERIX) EUROCONTROL Specification for Surveillance Data Exchange-Part 1 Edition: 2.4 Edition</i>. (n.d.). www.eurocontrol.int</div>
+<div class="csl-entry"><i> - All Purpose Structured EUROCONTROL Surveillance Information Exchange (ASTERIX) EUROCONTROL Specification for Surveillance Data Exchange-Part 1 Edition: 2.4 Edition</i>. (n.d.). www.eurocontrol.int</div>
 
-<div class="csl-entry"><i>MINIMUM OPERATIONAL PERFORMANCE SPECIFICATION FOR MODE S MULTILATERATION SYSTEMS FOR USE IN ADVANCED SURFACE MOVEMENT GUIDANCE AND CONTROL SYSTEMS (A-SMGCS) The European Organisation for Civil Aviation Equipment L’Organisation Européenne pour l’Equipement de l’Aviation Civile</i>. (2003).</div>
+<div class="csl-entry"><i> - MINIMUM OPERATIONAL PERFORMANCE SPECIFICATION FOR MODE S MULTILATERATION SYSTEMS FOR USE IN ADVANCED SURFACE MOVEMENT GUIDANCE AND CONTROL SYSTEMS (A-SMGCS) The European Organisation for Civil Aviation Equipment L’Organisation Européenne pour l’Equipement de l’Aviation Civile</i>. (2003).</div>
 
 <h3>       <picture><img src = "https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/about_me.gif" width = 25px></picture> Contributors</h3>
 
