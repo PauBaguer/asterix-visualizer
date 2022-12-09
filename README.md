@@ -36,8 +36,14 @@ The Renderer thread is divided in files describing the rendered objects and page
     </div>
 
   <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
-Backend</h4>
+Libraries utilized & software Stack</h4>
+
+<div align="center">
+    <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/libraries.drawio.png"  width = 80%>
+    </div>
+
 <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
+
 Frontend</h4>
 
 <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
@@ -123,7 +129,6 @@ Main Data Classes</h4>
        <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DemoFalseIdentification.PNG" width = 80%>
   <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DemoAccuracy.PNG" width = 80%>
   </div>
-
 
 </details>
 <i class="fa-regular fa-up-right-from-square"></i>
