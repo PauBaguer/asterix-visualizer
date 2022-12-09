@@ -94,11 +94,342 @@ export class Cat10 {
   system_status: SystemStatus;
 
 [...]
+
+  interface DataSourceIdentifier {
+    SAC: string;
+    SIC: string;
+  }
+
+  interface TargetReportDescription {
+    TYP: string;
+    DCR: string;
+    CHN: string;
+    GBS: string;
+    CRT: string;
+    SIM?: string;
+    TST?: string;
+    RAB?: string;
+    LOP?: string;
+    TOT?: string;
+    SPI?: string;
+  }
+
+  interface WGS_84_coordinates {
+    latitude: number;
+    longitude: number;
+  }
+
+  interface PolarCoordinates {
+    r: number;
+    theta: number;
+  }
+
+  interface CartesianCoordinates {
+    x: number;
+    y: number;
+  }
+
+  interface Mod3ACode {
+    V: string;
+    G: string;
+    L: string;
+    Mode: string;
+  }
+
+  interface FlightLevel {
+    V: string;
+    G: string;
+    FlightLevel: string;
+  }
+
+  interface TrackStatus {
+    CNF: string;
+    TRE: string;
+    CST: string;
+    MAH: string;
+    TCC: string;
+    STH: string;
+    TOM?: string;
+    DOU?: string;
+    MRS?: string;
+    GHO?: string;
+  }
+
+  interface CalculatedAcceleration {
+    Ax: number;
+    Ay: number;
+  }
+
+  interface TargetIdentification {
+    STI: string;
+    target_identification: string;
+  }
+
+  interface TargetSizeAndOrientation {
+    Lenght: string;
+    Orinetation?: string;
+    Width?: string;
+  }
+
+  interface Presence {
+    DRHO: string;
+    DTHETA: string;
+  }
+
+  interface PreprogrammedMessage {
+    TRB: string;
+    MSG: string;
+  }
+
+  interface StandardDeviationOfPosition {
+    X_component: string;
+    Y_component: string;
+    Covariance: string;
+  }
+
+  interface SystemStatus {
+    NOGO: string;
+    OVL: string;
+    TSV: string;
+    DIV: string;
+    TTF: string;
+  }
 }
 ```
 
 </details>
 
+<details>
+  <summary><h5>Cat21</h5></summary>
+
+```ts
+export class Cat21 {
+  id: number;
+  class: "Cat21";
+  instrument: "ADS-B";
+  aircraft_operational_status: AircraftOperationalStatus;
+  data_source_identifier: DataSourceIdentifier;
+  service_identification: string;
+  service_management: string;
+  emitter_category: string;
+  target_report_descriptor: TargetReportDescriptor;
+  mod_3A_code: string;
+  time_applicability_position: number;
+  time_applicability_velocity: number;
+  time_message_reception_position: number;
+  time_message_reception_position_high: number;
+  time_message_reception_velocity: number;
+  time_message_reception_velocity_high: number;
+  time_ASTERIX_report_transmission: number;
+  target_address: string;
+  quality_indicator: QualityIndicator;
+  tarjectory_intent: TrajectoryIntent;
+  wgs_84_coordinates: WGS_84_coordinates;
+  wgs_84_coordinates_high: WGS_84_coordinates;
+  message_amplitude: string;
+  geometric_height: string;
+  flight_level: string;
+  selected_altitude: SelectedAltitude;
+  final_state_selected_altitude: FinalStateSelectedAltitude;
+  air_speed: string;
+  true_airspeed: string;
+  magnetic_heading: string;
+  barometric_vertical_rate: string;
+  geometric_vertical_rate: string;
+  airborne_ground_vector: AirborneGroundVector;
+  track_number: number;
+  track_angle_rate: string;
+  target_identification: string;
+  target_status: TargetStatus;
+  mops_version: MOPSv;
+  met_information: MetInformation;
+  roll_angle: string;
+  mode_s_mb_data: string[];
+  acas_resolution_advisory_report: ACAS_ResolutioinAdvisorReport;
+  surface_capabilities_and_characteristics: SurfaceCapabilitiesAndCharacteristics;
+  //data_ages
+  receiver_ID: string;
+  Aircraft_Operational_Status_age: number;
+  Target_Report_Descriptor_age: number;
+  Mode_3A_Code_age: number;
+  Quality_Indicators_age: number;
+  Trajectory_Intent_age: number;
+  Message_Amplitude_age: number;
+  Geometric_Height_age: number;
+  Flight_Level_age: number;
+  Intermediate_State_Selected_Altitude_age: number;
+  Final_State_Selected_Altitude_age: number;
+  Air_Speed_age: number;
+  True_Air_Speed_age: number;
+  Magnetic_Heading_age: number;
+  Barometric_Vertical_Rate_age: number;
+  Geometric_Vertical_Rate_age: number;
+  Ground_Vector_age: number;
+  Track_Angle_Rate_age: number;
+  Target_Identification_age: number;
+  Target_Status_age: number;
+  Met_Information_age: number;
+  Roll_Angle_age: number;
+  ACAS_Resolution_Advisory_age: number;
+  Surface_Capabilities_and_Characteristics_age: number;
+  Pic_accuracy: number;
+
+[...]
+
+interface AircraftOperationalStatus {
+  RA: string;
+  TC: string;
+  TS: string;
+  ARV: string;
+  CDTI: string;
+  TCAS: string;
+  SA: string;
+}
+
+interface DataSourceIdentifier {
+  SAC: string;
+  SIC: string;
+}
+
+interface TargetReportDescriptor {
+  ATP: string;
+  ARC: string;
+  RC: string;
+  RAB: string;
+  DCR?: string;
+  GBS?: string;
+  SIM?: string;
+  TST?: string;
+  SAA?: string;
+  CL?: string;
+  IPC?: string;
+  NOGO?: string;
+  CPR?: string;
+  LDPJ?: string;
+  RCF?: string;
+}
+
+interface QualityIndicator {
+  NUCr_or_NACv?: string;
+  NUCp_or_NIC?: string;
+  NICBARO?: string;
+  SIL?: string;
+  NACp?: string;
+  SILsupplement?: string;
+  SDA?: string;
+  GVA?: string;
+  PIC?: string;
+}
+
+interface TrajectoryIntent {
+  TIS: boolean;
+  NAV?: string;
+  NVB?: string;
+  TID: boolean;
+  TIDvec?: TIData[];
+}
+
+interface TIData {
+  TCA: string;
+  NC: string;
+  TCPnumber: string;
+  Altitude: string;
+  Latitude: string;
+  Longitud: string;
+  PointType: string;
+  TD: string;
+  TRA: string;
+  TOA: string;
+  TOV: string;
+  TTR: string;
+}
+
+interface SelectedAltitude {
+  SAS: string;
+  Source: string;
+  Altitude: string;
+}
+
+interface FinalStateSelectedAltitude {
+  MV: string;
+  AH: string;
+  AM: string;
+  Altitude: string;
+}
+
+interface AirborneGroundVector {
+  GroundSpeed: string;
+  TrackAngle: string;
+}
+
+interface TargetStatus {
+  ICF: string;
+  LNAV: string;
+  PS: string;
+  SS: string;
+}
+
+interface MOPSv {
+  VNS: string;
+  VN: string;
+  LTT: string;
+}
+
+interface MetInformation {
+  WS?: string;
+  WD?: string;
+  TMP?: string;
+  TRB?: string;
+}
+
+interface ACAS_ResolutioinAdvisorReport {
+  TYP: string;
+  STYP: string;
+  ARA: string;
+  RAC: string;
+  RAT: string;
+  MTE: string;
+  TTI: string;
+  TID: string;
+}
+
+interface SurfaceCapabilitiesAndCharacteristics {
+  POA: string;
+  CDTI: string;
+  B2low: string;
+  RAS: string;
+  IDENT: string;
+  LW?: string;
+}
+
+export interface WGS_84_coordinates {
+  latitude: number;
+  longitude: number;
+}
+
+```
+
+</details>
+
+<details>
+  <summary><h5>Plane</h5></summary>
+
+```ts
+export interface Plane {
+  latitude: number;
+  longitude: number;
+  level: number; //FL
+  geometric_height: number; //ft
+  target_identification: string;
+  target_address: string;
+  graphic: Graphic | undefined;
+  pathGraphic: Graphic | undefined;
+  heading: number;
+  adsb_msgs: Cat21[];
+}
+```
+
+</details>
 </details>
 <details>
   <summary><h3><img src="https://media.giphy.com/media/iY8CRBdQXODJSCERIr/giphy.gif" width="25"> Eurocae ED-117 Parameters</h3></summary>  
