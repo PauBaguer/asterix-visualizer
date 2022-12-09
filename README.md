@@ -11,10 +11,21 @@
 
 <details>
   <summary><h3>📝 Structure</h3></summary>
+
+  <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
+General Structure Diagram</h4>
+
+<div align="center">
+    <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/asterix_arq.drawio.png"  width = 80%>
+    </div>
+
   <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
 Backend</h4>
 <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
 Frontend</h4>
+
+<h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
+Main Data Classes</h4>
   
 </details>
 <details>
@@ -84,7 +95,6 @@ Frontend</h4>
   <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DataKml.gif" width = 80%>
   </div>
 
-
 </details>
 <i class="fa-regular fa-up-right-from-square"></i>
 
@@ -96,7 +106,6 @@ Frontend</h4>
 - Adrià Calvo
 - Andrea Pujals
 - Mireia Carvajal
-
 
 <div align="center">
   <img  src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/grid-snake.svg"
