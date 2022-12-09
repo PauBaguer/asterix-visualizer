@@ -530,6 +530,11 @@ export interface Plane {
   <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/DemoAccuracy.PNG" width = 80%>
   </div>
 
+<h5>Other extras</h5>
+    <p align="justify">
+    - Data Item I021/090 Quality Indicators decodification
+    </p>
+
 </details>
 
 <details>

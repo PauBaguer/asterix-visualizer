@@ -5,7 +5,10 @@ import { join } from "path";
 export async function openFilePicker() {
   console.log("OPEN FILE PICKER");
 
-  const res = await dialog.showOpenDialog({ properties: ["openFile"] });
+  const res = await dialog.showOpenDialog({
+    properties: ["openFile"],
+    filters: [{ name: "Binary", extensions: ["ast"] }],
+  });
 
   if (res.filePaths === undefined) {
     console.log("No file selected");
