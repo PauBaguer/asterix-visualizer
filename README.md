@@ -199,6 +199,9 @@ export class Cat10 {
 
 </details>
 
+Cat10 contains all the data items that can appear in Eurocontrol's SURVAILLANCE DATA EXCHANGE Part 7: Category 010 document. This will consist on the transmission of data by mainly airport sensors.
+During decoding this class is going to be utilized to parse all the binary data in to the corresponding fields.
+
 <details>
   <summary><h5>Cat21</h5></summary>
 
@@ -411,6 +414,9 @@ export interface WGS_84_coordinates {
 
 </details>
 
+Cat21 contains all the data items that can appear in Eurocontrol's SURVAILLANCE DATA EXCHANGE Part 12: Category 021 document. This will consist on ADS-B reports.
+During decoding this class is going to be utilized to parse all the binary data in to the corresponding fields.
+
 <details>
   <summary><h5>Plane</h5></summary>
 
@@ -430,6 +436,8 @@ export interface Plane {
 ```
 
 </details>
+  Type class that marks a template for the information related with a Plane. This template is used for keeping track of the different planes during simulation. A derivative of this interface is also used holding SMR, MLAT and ADS-B information.
+  Messages are discriminated by track number or target address depending on application.
 </details>
 <details>
   <summary><h3><img src="https://media.giphy.com/media/iY8CRBdQXODJSCERIr/giphy.gif" width="25"> Eurocae ED-117 Parameters</h3></summary>  
