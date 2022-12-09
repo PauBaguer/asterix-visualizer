@@ -5,6 +5,8 @@
 
 <h2>Windows Insaller <a href="https://drive.google.com/file/d/1WlXx4roW8zsHD-r-6kqVpVRViwYNzflQ/view?usp=sharing" >Download Link</a>!</h2>
 
+<h4 align="center">Click to expand the different sections!</h4>
+</div>
 <details>
   <summary><h3>👋 Introduction</h3></summary>
 </details>
@@ -60,7 +62,7 @@ Main Data Classes</h4>
 Given the nature of the Javascript language, only a few data classes have been used. On this section we explain them.
 
 <details>
-  <summary><h5>Cat10</h5></summary>
+  <summary><h5>Cat10 (click to expand)</h5></summary>
 
 ```ts
 export class Cat10 {
@@ -203,7 +205,7 @@ Cat10 contains all the data items that can appear in Eurocontrol's SURVAILLANCE 
 During decoding this class is going to be utilized to parse all the binary data in to the corresponding fields.
 
 <details>
-  <summary><h5>Cat21</h5></summary>
+  <summary><h5>Cat21 (click to expand)</h5></summary>
 
 ```ts
 export class Cat21 {
@@ -418,7 +420,7 @@ Cat21 contains all the data items that can appear in Eurocontrol's SURVAILLANCE 
 During decoding this class is going to be utilized to parse all the binary data in to the corresponding fields.
 
 <details>
-  <summary><h5>Plane</h5></summary>
+  <summary><h5>Plane (click to expand)</h5></summary>
 
 ```ts
 export interface Plane {
