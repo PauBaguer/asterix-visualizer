@@ -15,6 +15,22 @@
   <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
 General Structure Diagram</h4>
 
+The general architecture of the program consists on two main threads provided by an Electron App. All Electron Apps have two main processes called Main and Renderer. They can be thought of a typical server-client relation where the Renderer is a Web client and the Main thread is the server. Communication between both of them is handled by the Inter-process communication (IPC) which is a fast HTTP based information exchange. Both threads have its Workers. Workers allow the creation of new processes that are separate from the parent process thus not blocking the application on calculation-intensive tasks. Heavy calculations like file decoding, file writing and performance parameters calculations have been offloaded to Workers.
+
+The Main thread consists on the main file (index.ts) that will launch the application and the Renderer thread. On the other hand, several functions (IPC-triggered functions) will be executed based on events sent by the Renderer (such as open a file, or give me the first 10 messages from a list). The functions are:
+
+- loadFileIpc: open the file picker and load a file.
+- sliceMainBuffer: divide a file Buffer into several Buffers containing individual messages.
+- getMessagesIpcWorker: decode all the buffers in a Worker. Calls the cat10_decoder and cat21_decoder classes which handle the decoding of each message.
+- getMessagesIpcSlices: send me 10000 messages.
+- startCalculationOfPerformanceData: start the calculation of the performance parameters.
+- parametersResults: send me the results from the parameter calculation.
+- writeCsvFile: Write a csv file in a separate Worker.
+- writeKmlFile: Write a kml file in a separate Worker.
+- tableProtocol: Apply filters, search and give me the messages I need to render in the table based on current page.
+
+The Renderer thread is divided in files describing the rendered objects and pages (.svelte) and the scripts (.ts) which handle the Map and Simulation logic. The main HTTP based Svelte files are App.svelte (general structure and Map), ExpandableTable.svelte (Table view) and Parameters.svelte (performance parameters view). The scripts consist on map.ts (initializing the map), graphicsLayer.ts (3D objects logic and layer management), groundLayer.ts (ground markers and layer management) and areaLayer.ts (ground areas definition). Finally Simulation.svelte handles the Sim logic and its rendered controls. Some of this work is distributed to Web-workers for a smoother operation.
+
 <div align="center">
     <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/asterix_arq.drawio.png"  width = 80%>
     </div>
