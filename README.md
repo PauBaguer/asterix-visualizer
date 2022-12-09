@@ -15,6 +15,8 @@
   <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
 General Structure Diagram</h4>
 
+This Application has been created using the Web technologies explained in a section below. As a consequence the primary languages used have been Javascript (as Typescript), HTML and CSS.
+
 The general architecture of the program consists on two main threads provided by an Electron App. All Electron Apps have two main processes called Main and Renderer. They can be thought of a typical server-client relation where the Renderer is a Web client and the Main thread is the server. Communication between both of them is handled by the Inter-process communication (IPC) which is a fast HTTP based information exchange. Both threads have its Workers. Workers allow the creation of new processes that are separate from the parent process thus not blocking the application on calculation-intensive tasks. Heavy calculations like file decoding, file writing and performance parameters calculations have been offloaded to Workers.
 
 The Main thread consists on the main file (index.ts) that will launch the application and the Renderer thread. On the other hand, several functions (IPC-triggered functions) will be executed based on events sent by the Renderer (such as open a file, or give me the first 10 messages from a list). The functions are:
@@ -38,17 +40,65 @@ The Renderer thread is divided in files describing the rendered objects and page
   <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
 Libraries utilized & software Stack</h4>
 
+The main libraries utilized to produce this Web Application are the following:
+
+- ElectronJS: Allows the creation of a Web based Desktop application for any platform (Windows, MacOS or Linux). The main architecture it provides is explained above.
+- Typescript: provides type-safety on top of Javascript for a more smooth developer experience.
+- Svelte.js: Frontend compiler that provides a reactive DOM and faster performance to create rich Web Applications.
+- ArcGIS API for JavaScript: Lightweight yet powerful library for embedding maps and data visualization in web applications.
+- Bootstrap 5: CSS Framework that provides several UI components such as buttons, menus, sliders...
+
+Other libraries used consist on Geolib for coordinate conversion and geometric operations, GeoJSON to quickly convert to KML and Array-search for searches.
+
 <div align="center">
     <img src="https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/libraries.drawio.png"  width = 80%>
     </div>
 
 <h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
-
-Frontend</h4>
-
-<h4><img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="15">
 Main Data Classes</h4>
   
+Given the nature of the Javascript language, only a few data classes have been used. On this section we explain them.
+
+<details>
+  <summary><h5>Cat10</h5></summary>
+
+<code lang="ts">
+export class Cat10 {
+  id: number;
+  class: "Cat10";
+  message_type: string;
+  instrument: string;
+  data_source_identifier: DataSourceIdentifier;
+  target_report_description: TargetReportDescription;
+  wgs_84_coordinates: WGS_84_coordinates;
+  polar_coordinates: PolarCoordinates;
+  cartesian_coordinates: CartesianCoordinates;
+  calculated_track_velocity_polar_coordinates: PolarCoordinates;
+  calculated_track_velocity_cartesian_coordinates: CartesianCoordinates;
+  mod_3A_code: Mod3ACode;
+  flight_level: FlightLevel;
+  measured_height: string;
+  amplitude_of_primary_plot: number;
+  time_of_day: number;
+  track_number: number;
+  track_status: TrackStatus;
+  calculated_acceleration: CalculatedAcceleration;
+  target_address: string;
+  target_identification: TargetIdentification;
+  mode_s_mb_data: string[];
+  target_size_and_orientation: TargetSizeAndOrientation;
+  presence: Presence[];
+  vehicle_fleet_identification: string;
+  preprogrammed_message: PreprogrammedMessage;
+  standard_deviation_of_position: StandardDeviationOfPosition;
+  system_status: SystemStatus;
+
+[...]
+}
+</code>
+
+</details>
+
 </details>
 <details>
   <summary><h3><img src="https://media.giphy.com/media/iY8CRBdQXODJSCERIr/giphy.gif" width="25"> Eurocae ED-117 Parameters</h3></summary>  
