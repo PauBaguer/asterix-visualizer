@@ -4,9 +4,17 @@
 </div>
 
 <h2>Windows Insaller <a href="https://drive.google.com/file/d/1WlXx4roW8zsHD-r-6kqVpVRViwYNzflQ/view?usp=sharing" >Download Link</a>!</h2>
-
 <details>
   <summary><h3>👋 Introduction</h3></summary>
+  <p align="justify">The ASTERIX (stands for All Purpose STructured Eurocontrol SuRveillance Information EXchange) protocol, is an ATM Surveillance Data Binary Messaging Format which allows the exchanging of information between any surveillance and automation system. ASTERIX is designed for communication media with limited bandwidth, this is why it follows rules that enable it to transmit all the information needed, with the smallest data load possible and without any loss of information during the whole process. </p>
+    <p align="justify">This software only decodes Cat 10 for SMR and MLAT and Cat 21 for ADS-B, with the aim of analyzing real traffic on the Airport Surface (SMR and MLAT), in approx/takeoffs (MLAT) and analyzing ADS-B trajectories in Airport surface and in flight.</p>
+
+<p align="justify">This software only decodes Cat 10 for SMR and MLAT and Cat 21 for ADS-B, with the aim of analyzing real traffic on the Airport Surface (SMR and MLAT), in approx/takeoffs (MLAT) and analyzing ADS-B trajectories in Airport surface and in flight.</p>
+<h4>Cat10</h4>
+<p align="justify">The SMR system (surface radar is a non-cooperative surveillance system) is capable of detecting and locating targets, whether mobile or fixed, in airport maneuvering and parking areas.</p>
+<p align="justify">The MLAT (Multilateration) system consists of receiving the signal transmitted from an aircraft or vehicle on the ground by several sensors in the vicinity. It is based on the TDOA principle (Time Differential Of Arrival), the difference in arrival time between the signals of a transponder received in several receivers. For the positioning of a target in 3D, at least 4 receivers are necessary.</p>
+<h4>Cat21</h4>
+<p align="justify">In the ADS (Automatic Dependent Surveillance) system, it is the aircraft that supplies the information automatically, through a data link (satellite, VHF, HF, Mode S). The information is obtained from the on-board positioning and navigation systems, and includes the flight identifier, the time, immediate maneuvers of the aircraft, radii of gyration, type of aircraft, among others.</p>
 </details>
 
 <details>
@@ -520,7 +528,11 @@ export interface Plane {
   </div>
 
 </details>
-<i class="fa-regular fa-up-right-from-square"></i>
+
+
+<h3>📄 Bibliography</h3>
+- 
+
 
 <h3>       <picture><img src = "https://github.com/PauBaguer/asterix-visualizer/blob/master/assets/about_me.gif" width = 25px></picture> Contributors</h3>
 
